@@ -1,9 +1,0 @@
-# Navigate to project
-cd wind-tunnel-rpi-LLM
-
-# Pull latest changes
-git pull origin main
-
-# Restart Flask app
-pkill -f flask_app.py
-python3 flask_app.py
