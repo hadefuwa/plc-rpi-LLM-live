@@ -60,12 +60,13 @@ template = '''
     <style>
         body { 
             font-family: Arial, sans-serif; 
-            margin: 20px; 
+            margin: 0; 
+            padding: 0;
             background-color: #f5f5f5;
         }
         .container { 
-            max-width: 1200px; 
-            margin: 0 auto; 
+            max-width: 100%; 
+            margin: 0; 
             background-color: white;
             padding: 20px;
             border-radius: 10px;
@@ -134,14 +135,23 @@ template = '''
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
+            font-size: 12px;
+            table-layout: fixed;
         }
         .table th, .table td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 6px;
             text-align: left;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         .table th {
             background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .table-responsive {
+            overflow-x: auto;
+            margin: 20px 0;
         }
         .metrics {
             display: flex;
@@ -164,7 +174,7 @@ template = '''
 <body>
     <div class="container">
         <h1>E-Stop AI Status Reporter</h1>
-        <p>Monitor PLC system status and generate intelligent operator reports using Phi-3 Mini AI</p>
+        <p>Monitor PLC system status and generate intelligent operator reports using Gemma3B 1B AI</p>
         
         <h2>System Overview</h2>
         <div class="metrics">
@@ -183,7 +193,9 @@ template = '''
         </div>
         
         <h2>System Events</h2>
-        {{ data_table|safe }}
+        <div class="table-responsive">
+            {{ data_table|safe }}
+        </div>
         
         <h2>System Monitoring</h2>
         <div id="plot1" class="plot"></div>
@@ -192,7 +204,7 @@ template = '''
         <div id="plot4" class="plot"></div>
         
         <div class="ai-section">
-            <h2>AI Analysis with Phi-3 Mini</h2>
+            <h2>AI Analysis with Gemma3B 1B</h2>
             <p>Ask questions about the PLC system status and get AI-powered operator insights!</p>
             
             <div>
@@ -227,7 +239,7 @@ template = '''
                 <li>Temperature_High: High temperature indicator (0=OK, 1=HIGH)</li>
                 <li>Flow_Rate: System flow rate in L/min</li>
             </ul>
-            <p><strong>AI Model:</strong> Phi-3 Mini running locally via Ollama<br>
+            <p><strong>AI Model:</strong> Gemma3B 1B running locally via Ollama<br>
             <strong>Visualization:</strong> Interactive Plotly charts<br>
             <strong>Framework:</strong> Flask</p>
         </div>
