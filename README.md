@@ -1,54 +1,63 @@
-# Wind Tunnel Data Explorer with AI Analysis
+# E-Stop AI Status Reporter
 
-A powerful Flask web application for analyzing wind tunnel aerodynamic test data with AI-powered insights. Features interactive visualizations and intelligent chat interface powered by the Gemma3 1B language model running locally via Ollama.
+A Python application running on a Raspberry Pi that monitors Siemens S7 PLC systems and generates intelligent operator reports when emergency stops are triggered. Features real-time IO monitoring, local AI analysis, and web-based reporting powered by local Large Language Models.
 
 ## What This App Does
 
-This Flask application provides a comprehensive platform for aerodynamic data analysis with:
+When an E-Stop is pressed on a Siemens S7 PLC, this application:
 
-- **Interactive Data Visualization**: Four different chart types showing aerodynamic relationships
-- **AI-Powered Analysis**: Ask natural language questions about your wind tunnel data
-- **Expert Insights**: Get technical explanations of aerodynamic phenomena
-- **Educational Tool**: Perfect for students and engineers learning aerodynamics
-- **Privacy-First**: All AI processing happens locally on your device
+- **Monitors E-Stop State**: Continuously polls the PLC for emergency stop activation
+- **Reads System IO**: Captures all critical input/output states when E-Stop is triggered
+- **Generates AI Reports**: Uses local LLM to create human-readable operator reports
+- **Web Display**: Shows reports on a simple web interface accessible from any device on the LAN
 
 ## Key Features
 
-### Data Visualization
-- **Lift vs Angle of Attack**: See how lift force changes with wing angle
-- **Drag vs Angle of Attack**: Analyze drag characteristics across angles
-- **Lift-Drag Polar Diagram**: Classical aerodynamic performance plot
-- **Coefficient Analysis**: Compare lift (Cl) and drag (Cd) coefficients
+### PLC Integration
+- **Siemens S7 Support**: Compatible with S7-1200, S7-1500, S7-300, and S7-400 series
+- **Real-time Monitoring**: Continuous polling of digital and analog inputs/outputs
+- **Configurable IO**: Define which signals to monitor and report on
+- **Ethernet Communication**: Direct IP connection to PLC
 
-### AI Chat Interface
-- Ask questions in plain English about your data
-- Get concise, technical explanations (2-3 sentences)
-- Example queries:
-  - "What is the optimal angle of attack for maximum lift?"
-  - "At what angle does stall occur?"
-  - "What's the best lift-to-drag ratio?"
-  - "Explain the aerodynamic behavior in this data"
+### AI-Powered Reporting
+- **Local LLM Processing**: Uses Ollama with lightweight models (Phi-3 Mini recommended)
+- **Intelligent Analysis**: Converts raw IO states into actionable operator reports
+- **Custom Prompts**: Template-based reporting with system-specific context
+- **Privacy-First**: All processing happens locally, no data leaves your network
 
-### Technical Specifications
-- **Framework**: Flask web application for universal compatibility
-- **AI Model**: Gemma3 1B (815MB) - optimized for local deployment
-- **Visualizations**: Interactive Plotly.js charts
-- **Data Format**: Standard aerodynamic CSV format
-- **Deployment**: Raspberry Pi ready with ARM compatibility
+### Web Interface
+- **Flask Web Server**: Lightweight, responsive web application
+- **Real-time Updates**: View latest E-Stop reports and system status
+- **Mobile-Friendly**: Accessible from phones, tablets, and computers
+- **Event Logging**: Optional history of E-Stop events and AI reports
+
+## System Overview
+
+### Hardware Requirements
+- **Raspberry Pi**: 4 or 5 recommended for LLM performance (8GB RAM preferred)
+- **Siemens S7 PLC**: 1200/1500/300/400 series with Ethernet capability
+- **Network**: Ethernet connection between Pi and PLC on same subnet
+
+### Software Stack
+- **Python 3.x**: Core application framework
+- **python-snap7**: S7 PLC communication library
+- **Flask**: Web interface and API
+- **Ollama**: Local LLM hosting (Phi-3 Mini or similar lightweight model)
 
 ## Quick Start
 
 ### Prerequisites
 - Python 3.8+
-- Ollama (for AI functionality)
-- 4GB+ RAM recommended (8GB for Raspberry Pi)
+- Raspberry Pi 4/5 (8GB RAM recommended)
+- Siemens S7 PLC with Ethernet connectivity
+- Ollama installed for local LLM
 
 ### Installation
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/hadefuwa/wind-tunnel-rpi-LLM.git
-cd wind-tunnel-rpi-LLM
+git clone https://github.com/hadefuwa/plc-rpi-LLM.git
+cd plc-rpi-LLM
 ```
 
 2. **Install Python dependencies**
@@ -56,26 +65,33 @@ cd wind-tunnel-rpi-LLM
 pip install -r requirements.txt
 ```
 
-3. **Install and setup Ollama**
+3. **Install Ollama and LLM model**
 ```bash
-# Linux/macOS/Raspberry Pi
+# Install Ollama
 curl -fsSL https://ollama.ai/install.sh | sh
 
-# Windows: Download from https://ollama.ai
-# Then pull the AI model:
-ollama pull gemma3:1b
+# Pull lightweight model (recommended for Pi)
+ollama pull phi3:mini
 ```
 
-4. **Run the Flask application**
+4. **Configure PLC connection**
+```python
+# Edit configuration in flask_app.py
+PLC_IP = "192.168.1.100"  # Your PLC IP address
+PLC_RACK = 0              # PLC rack number
+PLC_SLOT = 1              # PLC slot number
+```
+
+5. **Run the application**
 ```bash
 # Windows
 python flask_app.py
 
-# Linux/macOS/Raspberry Pi
+# Linux/Raspberry Pi
 python3 flask_app.py
 ```
 
-5. **Open in browser**: http://localhost:5000
+6. **Access web interface**: http://localhost:5000
 
 ## Easy Startup Scripts
 
@@ -85,152 +101,162 @@ python3 flask_app.py
 run.bat
 ```
 
-### Linux/macOS/Raspberry Pi
+### Linux/Raspberry Pi
 ```bash
 # Make executable and run:
 chmod +x run.sh
 ./run.sh
 ```
 
-## Data Format
+## Configuration
 
-Your CSV file should be named `wind_tunnel_test_data.csv` with these columns:
+### PLC Setup
+1. **Enable Put/Get**: In TIA Portal > Device > Properties > Protection & Security
+2. **Network Configuration**: Ensure Pi and PLC are on same subnet
+3. **IP Address**: Configure static IP for reliable communication
 
-| Column | Description | Units |
-|--------|-------------|-------|
-| `AoA (deg)` | Angle of Attack | degrees |
-| `Lift (mN)` | Lift Force | millinewtons |
-| `Cl` | Lift Coefficient | dimensionless |
-| `Drag (mN)` | Drag Force | millinewtons |
-| `Cd` | Drag Coefficient | dimensionless |
+### IO Configuration
+Define which inputs/outputs to monitor in the application:
 
-Example data structure:
-```csv
-AoA (deg),Lift (mN),Cl,Drag (mN),Cd
--10,150.2,0.125,45.1,0.038
--5,280.5,0.234,52.3,0.044
-0,420.8,0.351,61.2,0.051
-5,580.3,0.484,73.8,0.062
-10,720.1,0.601,89.5,0.075
+```python
+# Example IO configuration
+MONITORED_IO = {
+    'inputs': {
+        'emergency_stop': 'I0.0',
+        'tank_level_low': 'I0.1', 
+        'pump_running': 'I0.2',
+        'valve_open': 'I0.3'
+    },
+    'outputs': {
+        'motor_control': 'Q0.0',
+        'alarm_relay': 'Q0.1',
+        'valve_control': 'Q0.2'
+    }
+}
 ```
 
-## Raspberry Pi Deployment
+### AI Prompt Template
+Customize the AI prompt for your specific system:
 
-### SSH Installation
-```bash
-# Copy files to your Pi
-scp -r . pi@192.168.0.115:/home/pi/wind-tunnel-app/
+```python
+PROMPT_TEMPLATE = """
+The emergency stop has been pressed. Current system status:
+{io_summary}
 
-# SSH into Pi
-ssh pi@192.168.0.115
-
-# Setup and run
-cd wind-tunnel-app
-./run.sh
+Please write a short operator report (2-3 sentences) summarizing:
+1. Current system status
+2. Immediate safety concerns
+3. Recommended next actions
+"""
 ```
 
-### Pi Performance Notes
-- **Gemma3 1B**: Optimized for Raspberry Pi 4 (8GB RAM)
-- **Response Time**: 10-30 seconds per AI query (normal)
-- **Memory Usage**: ~2GB for model + 500MB for Flask
-- **Cooling**: Ensure adequate ventilation for sustained use
-
-## How the AI Works
-
-The Flask application uses a sophisticated prompt engineering approach:
-
-1. **Data Context**: Automatically includes your complete dataset in AI prompts
-2. **Technical Focus**: Prompts are tuned for aerodynamic analysis
-3. **Concise Responses**: Limited to 100 tokens (~75 words) for quick insights
-4. **Low Temperature**: Set to 0.1 for focused, technical responses
-5. **Local Processing**: No data leaves your device
-
-### Sample AI Conversation
-**User**: "What angle gives maximum lift?"  
-**AI**: "Maximum lift occurs at 15° angle of attack with 850.7 mN force (Cl = 0.709). Beyond this point, flow separation begins causing stall characteristics."
-
-## Flask Architecture
+## Functional Flow
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Flask App     │    │   Ollama API    │
-│   (HTML/JS)     │◄───┤   (Python)      │◄───┤   (Gemma3 1B)   │
-│   Plotly Charts │    │   Data Analysis │    │   AI Responses  │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   PLC       │    │   Python    │    │   Ollama    │    │   Web       │
+│   E-Stop    │───▶│   Monitor   │───▶│   LLM       │───▶│   Display   │
+│   Triggered │    │   & Read IO │    │   Analysis  │    │   Report    │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
 ```
 
-### Components
-- **flask_app.py**: Main Flask server with data processing and API endpoints
-- **Templates**: Embedded HTML/CSS/JavaScript for clean interface
-- **Static Assets**: Plotly.js for interactive visualizations
-- **AI Engine**: Local Ollama instance with Gemma3 1B model
+### Step-by-Step Process
+1. **E-Stop Detection**: Application continuously polls E-Stop input (e.g., I0.0)
+2. **IO Reading**: On trigger, reads all configured digital/analog IO states
+3. **Data Formatting**: Converts raw IO data into structured summary
+4. **AI Analysis**: Sends formatted data to local LLM with prompt template
+5. **Report Generation**: LLM generates human-readable operator report
+6. **Web Display**: Shows report on Flask web interface
 
-### Key Flask Routes
-- **`/`**: Main application interface
-- **`/chat`**: POST endpoint for AI queries
-- **`/test_ai`**: AI connection testing endpoint
+## Example AI Report
 
-## Educational Use Cases
+**Input Data:**
+```
+E-Stop: PRESSED
+Pump Running: OFF
+Tank Low Level: ON
+Valve Open: OFF
+Motor Control: OFF
+Alarm Relay: ON
+```
 
-### For Students
-- **Learn Aerodynamics**: Visualize how wing angle affects lift and drag
-- **Understand Stall**: See stall characteristics in real data
-- **Efficiency Analysis**: Explore lift-to-drag ratios
-- **Ask Questions**: Natural language interface for exploration
+**AI Generated Report:**
+```
+EMERGENCY STOP ACTIVATED - System Status Report
 
-### For Engineers
-- **Design Validation**: Analyze wing section performance
-- **Optimization**: Find optimal operating points
-- **Documentation**: Generate insights for reports
-- **Teaching**: Demonstrate concepts with real data
+The emergency stop has been triggered, immediately shutting down all motor operations. 
+The pump is currently stopped and the tank level is critically low. 
+The alarm relay is active, indicating system shutdown. 
+
+IMMEDIATE ACTIONS REQUIRED:
+1. Verify all personnel are safe and clear of equipment
+2. Investigate cause of emergency stop activation
+3. Check tank levels and refill if necessary
+4. Reset E-Stop only after safety inspection is complete
+```
+
+## Deployment Notes
+
+### Raspberry Pi Setup
+- **Memory**: 8GB RAM recommended for LLM performance
+- **Storage**: 32GB+ SD card for logs and application
+- **Cooling**: Ensure adequate ventilation for sustained operation
+- **Network**: Static IP configuration for reliable PLC communication
+
+### PLC Configuration
+- **Put/Get Access**: Must be enabled in TIA Portal
+- **Network Security**: Configure appropriate firewall rules
+- **IO Mapping**: Ensure monitored signals are properly configured
+- **Backup**: Keep PLC program backups before testing
+
+### Performance Considerations
+- **LLM Response Time**: 5-15 seconds typical for lightweight models
+- **Memory Usage**: ~2GB for LLM + 500MB for application
+- **Network Latency**: Keep Pi and PLC on same subnet for low latency
+- **Logging**: Monitor disk space for event logs
 
 ## Troubleshooting
 
 ### Common Issues
 
-**Flask app not starting?**
-- Check Python installation: `python --version`
-- Install dependencies: `pip install -r requirements.txt`
-- Ensure port 5000 is available
+**PLC Connection Failed?**
+- Verify IP address and network connectivity
+- Check Put/Get is enabled in TIA Portal
+- Ensure Pi and PLC are on same subnet
+- Test with ping: `ping 192.168.1.100`
 
-**Charts not loading?**
-- Check browser console for JavaScript errors
-- Ensure `wind_tunnel_test_data.csv` exists
-- Refresh the page
-
-**AI not responding?**
+**AI Not Responding?**
 - Verify Ollama is running: `ollama ps`
-- Check model is installed: `ollama list | grep gemma3`
-- Test connection: Click "Test AI Connection" button
+- Check model is installed: `ollama list`
+- Test LLM connection: Visit `/test_ai` endpoint
+- Monitor system resources: `htop`
 
-**Slow on Raspberry Pi?**
-- Normal behavior - AI processing takes time
-- Close other applications to free memory
+**Web Interface Not Loading?**
+- Check Flask is running: `python flask_app.py`
+- Verify port 5000 is available
+- Check firewall settings
+- Access via: `http://[PI_IP]:5000`
+
+**Slow Performance?**
+- Close unnecessary applications
+- Consider lighter LLM model (Phi-3 Mini)
+- Monitor memory usage: `free -h`
 - Ensure adequate cooling
 
-**Memory issues?**
-- Restart Ollama: `sudo systemctl restart ollama`
-- Monitor with `htop`
-- Consider adding swap space
+## Future Enhancements
 
-## Performance Optimization
+### Planned Features
+- **Email Alerts**: Automatic report distribution via email
+- **Historical Logging**: Database storage of all E-Stop events
+- **Custom Scenarios**: Different AI prompts based on IO combinations
+- **Mobile App**: Native mobile interface for operators
+- **Integration**: Connect with SCADA or MES systems
 
-### For Raspberry Pi
-```bash
-# Add swap space if needed
-sudo dphys-swapfile swapoff
-sudo nano /etc/dphys-swapfile  # Set CONF_SWAPSIZE=2048
-sudo dphys-swapfile swapon
-
-# Monitor performance
-htop
-watch -n 1 'free -h'
-```
-
-### For All Systems
-- **Close unnecessary applications** before running AI queries
-- **Use Chrome/Firefox** for best JavaScript performance
-- **Wait for responses** - AI processing takes time
+### Advanced Features
+- **Predictive Analysis**: AI prediction of potential issues
+- **Multi-PLC Support**: Monitor multiple PLCs simultaneously
+- **Custom Models**: Train specialized models for specific industries
+- **Cloud Integration**: Optional cloud backup and analytics
 
 ## Contributing
 
@@ -247,13 +273,13 @@ MIT License - feel free to use for educational and commercial purposes.
 
 ## Acknowledgments
 
+- **python-snap7**: For Siemens S7 PLC communication
 - **Ollama Team**: For local AI model deployment
-- **Google**: For the Gemma3 language model
-- **Plotly**: For interactive visualization library
-- **Flask**: For lightweight web framework
+- **Flask Team**: For lightweight web framework
+- **Microsoft**: For Phi-3 Mini language model
 
 ---
 
-**Built with care for aerodynamics education and research**
+**Built for industrial safety and operational efficiency**
 
-*Transform your wind tunnel data into insights with the power of local AI and Flask*
+*Transform your PLC emergency stops into intelligent, actionable insights*
