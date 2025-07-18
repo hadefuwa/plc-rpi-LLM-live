@@ -9,7 +9,7 @@ app = Flask(__name__)
 data = pd.read_csv('plc_io_data.csv')
 
 def query_ollama(prompt, data_summary):
-    """Send query to local Ollama API with Phi-3 Mini model"""
+    """Send query to local Ollama API with Gemma3B 1B model"""
     try:
         # Prepare the full prompt with data context
         full_prompt = f"""You are analyzing PLC system data for an industrial E-Stop monitoring system. Here is the dataset summary:
@@ -24,7 +24,7 @@ Please provide a clear, CONCISE technical analysis based on this PLC data. Keep 
         response = requests.post(
             "http://localhost:11434/api/generate",
             json={
-                "model": "phi3:mini",  # Using Phi-3 Mini model for better Pi performance
+                "model": "gemma3b:1b",  # Using Gemma3B 1B model for Pi compatibility
                 "prompt": full_prompt,
                 "stream": False,
                 "options": {
@@ -404,7 +404,7 @@ def test_ollama():
         response = requests.post(
             "http://localhost:11434/api/generate",
             json={
-                "model": "phi3:mini",
+                "model": "gemma3b:1b",
                 "prompt": "Hello, respond with 'AI is working!'",
                 "stream": False
             }

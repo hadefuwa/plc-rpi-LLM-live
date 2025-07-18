@@ -62,7 +62,7 @@ pip install -r requirements.txt
 3. **Install and configure Ollama**
 ```bash
 # Download and install Ollama from https://ollama.ai
-ollama pull phi3:mini
+ollama pull gemma3b:1b
 ollama serve
 ```
 
@@ -114,7 +114,7 @@ sudo systemctl enable ollama
 sudo systemctl start ollama
 
 # Pull the lightweight model
-ollama pull phi3:mini
+ollama pull gemma3b:1b
 ```
 
 5. **Run as a service (recommended)**

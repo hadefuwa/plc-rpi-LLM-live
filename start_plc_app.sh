@@ -23,10 +23,10 @@ if ! curl -s http://localhost:11434/api/tags > /dev/null; then
     sleep 5
 fi
 
-# Check if Phi-3 Mini model is available
-if ! ollama list | grep -q "phi3:mini"; then
-    echo "Downloading Phi-3 Mini model..."
-    ollama pull phi3:mini
+# Check if Gemma3B 1B model is available
+if ! ollama list | grep -q "gemma3b:1b"; then
+    echo "Downloading Gemma3B 1B model..."
+    ollama pull gemma3b:1b
 fi
 
 # Start the Flask application
