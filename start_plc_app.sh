@@ -23,10 +23,19 @@ if ! curl -s http://localhost:11434/api/tags > /dev/null; then
     sleep 5
 fi
 
+# Remove old Phi-3 model if it exists (to save space)
+if ollama list | grep -q "phi3:mini"; then
+    echo "Removing old Phi-3 model to save space..."
+    ollama rm phi3:mini
+fi
+
 # Check if Gemma3 1B model is available
+echo "Checking for Gemma3 1B model..."
 if ! ollama list | grep -q "gemma3:1b"; then
-    echo "Downloading Gemma3 1B model..."
+    echo "Gemma3 1B model not found. Downloading..."
     ollama pull gemma3:1b
+else
+    echo "Gemma3 1B model already available."
 fi
 
 # Start the Flask application
