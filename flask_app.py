@@ -9,7 +9,7 @@ app = Flask(__name__)
 data = pd.read_csv('plc_io_data.csv')
 
 def query_ollama(prompt, data_summary):
-    """Send query to local Ollama API with Gemma3B 1B model"""
+    """Send query to local Ollama API with Gemma3 1B model"""
     try:
         # Prepare the full prompt with data context
         full_prompt = f"""You are analyzing PLC system data for an industrial E-Stop monitoring system. Here is the dataset summary:
@@ -24,7 +24,7 @@ Please provide a clear, CONCISE technical analysis based on this PLC data. Keep 
         response = requests.post(
             "http://localhost:11434/api/generate",
             json={
-                "model": "gemma3b:1b",  # Using Gemma3B 1B model for Pi compatibility
+                "model": "gemma3:1b",  # Using Gemma3 1B model for Pi compatibility
                 "prompt": full_prompt,
                 "stream": False,
                 "options": {
@@ -174,7 +174,7 @@ template = '''
 <body>
     <div class="container">
         <h1>E-Stop AI Status Reporter</h1>
-        <p>Monitor PLC system status and generate intelligent operator reports using Gemma3B 1B AI</p>
+        <p>Monitor PLC system status and generate intelligent operator reports using Gemma3 1B AI</p>
         
         <h2>System Overview</h2>
         <div class="metrics">
@@ -204,7 +204,7 @@ template = '''
         <div id="plot4" class="plot"></div>
         
         <div class="ai-section">
-            <h2>AI Analysis with Gemma3B 1B</h2>
+            <h2>AI Analysis with Gemma3 1B</h2>
             <p>Ask questions about the PLC system status and get AI-powered operator insights!</p>
             
             <div>
@@ -239,7 +239,7 @@ template = '''
                 <li>Temperature_High: High temperature indicator (0=OK, 1=HIGH)</li>
                 <li>Flow_Rate: System flow rate in L/min</li>
             </ul>
-            <p><strong>AI Model:</strong> Gemma3B 1B running locally via Ollama<br>
+            <p><strong>AI Model:</strong> Gemma3 1B running locally via Ollama<br>
             <strong>Visualization:</strong> Interactive Plotly charts<br>
             <strong>Framework:</strong> Flask</p>
         </div>
@@ -416,7 +416,7 @@ def test_ollama():
         response = requests.post(
             "http://localhost:11434/api/generate",
             json={
-                "model": "gemma3b:1b",
+                "model": "gemma3:1b",
                 "prompt": "Hello, respond with 'AI is working!'",
                 "stream": False
             }

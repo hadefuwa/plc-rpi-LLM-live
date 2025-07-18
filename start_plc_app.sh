@@ -23,10 +23,10 @@ if ! curl -s http://localhost:11434/api/tags > /dev/null; then
     sleep 5
 fi
 
-# Check if Gemma3B 1B model is available
-if ! ollama list | grep -q "gemma3b:1b"; then
-    echo "Downloading Gemma3B 1B model..."
-    ollama pull gemma3b:1b
+# Check if Gemma3 1B model is available
+if ! ollama list | grep -q "gemma3:1b"; then
+    echo "Downloading Gemma3 1B model..."
+    ollama pull gemma3:1b
 fi
 
 # Start the Flask application
