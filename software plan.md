@@ -1,73 +1,106 @@
-Software Plan: Wind Tunnel CSV + LLM Explorer (Flask Implementation)
-Objective
-Create a simple Raspberry Pi app that:
+Application Plan: E-Stop AI Status Reporter
+Purpose
+When the E-Stop is pressed on a Siemens S7 PLC, a Python application running on a Raspberry Pi will:
 
-Loads a predefined wind tunnel CSV file from disk (no file upload)
+Read all key system IO (inputs/outputs) from the PLC
 
-Displays CSV data as a graph
+Pass the IO states to a locally running Large Language Model (LLM)
 
-Has a button “Send test data to AI” which sends the CSV and user’s question to the local LLM (Ollama) and shows the response
+Generate a human-readable operator report and display it on a simple web page
 
-Core Features
-Preloaded CSV
+System Overview
+Hardware:
 
-The app automatically loads a specific CSV file from a known location (e.g., /home/pi/wind_tunnel_test_data.csv)
+Raspberry Pi (4 or 5 preferred for LLM performance)
 
-Data Visualization
+Siemens S7 PLC (1200/1500/300/400)
 
-Display line graphs of main metrics (e.g., air velocity, pressure, force, fan speed) vs time
+Ethernet connection between Pi and PLC
 
-LLM Chat Interface
+Software Components:
 
-Text field for the user to enter a question about the data
+python-snap7 for S7 PLC communications
 
-Button: “Send test data to AI”
+Ollama (or similar) to host a local LLM (Phi-3 Mini or other small model)
 
-On click: app sends the CSV data and the user’s prompt to the local Ollama API
+Python Flask for web-based display of reports
 
-Display the LLM’s answer in the app
+Functional Flow
+Monitor E-Stop State
 
-Workflow
-On launch, the app loads /home/pi/wind_tunnel_test_data.csv
+Continuously poll a specific digital input on the S7 PLC (e.g., I 0.0 = E-Stop channel).
 
-Displays the data as a table and line graph(s)
+Detect a change to “pressed” state.
 
-User enters a question in a text box
+Read System IO
 
-User clicks “Send test data to AI”
+On E-Stop trigger, read a defined set of digital/analogue IO from the PLC:
 
-App sends CSV + question to Ollama via API
+Inputs: E-Stop, tank level, pump status, etc.
 
-App displays AI’s response below
+Outputs: motor, valve, alarm relays, etc.
+
+Format this IO data as a status summary.
+
+Generate AI Report
+
+Compose a natural language prompt including the IO summary, e.g.:
+
+diff
+Copy
+Edit
+"The emergency stop has been pressed. Current IO: 
+- Pump Running: OFF
+- Tank Low Level: ON
+- Valve Open: OFF
+Please write a short operator report summarising system status and recommended immediate actions."
+Send prompt to the local LLM (served by Ollama) via API.
+
+Display Output
+
+Show the AI-generated report on a local Flask web page accessible from any device on the LAN.
+
+(Optional) Log events and reports to a local file.
+
+Minimum Viable Features
+Configurable PLC connection (IP, rack, slot)
+
+Configurable input/output list for monitoring
+
+E-Stop edge detection logic
+
+LLM integration with prompt template
+
+Web interface to view latest report
+
+Stretch Features (Optional for V1)
+Log history of E-Stop events and AI reports
+
+Option to email or message the report
+
+Custom prompt or scenario logic based on additional IO states
+
+Mobile-friendly web UI
 
 Tech Stack
-Backend: Python + Flask (lightweight web server)
+Python 3.x
 
-Frontend: HTML/CSS/JavaScript with embedded templates
+python-snap7
 
-Plotting: Plotly.js (client-side interactive charts)
+Flask
 
-Data: pandas
+Local LLM via Ollama (REST API)
 
-LLM API: requests library to connect to local Ollama (Gemma3 1B model)
+(Optional) Docker Compose for easy deployment
 
-CSV file: Assumed present at fixed path
+Deployment Notes
+Pi and PLC must be on the same subnet with direct IP access
 
-Deliverables
-Flask app code (flask_app.py)
+Put/Get must be enabled in the PLC project (see TIA Portal > Device > Properties > Protection & Security)
 
-Uses predefined CSV file (no uploads)
+LLM model must be installed and served via Ollama or similar tool
 
-README for setup
-
-Model-Specific Considerations (Gemma3 1B)
-Context Window: Keep CSV data summaries concise to fit within model limits
-
-Prompt Engineering: Use clear, specific prompts for better responses from the smaller model
-
-Response Time: Expect faster inference compared to larger models
-
-Data Preprocessing: Consider summarizing large datasets before sending to the model
-
-Example Prompts: Provide suggested questions that work well with Gemma3 1B's capabilities
-
+Reference Code Links
+python-snap7 Docs
+Ollama Docs
+Flask Docs
