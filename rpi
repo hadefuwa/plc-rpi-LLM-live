@@ -1,5 +1,5 @@
 # Navigate to project
-cd wind-tunnel-rpi-LLM
+cd plc-rpi-LLM
 
 # Pull latest changes
 git pull origin main
