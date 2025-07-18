@@ -421,21 +421,26 @@ def ask_ai():
     question = request.json.get('question', '')
     
     # Prepare data summary for AI
-    data_summary = f"""
-    Wind Tunnel Test Data Summary:
-    - Data Points: {len(data)}
-    - Angle of Attack Range: {data['AoA (deg)'].min()}° to {data['AoA (deg)'].max()}°
-    - Lift Range: {data['Lift (mN)'].min():.1f} to {data['Lift (mN)'].max():.1f} mN
-    - Drag Range: {data['Drag (mN)'].min():.1f} to {data['Drag (mN)'].max():.1f} mN
-    - Lift Coefficient Range: {data['Cl'].min():.3f} to {data['Cl'].max():.3f}
-    - Drag Coefficient Range: {data['Cd'].min():.3f} to {data['Cd'].max():.3f}
+    emergency_stops = len(data[data['E_Stop_Status'] == 1])
+    latest_status = data.iloc[-1]['Status_Description'] if len(data) > 0 else "No data"
     
-    Key Data Points:
-    {data.to_string(index=False)}
+    data_summary = f"""
+    PLC System Data Summary:
+    - Total Events: {len(data)}
+    - Emergency Stops: {emergency_stops}
+    - Current Status: {latest_status}
+    - Flow Rate Range: {data['Flow_Rate'].min():.1f} to {data['Flow_Rate'].max():.1f} L/min
+    - Pump Running Events: {len(data[data['Pump_Running'] == 1])}
+    - Alarm Events: {len(data[data['Alarm_Relay'] == 1])}
+    - High Pressure Events: {len(data[data['Pressure_High'] == 1])}
+    - High Temperature Events: {len(data[data['Temperature_High'] == 1])}
+    
+    Recent Events:
+    {data.tail(5).to_string(index=False)}
     """
     
     response = query_ollama(question, data_summary)
     return jsonify({'response': response})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8501, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

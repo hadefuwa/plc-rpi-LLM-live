@@ -1,23 +1,23 @@
 Timestamp,Scenario,E_Stop_Status,Pump_Running,Tank_Level_Low,Valve_Open,Motor_Control,Alarm_Relay,Pressure_High,Temperature_High,Flow_Rate,Status_Description
-2024-01-15 08:30:15,Normal_Operation,0,1,0,1,1,0,0,0,85.5,All systems operating normally
-2024-01-15 09:15:22,Low_Tank_Warning,0,1,1,1,1,0,0,0,82.1,Tank level low - refill recommended
-2024-01-15 10:45:33,Pressure_Alert,0,1,0,1,1,1,1,0,78.3,High pressure detected - monitoring
-2024-01-15 11:20:18,Temperature_Warning,0,1,0,1,1,1,0,1,76.8,High temperature - check cooling
-2024-01-15 12:05:45,Emergency_Stop_1,1,0,1,0,0,1,0,0,0.0,EMERGENCY STOP - Tank low, pump stopped
-2024-01-15 13:30:12,Emergency_Stop_2,1,0,0,0,0,1,1,0,0.0,EMERGENCY STOP - High pressure condition
-2024-01-15 14:15:28,Emergency_Stop_3,1,0,0,0,0,1,0,1,0.0,EMERGENCY STOP - High temperature shutdown
-2024-01-15 15:00:05,Maintenance_Mode,0,0,0,0,0,0,0,0,0.0,System in maintenance mode
-2024-01-15 16:20:33,Startup_Sequence,0,0,0,0,0,0,0,0,15.2,System starting up
-2024-01-15 17:45:18,Normal_Operation,0,1,0,1,1,0,0,0,87.2,All systems operating normally
-2024-01-15 18:30:42,Flow_Reduced,0,1,0,1,1,0,0,0,45.6,Reduced flow rate - partial operation
-2024-01-15 19:15:55,Emergency_Stop_4,1,0,1,0,0,1,1,1,0.0,EMERGENCY STOP - Multiple fault conditions
-2024-01-15 20:00:12,Shutdown_Sequence,0,0,0,0,0,0,0,0,8.3,Controlled shutdown in progress
-2024-01-15 21:30:25,Standby_Mode,0,0,0,0,0,0,0,0,0.0,System in standby mode
-2024-01-15 22:15:38,Test_Mode,0,1,0,1,1,0,0,0,92.1,Test mode - all systems functional
-2024-01-15 23:00:52,Emergency_Stop_5,1,0,0,0,0,1,0,0,0.0,EMERGENCY STOP - Manual activation
-2024-01-16 00:30:15,Offline_Mode,0,0,0,0,0,0,0,0,0.0,System offline
-2024-01-16 01:45:28,Calibration_Mode,0,0,0,0,0,0,0,0,0.0,Calibration in progress
-2024-01-16 02:20:42,Emergency_Stop_6,1,0,1,0,0,1,0,1,0.0,EMERGENCY STOP - Tank low and high temp
-2024-01-16 03:15:55,Recovery_Mode,0,1,0,0,0,1,0,0,25.4,System recovering from fault
-2024-01-16 04:00:18,Normal_Operation,0,1,0,1,1,0,0,0,88.7,All systems operating normally
-2024-01-16 05:30:33,Preventive_Stop,0,0,0,0,0,0,0,0,0.0,Preventive maintenance stop 
+2024-01-15 08:30:15,Normal_Operation,0,1,0,1,1,0,0,0,85.5,"All systems operating normally"
+2024-01-15 09:15:22,Low_Tank_Warning,0,1,1,1,1,0,0,0,82.1,"Tank level low - refill recommended"
+2024-01-15 10:45:33,Pressure_Alert,0,1,0,1,1,1,1,0,78.3,"High pressure detected - monitoring"
+2024-01-15 11:20:18,Temperature_Warning,0,1,0,1,1,1,0,1,76.8,"High temperature - check cooling"
+2024-01-15 12:05:45,Emergency_Stop_1,1,0,1,0,0,1,0,0,0.0,"EMERGENCY STOP - Tank low, pump stopped"
+2024-01-15 13:30:12,Emergency_Stop_2,1,0,0,0,0,1,1,0,0.0,"EMERGENCY STOP - High pressure condition"
+2024-01-15 14:15:28,Emergency_Stop_3,1,0,0,0,0,1,0,1,0.0,"EMERGENCY STOP - High temperature shutdown"
+2024-01-15 15:00:05,Maintenance_Mode,0,0,0,0,0,0,0,0,0.0,"System in maintenance mode"
+2024-01-15 16:20:33,Startup_Sequence,0,0,0,0,0,0,0,0,15.2,"System starting up"
+2024-01-15 17:45:18,Normal_Operation,0,1,0,1,1,0,0,0,87.2,"All systems operating normally"
+2024-01-15 18:30:42,Flow_Reduced,0,1,0,1,1,0,0,0,45.6,"Reduced flow rate - partial operation"
+2024-01-15 19:15:55,Emergency_Stop_4,1,0,1,0,0,1,1,1,0.0,"EMERGENCY STOP - Multiple fault conditions"
+2024-01-15 20:00:12,Shutdown_Sequence,0,0,0,0,0,0,0,0,8.3,"Controlled shutdown in progress"
+2024-01-15 21:30:25,Standby_Mode,0,0,0,0,0,0,0,0,0.0,"System in standby mode"
+2024-01-15 22:15:38,Test_Mode,0,1,0,1,1,0,0,0,92.1,"Test mode - all systems functional"
+2024-01-15 23:00:52,Emergency_Stop_5,1,0,0,0,0,1,0,0,0.0,"EMERGENCY STOP - Manual activation"
+2024-01-16 00:30:15,Offline_Mode,0,0,0,0,0,0,0,0,0.0,"System offline"
+2024-01-16 01:45:28,Calibration_Mode,0,0,0,0,0,0,0,0,0.0,"Calibration in progress"
+2024-01-16 02:20:42,Emergency_Stop_6,1,0,1,0,0,1,0,1,0.0,"EMERGENCY STOP - Tank low and high temp"
+2024-01-16 03:15:55,Recovery_Mode,0,1,0,0,0,1,0,0,25.4,"System recovering from fault"
+2024-01-16 04:00:18,Normal_Operation,0,1,0,1,1,0,0,0,88.7,"All systems operating normally"
+2024-01-16 05:30:33,Preventive_Stop,0,0,0,0,0,0,0,0,0.0,"Preventive maintenance stop" 

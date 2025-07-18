@@ -46,13 +46,7 @@ When an E-Stop is pressed on a Siemens S7 PLC, this application:
 
 ## Quick Start
 
-### Prerequisites
-- Python 3.8+
-- Raspberry Pi 4/5 (8GB RAM recommended)
-- Siemens S7 PLC with Ethernet connectivity
-- Ollama installed for local LLM
-
-### Installation
+### Local Development (Windows/Linux)
 
 1. **Clone the repository**
 ```bash
@@ -60,38 +54,106 @@ git clone https://github.com/hadefuwa/plc-rpi-LLM.git
 cd plc-rpi-LLM
 ```
 
-2. **Install Python dependencies**
+2. **Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **Install Ollama and LLM model**
+3. **Install and configure Ollama**
 ```bash
+# Download and install Ollama from https://ollama.ai
+ollama pull phi3:mini
+ollama serve
+```
+
+4. **Run the application**
+```bash
+python flask_app.py
+```
+
+5. **Access the web interface**
+Open your browser and navigate to `http://localhost:5000`
+
+### Raspberry Pi Deployment
+
+1. **Prepare your Raspberry Pi**
+```bash
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install Python and pip
+sudo apt install python3 python3-pip python3-venv -y
+
 # Install Ollama
 curl -fsSL https://ollama.ai/install.sh | sh
+```
 
-# Pull lightweight model (recommended for Pi)
+2. **Clone and setup the project**
+```bash
+git clone https://github.com/hadefuwa/plc-rpi-LLM.git
+cd plc-rpi-LLM
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+3. **Configure PLC connection**
+```bash
+# Edit config.py with your PLC IP address
+nano config.py
+```
+
+4. **Setup Ollama and model**
+```bash
+# Start Ollama service
+sudo systemctl enable ollama
+sudo systemctl start ollama
+
+# Pull the lightweight model
 ollama pull phi3:mini
 ```
 
-4. **Configure PLC connection**
-```python
-# Edit configuration in flask_app.py
-PLC_IP = "192.168.1.100"  # Your PLC IP address
-PLC_RACK = 0              # PLC rack number
-PLC_SLOT = 1              # PLC slot number
-```
-
-5. **Run the application**
+5. **Run as a service (recommended)**
 ```bash
-# Windows
-python flask_app.py
-
-# Linux/Raspberry Pi
-python3 flask_app.py
+# Create systemd service file
+sudo nano /etc/systemd/system/plc-estop.service
 ```
 
-6. **Access web interface**: http://localhost:5000
+Add this content:
+```ini
+[Unit]
+Description=PLC E-Stop AI Status Reporter
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/plc-rpi-LLM
+Environment=PATH=/home/pi/plc-rpi-LLM/venv/bin
+ExecStart=/home/pi/plc-rpi-LLM/venv/bin/python flask_app.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+# Enable and start the service
+sudo systemctl daemon-reload
+sudo systemctl enable plc-estop
+sudo systemctl start plc-estop
+
+# Check status
+sudo systemctl status plc-estop
+```
+
+6. **Access the web interface**
+Open your browser and navigate to `http://YOUR_PI_IP:5000`
 
 ## Easy Startup Scripts
 
