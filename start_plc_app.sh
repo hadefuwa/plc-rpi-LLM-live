@@ -4,6 +4,9 @@
 # This script starts the application with proper environment setup
 
 echo "Starting PLC E-Stop AI Status Reporter..."
+echo "Current directory: $(pwd)"
+echo "Current user: $(whoami)"
+echo "Python version: $(python3 --version)"
 
 # Change to the application directory
 cd "$(dirname "$0")"
@@ -17,10 +20,19 @@ else
 fi
 
 # Check if Ollama is running
+echo "Checking if Ollama is running..."
 if ! curl -s http://localhost:11434/api/tags > /dev/null; then
     echo "Starting Ollama service..."
     nohup ollama serve > /dev/null 2>&1 &
     sleep 10
+    echo "Checking if Ollama started successfully..."
+    if curl -s http://localhost:11434/api/tags > /dev/null; then
+        echo "Ollama started successfully!"
+    else
+        echo "Warning: Ollama may not have started properly"
+    fi
+else
+    echo "Ollama is already running"
 fi
 
 # Remove old Phi-3 model if it exists (to save space)
@@ -40,4 +52,6 @@ fi
 
 # Start the Flask application
 echo "Starting Flask application..."
+echo "Flask app file exists: $(ls -la flask_app.py)"
+echo "About to start Flask on port 5000..."
 python3 flask_app.py 
