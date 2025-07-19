@@ -19,14 +19,8 @@ fi
 # Check if Ollama is running
 if ! curl -s http://localhost:11434/api/tags > /dev/null; then
     echo "Starting Ollama service..."
-    # Try systemctl first, if that fails, start manually
-    if ! sudo systemctl start ollama 2>/dev/null; then
-        echo "Systemctl failed, starting Ollama manually..."
-        nohup ollama serve > /dev/null 2>&1 &
-        sleep 10
-    else
-        sleep 5
-    fi
+    nohup ollama serve > /dev/null 2>&1 &
+    sleep 10
 fi
 
 # Remove old Phi-3 model if it exists (to save space)
