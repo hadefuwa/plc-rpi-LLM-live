@@ -154,6 +154,53 @@ sudo journalctl -u plc-estop -f
 sudo systemctl disable plc-estop
 ```
 
+## Auto-Start Chromium Browser (Kiosk Mode)
+
+To automatically open the web interface in a browser when the Pi boots:
+
+**1. Install Chromium (if not already installed):**
+```bash
+sudo apt update
+sudo apt install chromium-browser -y
+```
+
+**2. Setup autostart directory:**
+```bash
+mkdir -p ~/.config/autostart
+```
+
+**3. Copy the autostart file:**
+```bash
+cp autostart-plc-app.desktop ~/.config/autostart/
+```
+
+**4. Make it executable:**
+```bash
+chmod +x ~/.config/autostart/autostart-plc-app.desktop
+```
+
+**5. Test the autostart (optional):**
+```bash
+# Test if the desktop file works
+gtk-launch autostart-plc-app
+```
+
+**6. Reboot to test:**
+```bash
+sudo reboot
+```
+
+**Autostart Features:**
+- **Full Screen**: Opens in maximized window
+- **App Mode**: Runs as a standalone app (no browser UI)
+- **Auto-Refresh**: Will reload if the page becomes unavailable
+- **Kiosk Ready**: Perfect for wall-mounted displays
+
+**To Disable Browser Autostart:**
+```bash
+rm ~/.config/autostart/autostart-plc-app.desktop
+```
+
 6. **Access the web interface**
 Open your browser and navigate to `http://YOUR_PI_IP:5000`
 

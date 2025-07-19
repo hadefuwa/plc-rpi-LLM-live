@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=PLC E-Stop AI Status Reporter
+Comment=Auto-start PLC monitoring web interface
+Exec=chromium-browser --start-maximized --disable-web-security --user-data-dir=/tmp/chrome-plc-app --app=http://localhost:5000
+Terminal=false
+X-GNOME-Autostart-enabled=true 
