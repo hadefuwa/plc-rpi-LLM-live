@@ -1,0 +1,22 @@
+[Unit]
+Description=PLC E-Stop AI Status Reporter
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/plc-rpi-LLM
+Environment=PATH=/home/pi/plc-rpi-LLM/venv/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/pi/plc-rpi-LLM/start_plc_app.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Give the service time to start up
+TimeoutStartSec=60
+
+[Install]
+WantedBy=multi-user.target 

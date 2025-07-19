@@ -117,39 +117,41 @@ sudo systemctl start ollama
 ollama pull gemma3:1b
 ```
 
-5. **Run as a service (recommended)**
+5. **Setup Auto-Startup (Recommended)**
 ```bash
-# Create systemd service file
-sudo nano /etc/systemd/system/plc-estop.service
-```
+# Copy the service file to systemd
+sudo cp plc-estop.service /etc/systemd/system/
 
-Add this content:
-```ini
-[Unit]
-Description=PLC E-Stop AI Status Reporter
-After=network.target
-
-[Service]
-Type=simple
-User=pi
-WorkingDirectory=/home/pi/plc-rpi-LLM
-Environment=PATH=/home/pi/plc-rpi-LLM/venv/bin
-ExecStart=/home/pi/plc-rpi-LLM/venv/bin/python flask_app.py
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-```
-
-```bash
-# Enable and start the service
+# Reload systemd and enable the service
 sudo systemctl daemon-reload
 sudo systemctl enable plc-estop
+
+# Start the service
 sudo systemctl start plc-estop
 
 # Check status
 sudo systemctl status plc-estop
+```
+
+**Service Management Commands:**
+```bash
+# Start the service
+sudo systemctl start plc-estop
+
+# Stop the service
+sudo systemctl stop plc-estop
+
+# Restart the service
+sudo systemctl restart plc-estop
+
+# Check service status
+sudo systemctl status plc-estop
+
+# View service logs
+sudo journalctl -u plc-estop -f
+
+# Disable auto-startup
+sudo systemctl disable plc-estop
 ```
 
 6. **Access the web interface**
