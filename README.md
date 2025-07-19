@@ -42,7 +42,9 @@ When an E-Stop is pressed on a Siemens S7 PLC, this application:
 - **Python 3.x**: Core application framework
 - **python-snap7**: S7 PLC communication library
 - **Flask**: Web interface and API
-- **Ollama**: Local LLM hosting (Phi-3 Mini or similar lightweight model)
+- **Ollama**: Local LLM hosting (Gemma3 1B for Pi compatibility)
+- **Chromium**: Full-screen kiosk browser
+- **Systemd**: Auto-startup service management
 
 ## Quick Start
 
@@ -388,6 +390,109 @@ MIT License - feel free to use for educational and commercial purposes.
 - **Ollama Team**: For local AI model deployment
 - **Flask Team**: For lightweight web framework
 - **Microsoft**: For Phi-3 Mini language model
+
+## Complete Industrial Kiosk Setup
+
+This project creates a fully automated PLC monitoring kiosk perfect for industrial environments.
+
+### What You Get After Setup
+
+**🏭 Complete Industrial Solution:**
+- **PLC Monitoring**: Real-time Siemens S7 PLC data monitoring
+- **AI Analysis**: Local Gemma3 1B AI for intelligent reporting  
+- **Web Dashboard**: Full-screen monitoring interface
+- **Auto-Startup**: Starts automatically on every boot
+- **Kiosk Mode**: Full-screen display ready for wall mounting
+- **Network Access**: Accessible from any device on the network
+
+**🎯 Perfect For:**
+- Industrial control rooms
+- Manufacturing floors
+- Remote monitoring stations
+- Wall-mounted displays
+- Operator workstations
+
+### Complete Setup Commands
+
+**One-Command Setup (Copy & Paste):**
+```bash
+# Update and install dependencies
+sudo apt update && sudo apt upgrade -y
+sudo apt install python3 python3-pip python3-venv chromium-browser -y
+
+# Install Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Clone and setup project
+git clone https://github.com/hadefuwa/plc-rpi-LLM.git
+cd plc-rpi-LLM
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Setup Ollama
+sudo systemctl enable ollama
+sudo systemctl start ollama
+ollama pull gemma3:1b
+
+# Setup auto-startup service
+sudo cp plc-estop.service /etc/systemd/system/
+chmod +x start_plc_app.sh
+sudo systemctl daemon-reload
+sudo systemctl enable plc-estop
+sudo systemctl start plc-estop
+
+# Setup Chromium kiosk mode
+mkdir -p ~/.config/autostart
+cp autostart-plc-app.desktop ~/.config/autostart/
+chmod +x ~/.config/autostart/autostart-plc-app.desktop
+
+# Reboot to test everything
+sudo reboot
+```
+
+### Troubleshooting Guide
+
+**Service Issues:**
+```bash
+# Check service status
+sudo systemctl status plc-estop
+
+# View service logs
+sudo journalctl -u plc-estop -n 50
+
+# If service fails to start, check logs
+sudo journalctl -u plc-estop -f
+
+# If port 5000 is in use, kill existing processes
+sudo netstat -tlnp | grep :5000
+sudo kill [PID_NUMBER]
+
+# If Ollama isn't running
+ollama serve &
+
+# Test the startup script manually
+./start_plc_app.sh
+```
+
+**Permission Issues:**
+```bash
+# Make startup script executable
+chmod +x start_plc_app.sh
+
+# Fix service permissions
+sudo systemctl daemon-reload
+sudo systemctl restart plc-estop
+```
+
+**Browser Issues:**
+```bash
+# Test if Chromium can access the app
+curl http://localhost:5000
+
+# Check if autostart file is executable
+chmod +x ~/.config/autostart/autostart-plc-app.desktop
+```
 
 ---
 
