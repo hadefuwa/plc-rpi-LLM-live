@@ -2,11 +2,13 @@ from flask import Flask, render_template_string, request, jsonify
 import pandas as pd
 import json
 import requests
+from config import load_config, save_config, get_config_summary, update_plc_settings, update_io_mapping
+from plc_communicator import PLCCommunicator
+from nav_template import NAV_TEMPLATE, NAV_STYLES
 
 app = Flask(__name__)
 
-# Load data
-data = pd.read_csv('plc_io_data.csv')
+# No longer loading CSV data - using live PLC data instead
 
 def query_ollama(prompt, data_summary):
     """Send query to local Ollama API with Gemma3 1B model"""
@@ -51,13 +53,397 @@ Please provide a clear, CONCISE technical analysis based on this PLC data. Keep 
     except Exception as e:
         return f"Error: {str(e)}"
 
+# Configuration page template
+config_template = '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PLC Configuration - E-Stop AI Status Reporter</title>
+    <style>
+        /* Navigation Styles */
+        {{ nav_styles|safe }}
+        
+        /* Main Content Styles */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .io-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .io-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .io-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .io-description {
+            color: #666;
+            font-size: 12px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .test-result.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .test-result.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    {{ nav_html|safe }}
+    
+    <div class="container">
+        <div class="page-header">
+            <h2>PLC Configuration</h2>
+            <p>Configure your PLC connection settings and IO mapping.</p>
+        </div>
+        
+        <div class="section">
+            <h2>PLC Connection Settings</h2>
+            <form id="plcForm">
+                <div class="form-group">
+                    <label for="plc_ip">PLC IP Address:</label>
+                    <input type="text" id="plc_ip" name="plc_ip" value="{{ config.plc_ip }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="plc_rack">Rack Number:</label>
+                    <input type="number" id="plc_rack" name="plc_rack" value="{{ config.plc_rack }}" min="0" max="31">
+                </div>
+                <div class="form-group">
+                    <label for="plc_slot">Slot Number:</label>
+                    <input type="number" id="plc_slot" name="plc_slot" value="{{ config.plc_slot }}" min="0" max="31">
+                </div>
+                <button type="submit" class="btn btn-success">Save PLC Settings</button>
+                <button type="button" class="btn" onclick="testConnection()">Test Connection</button>
+            </form>
+            <div id="plcStatus"></div>
+        </div>
+        
+        <div class="section">
+            <h2>IO Mapping Configuration</h2>
+            <p>Configure your PLC IO addresses. Current mapping has {{ config.io_count }} items.</p>
+            
+            <div id="ioMapping">
+                {% for io_name, io_config in config.io_mapping.items() %}
+                <div class="io-item">
+                    <div class="io-header">
+                        <div>
+                            <div class="io-name">{{ io_name }}</div>
+                            <div class="io-description">{{ io_config.description }}</div>
+                        </div>
+                        <button class="btn btn-danger" onclick="removeIO('{{ io_name }}')">Remove</button>
+                    </div>
+                    <form class="io-form" data-io-name="{{ io_name }}">
+                        <div class="form-group">
+                            <label>Data Type:</label>
+                            <select name="io_type" required>
+                                <option value="bit" {% if io_config.type == 'bit' %}selected{% endif %}>Bit (DBX)</option>
+                                <option value="byte" {% if io_config.type == 'byte' %}selected{% endif %}>Byte (DBB)</option>
+                                <option value="word" {% if io_config.type == 'word' %}selected{% endif %}>Word (DBW)</option>
+                                <option value="dword" {% if io_config.type == 'dword' %}selected{% endif %}>DWord (DBD)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>PLC Address:</label>
+                            <input type="text" name="io_address" value="{{ io_config.address }}" required 
+                                   placeholder="e.g., DB1.DBX0.0, DB1.DBW2">
+                        </div>
+                        <div class="form-group">
+                            <label>Description:</label>
+                            <input type="text" name="io_description" value="{{ io_config.description }}" 
+                                   placeholder="Description of this IO point">
+                        </div>
+                        <button type="submit" class="btn">Update IO</button>
+                        <button type="button" class="btn" onclick="testIO('{{ io_name }}')">Test IO</button>
+                    </form>
+                    <div id="testResult_{{ io_name }}" class="test-result" style="display: none;"></div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="section">
+                <h3>Add New IO Point</h3>
+                <form id="newIOForm">
+                    <div class="form-group">
+                        <label for="new_io_name">IO Name:</label>
+                        <input type="text" id="new_io_name" name="io_name" required placeholder="e.g., Temperature_Sensor">
+                    </div>
+                    <div class="form-group">
+                        <label for="new_io_type">Data Type:</label>
+                        <select id="new_io_type" name="io_type" required>
+                            <option value="bit">Bit (DBX)</option>
+                            <option value="byte">Byte (DBB)</option>
+                            <option value="word">Word (DBW)</option>
+                            <option value="dword">DWord (DBD)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new_io_address">PLC Address:</label>
+                        <input type="text" id="new_io_address" name="io_address" required 
+                               placeholder="e.g., DB1.DBX0.0, DB1.DBW2">
+                    </div>
+                    <div class="form-group">
+                        <label for="new_io_description">Description:</label>
+                        <input type="text" id="new_io_description" name="io_description" 
+                               placeholder="Description of this IO point">
+                    </div>
+                    <button type="submit" class="btn btn-success">Add IO Point</button>
+                </form>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="/" class="btn">Back to Main Dashboard</a>
+        </div>
+    </div>
+    
+    <script>
+        // PLC Settings Form
+        document.getElementById('plcForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                ip: formData.get('plc_ip'),
+                rack: parseInt(formData.get('plc_rack')),
+                slot: parseInt(formData.get('plc_slot'))
+            };
+            
+            fetch('/update_plc_settings', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusDiv = document.getElementById('plcStatus');
+                if (data.success) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = 'PLC settings saved successfully!';
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = 'Error: ' + data.error;
+                }
+            });
+        });
+        
+        // Test PLC Connection
+        function testConnection() {
+            fetch('/test_plc_connection')
+            .then(response => response.json())
+            .then(data => {
+                const statusDiv = document.getElementById('plcStatus');
+                if (data.success) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = 'Connection test successful! ' + data.message;
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = 'Connection test failed: ' + data.error;
+                }
+            });
+        }
+        
+        // IO Form Submission
+        document.addEventListener('submit', function(e) {
+            if (e.target.classList.contains('io-form')) {
+                e.preventDefault();
+                
+                const formData = new FormData(e.target);
+                const ioName = e.target.dataset.ioName;
+                const data = {
+                    io_name: ioName,
+                    io_type: formData.get('io_type'),
+                    io_address: formData.get('io_address'),
+                    io_description: formData.get('io_description')
+                };
+                
+                fetch('/update_io_mapping', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('IO mapping updated successfully!');
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                });
+            }
+        });
+        
+        // Test IO Reading
+        function testIO(ioName) {
+            fetch('/test_io_reading', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({io_name: ioName})
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('testResult_' + ioName);
+                resultDiv.style.display = 'block';
+                
+                if (data.success) {
+                    resultDiv.className = 'test-result success';
+                    resultDiv.textContent = 'Test successful! Value: ' + data.value;
+                } else {
+                    resultDiv.className = 'test-result error';
+                    resultDiv.textContent = 'Test failed: ' + data.error;
+                }
+            });
+        }
+        
+        // Remove IO Point
+        function removeIO(ioName) {
+            if (confirm('Are you sure you want to remove ' + ioName + '?')) {
+                fetch('/remove_io_mapping', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({io_name: ioName})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload(); // Refresh page to show updated mapping
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                });
+            }
+        }
+        
+        // Add New IO Form
+        document.getElementById('newIOForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                io_name: formData.get('io_name'),
+                io_type: formData.get('io_type'),
+                io_address: formData.get('io_address'),
+                io_description: formData.get('io_description')
+            };
+            
+            fetch('/add_io_mapping', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('IO point added successfully!');
+                    location.reload(); // Refresh page to show new IO
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+'''
+
 template = '''
 <!DOCTYPE html>
 <html>
 <head>
     <title>E-Stop AI Status Reporter</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
+        /* Navigation Styles */
+        {{ nav_styles|safe }}
+        
+        /* Main Content Styles */
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
@@ -169,12 +555,102 @@ template = '''
             margin: 0;
             color: #007bff;
         }
+        .io-status-container {
+            margin: 20px 0;
+        }
+        .io-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .io-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .io-card.online {
+            border-left: 4px solid #28a745;
+        }
+        .io-card.offline {
+            border-left: 4px solid #dc3545;
+        }
+        .io-card.error {
+            border-left: 4px solid #ffc107;
+        }
+        .io-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .io-description {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        .io-value {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .io-value.on {
+            color: #28a745;
+        }
+        .io-value.off {
+            color: #dc3545;
+        }
+        .io-value.number {
+            color: #007bff;
+        }
+        .io-address {
+            font-family: monospace;
+            font-size: 11px;
+            color: #888;
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .refresh-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .refresh-info span {
+            color: #666;
+            font-size: 12px;
+        }
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .page-header h2 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 28px;
+        }
+        .page-header p {
+            margin: 0;
+            color: #666;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
+    {{ nav_html|safe }}
+    
     <div class="container">
-        <h1>E-Stop AI Status Reporter</h1>
-        <p>Monitor PLC system status and generate intelligent operator reports using Gemma3 1B AI</p>
+        <div class="page-header">
+            <h2>Dashboard</h2>
+            <p>Monitor PLC system status and generate intelligent operator reports using Gemma3 1B AI</p>
+        </div>
         
         <h2>System Overview</h2>
         <div class="metrics">
@@ -192,16 +668,16 @@ template = '''
             </div>
         </div>
         
-        <h2>System Events</h2>
-        <div class="table-responsive">
-            {{ data_table|safe }}
+        <h2>Live IO Status</h2>
+        <div class="io-status-container">
+            <div class="io-grid" id="ioGrid">
+                <!-- IO status will be loaded here -->
+            </div>
+            <div class="refresh-info">
+                <button class="btn" onclick="refreshIOStatus()" style="background-color: #28a745;">Refresh IO Status</button>
+                <span id="lastUpdate">Last update: Never</span>
+            </div>
         </div>
-        
-        <h2>System Monitoring</h2>
-        <div id="plot1" class="plot"></div>
-        <div id="plot2" class="plot"></div>
-        <div id="plot3" class="plot"></div>
-        <div id="plot4" class="plot"></div>
         
         <div class="ai-section">
             <h2>AI Analysis with Gemma3 1B</h2>
@@ -246,19 +722,6 @@ template = '''
     </div>
     
     <script>
-        window.plotData = {
-            timestamp: {{ timestamp_json|safe }},
-            e_stop: {{ e_stop_json|safe }},
-            pump_running: {{ pump_running_json|safe }},
-            tank_level: {{ tank_level_json|safe }},
-            valve_open: {{ valve_open_json|safe }},
-            motor_control: {{ motor_control_json|safe }},
-            alarm_relay: {{ alarm_relay_json|safe }},
-            pressure_high: {{ pressure_high_json|safe }},
-            temperature_high: {{ temperature_high_json|safe }},
-            flow_rate: {{ flow_rate_json|safe }}
-        };
-        
         function setQuestion(question) {
             document.getElementById('questionInput').value = question;
         }
@@ -313,68 +776,98 @@ template = '''
             });
         }
         
+        function refreshIOStatus() {
+            fetch('/get_io_status')
+            .then(response => response.json())
+            .then(data => {
+                updateIOGrid(data.io_data);
+                document.getElementById('lastUpdate').textContent = 'Last update: ' + new Date().toLocaleTimeString();
+            })
+            .catch(error => {
+                console.error('Error refreshing IO status:', error);
+                document.getElementById('lastUpdate').textContent = 'Last update: Error - ' + new Date().toLocaleTimeString();
+            });
+        }
+        
+        function updateIOGrid(ioData) {
+            const ioGrid = document.getElementById('ioGrid');
+            ioGrid.innerHTML = '';
+            
+            for (const [ioName, ioInfo] of Object.entries(ioData)) {
+                const card = document.createElement('div');
+                card.className = 'io-card';
+                
+                // Determine status class
+                if (ioInfo.status === 'error') {
+                    card.classList.add('error');
+                } else if (ioInfo.value !== null) {
+                    card.classList.add('online');
+                } else {
+                    card.classList.add('offline');
+                }
+                
+                // Determine value class
+                let valueClass = 'number';
+                if (ioInfo.type === 'bit') {
+                    valueClass = ioInfo.value ? 'on' : 'off';
+                }
+                
+                // Format value display
+                let valueDisplay = 'ERROR';
+                if (ioInfo.value !== null) {
+                    if (ioInfo.type === 'bit') {
+                        valueDisplay = ioInfo.value ? 'ON' : 'OFF';
+                    } else {
+                        valueDisplay = ioInfo.value.toString();
+                    }
+                }
+                
+                card.innerHTML = `
+                    <div class="io-name">${ioName}</div>
+                    <div class="io-description">${ioInfo.description}</div>
+                    <div class="io-value ${valueClass}">${valueDisplay}</div>
+                    <div class="io-address">${ioInfo.address}</div>
+                `;
+                
+                ioGrid.appendChild(card);
+            }
+        }
+        
+        // Update connection status in navigation
+        function updateConnectionStatus() {
+            fetch('/get_io_status')
+            .then(response => response.json())
+            .then(data => {
+                const statusDot = document.querySelector('.status-dot');
+                const statusText = document.querySelector('#connectionStatus');
+                
+                // Check if any IO points are online
+                const hasOnlineIO = Object.values(data.io_data).some(io => io.status === 'online');
+                
+                if (hasOnlineIO) {
+                    statusDot.className = 'status-dot connected';
+                    statusText.innerHTML = '<span class="status-dot connected"></span>Connected';
+                } else {
+                    statusDot.className = 'status-dot disconnected';
+                    statusText.innerHTML = '<span class="status-dot disconnected"></span>Disconnected';
+                }
+            })
+            .catch(error => {
+                const statusDot = document.querySelector('.status-dot');
+                const statusText = document.querySelector('#connectionStatus');
+                statusDot.className = 'status-dot disconnected';
+                statusText.innerHTML = '<span class="status-dot disconnected"></span>Error';
+            });
+        }
+        
+        // Auto-refresh every 5 seconds
+        setInterval(refreshIOStatus, 5000);
+        setInterval(updateConnectionStatus, 10000); // Update connection status every 10 seconds
+        
+        // Load initial IO status when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            var data = window.plotData;
-            
-            // E-Stop Events Timeline
-            Plotly.newPlot('plot1', [{
-                x: data.timestamp, y: data.e_stop,
-                mode: 'lines+markers', name: 'E-Stop Status',
-                line: {color: '#dc3545'}, marker: {color: '#dc3545'}
-            }], {
-                title: 'Emergency Stop Events Timeline',
-                xaxis: {title: 'Time'},
-                yaxis: {title: 'E-Stop Status (0=OFF, 1=ON)'}
-            });
-            
-            // System Status Overview
-            Plotly.newPlot('plot2', [{
-                x: data.timestamp, y: data.pump_running,
-                mode: 'lines+markers', name: 'Pump',
-                line: {color: '#007bff'}, marker: {color: '#007bff'}
-            }, {
-                x: data.timestamp, y: data.motor_control,
-                mode: 'lines+markers', name: 'Motor',
-                line: {color: '#28a745'}, marker: {color: '#28a745'}
-            }, {
-                x: data.timestamp, y: data.valve_open,
-                mode: 'lines+markers', name: 'Valve',
-                line: {color: '#ffc107'}, marker: {color: '#ffc107'}
-            }], {
-                title: 'System Components Status',
-                xaxis: {title: 'Time'},
-                yaxis: {title: 'Status (0=OFF, 1=ON)'}
-            });
-            
-            // Alarm Conditions
-            Plotly.newPlot('plot3', [{
-                x: data.timestamp, y: data.alarm_relay,
-                mode: 'lines+markers', name: 'Alarm',
-                line: {color: '#dc3545'}, marker: {color: '#dc3545'}
-            }, {
-                x: data.timestamp, y: data.pressure_high,
-                mode: 'lines+markers', name: 'High Pressure',
-                line: {color: '#fd7e14'}, marker: {color: '#fd7e14'}
-            }, {
-                x: data.timestamp, y: data.temperature_high,
-                mode: 'lines+markers', name: 'High Temperature',
-                line: {color: '#e83e8c'}, marker: {color: '#e83e8c'}
-            }], {
-                title: 'Alarm Conditions and Faults',
-                xaxis: {title: 'Time'},
-                yaxis: {title: 'Status (0=OK, 1=FAULT)'}
-            });
-            
-            // Flow Rate Analysis
-            Plotly.newPlot('plot4', [{
-                x: data.timestamp, y: data.flow_rate,
-                mode: 'lines+markers', name: 'Flow Rate',
-                line: {color: '#6f42c1'}, marker: {color: '#6f42c1'}
-            }], {
-                title: 'System Flow Rate Over Time',
-                xaxis: {title: 'Time'},
-                yaxis: {title: 'Flow Rate (L/min)'}
-            });
+            refreshIOStatus();
+            updateConnectionStatus();
             
             // Enter key handler
             document.getElementById('questionInput').addEventListener('keypress', function(e) {
@@ -388,25 +881,32 @@ template = '''
 
 @app.route('/')
 def home():
-    # Calculate system metrics
-    emergency_stops = len(data[data['E_Stop_Status'] == 1])
-    latest_status = data.iloc[-1]['Status_Description'] if len(data) > 0 else "No data"
+    # Calculate system metrics from live IO data
+    try:
+        plc = PLCCommunicator()
+        if plc.connect():
+            io_data = plc.read_all_io()
+            plc.disconnect()
+            
+            # Count active signals
+            active_signals = sum(1 for value in io_data.values() if value is not None and value != 0)
+            total_signals = len(io_data)
+            system_status = f"{active_signals}/{total_signals} signals active"
+        else:
+            system_status = "PLC not connected"
+            active_signals = 0
+            total_signals = 0
+    except:
+        system_status = "Error reading PLC"
+        active_signals = 0
+        total_signals = 0
     
     return render_template_string(template,
-        data_points=len(data),
-        emergency_stops=emergency_stops,
-        system_status=latest_status,
-        data_table=data.to_html(classes='table', table_id='data-table'),
-        timestamp_json=json.dumps(data['Timestamp'].tolist()),
-        e_stop_json=json.dumps(data['E_Stop_Status'].tolist()),
-        pump_running_json=json.dumps(data['Pump_Running'].tolist()),
-        tank_level_json=json.dumps(data['Tank_Level_Low'].tolist()),
-        valve_open_json=json.dumps(data['Valve_Open'].tolist()),
-        motor_control_json=json.dumps(data['Motor_Control'].tolist()),
-        alarm_relay_json=json.dumps(data['Alarm_Relay'].tolist()),
-        pressure_high_json=json.dumps(data['Pressure_High'].tolist()),
-        temperature_high_json=json.dumps(data['Temperature_High'].tolist()),
-        flow_rate_json=json.dumps(data['Flow_Rate'].tolist())
+        nav_html=NAV_TEMPLATE,
+        nav_styles=NAV_STYLES,
+        data_points=total_signals,
+        emergency_stops=active_signals,
+        system_status=system_status
     )
 
 @app.route('/test_ollama')
@@ -432,27 +932,244 @@ def test_ollama():
 def ask_ai():
     question = request.json.get('question', '')
     
-    # Prepare data summary for AI
-    emergency_stops = len(data[data['E_Stop_Status'] == 1])
-    latest_status = data.iloc[-1]['Status_Description'] if len(data) > 0 else "No data"
-    
-    data_summary = f"""
-    PLC System Data Summary:
-    - Total Events: {len(data)}
-    - Emergency Stops: {emergency_stops}
-    - Current Status: {latest_status}
-    - Flow Rate Range: {data['Flow_Rate'].min():.1f} to {data['Flow_Rate'].max():.1f} L/min
-    - Pump Running Events: {len(data[data['Pump_Running'] == 1])}
-    - Alarm Events: {len(data[data['Alarm_Relay'] == 1])}
-    - High Pressure Events: {len(data[data['Pressure_High'] == 1])}
-    - High Temperature Events: {len(data[data['Temperature_High'] == 1])}
-    
-    Recent Events:
-    {data.tail(5).to_string(index=False)}
-    """
+    # Get live IO data for AI analysis
+    try:
+        plc = PLCCommunicator()
+        io_mapping = get_io_mapping()
+        io_data = {}
+        
+        if plc.connect():
+            for io_name in io_mapping.keys():
+                try:
+                    value = plc.read_io(io_name)
+                    io_data[io_name] = value
+                except:
+                    io_data[io_name] = None
+            plc.disconnect()
+        else:
+            # Use configured IO with null values if PLC not connected
+            for io_name in io_mapping.keys():
+                io_data[io_name] = None
+        
+        # Prepare data summary for AI
+        active_signals = sum(1 for value in io_data.values() if value is not None and value != 0)
+        total_signals = len(io_data)
+        
+        data_summary = f"""
+        Live PLC System Data Summary:
+        - Total IO Points: {total_signals}
+        - Active Signals: {active_signals}
+        - Connection Status: {'Connected' if plc.connect() else 'Not Connected'}
+        
+        Current IO Values:
+        {chr(10).join([f"- {name}: {value}" for name, value in io_data.items()])}
+        """
+        
+        if plc.connect():
+            plc.disconnect()
+        
+    except Exception as e:
+        data_summary = f"Error reading PLC data: {str(e)}"
     
     response = query_ollama(question, data_summary)
     return jsonify({'response': response})
+
+# Configuration routes
+@app.route('/config')
+def config():
+    """Render the PLC configuration page"""
+    config_summary = get_config_summary()
+    return render_template_string(config_template, 
+        nav_html=NAV_TEMPLATE,
+        nav_styles=NAV_STYLES,
+        config=config_summary
+    )
+
+@app.route('/update_plc_settings', methods=['POST'])
+def update_plc_settings_route():
+    """Endpoint to update PLC connection settings"""
+    try:
+        data = request.json
+        success = update_plc_settings(data['ip'], data['rack'], data['slot'])
+        return jsonify({'success': success, 'message': 'PLC settings updated' if success else 'Failed to update settings'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/test_plc_connection')
+def test_plc_connection():
+    """Endpoint to test PLC connection"""
+    try:
+        plc = PLCCommunicator()
+        success, message = plc.test_connection()
+        return jsonify({'success': success, 'message': message})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/update_io_mapping', methods=['POST'])
+def update_io_mapping_route():
+    """Endpoint to update an existing IO mapping"""
+    try:
+        data = request.json
+        success = update_io_mapping(data['io_name'], data['io_type'], data['io_address'], data['io_description'])
+        return jsonify({'success': success, 'message': 'IO mapping updated' if success else 'Failed to update mapping'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/test_io_reading', methods=['POST'])
+def test_io_reading():
+    """Endpoint to test reading an IO point"""
+    try:
+        data = request.json
+        plc = PLCCommunicator()
+        if plc.connect():
+            value = plc.read_io(data['io_name'])
+            plc.disconnect()
+            if value is not None:
+                return jsonify({'success': True, 'value': value})
+            else:
+                return jsonify({'success': False, 'error': plc.last_error})
+        else:
+            return jsonify({'success': False, 'error': 'Failed to connect to PLC'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/add_io_mapping', methods=['POST'])
+def add_io_mapping():
+    """Endpoint to add a new IO mapping"""
+    try:
+        data = request.json
+        success = update_io_mapping(data['io_name'], data['io_type'], data['io_address'], data['io_description'])
+        return jsonify({'success': success, 'message': 'IO mapping added' if success else 'Failed to add mapping'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/remove_io_mapping', methods=['POST'])
+def remove_io_mapping():
+    """Endpoint to remove an IO mapping"""
+    try:
+        data = request.json
+        config = load_config()
+        if data['io_name'] in config['io_mapping']:
+            del config['io_mapping'][data['io_name']]
+            success = save_config(config)
+            return jsonify({'success': success, 'message': 'IO mapping removed' if success else 'Failed to remove mapping'})
+        else:
+            return jsonify({'success': False, 'error': 'IO mapping not found'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/status')
+def system_status():
+    """System status page"""
+    return render_template_string('''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>System Status - E-Stop AI Status Reporter</title>
+        <style>
+            {{ nav_styles|safe }}
+            body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
+            .container { max-width: 1200px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            .page-header { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0; }
+            .page-header h2 { margin: 0 0 10px 0; color: #333; font-size: 28px; }
+            .page-header p { margin: 0; color: #666; font-size: 16px; }
+        </style>
+    </head>
+    <body>
+        {{ nav_html|safe }}
+        <div class="container">
+            <div class="page-header">
+                <h2>System Status</h2>
+                <p>Detailed system status and performance metrics</p>
+            </div>
+            <div style="text-align: center; padding: 50px;">
+                <h3>🚧 Coming Soon</h3>
+                <p>System status page is under development.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    ''', nav_html=NAV_TEMPLATE, nav_styles=NAV_STYLES)
+
+@app.route('/logs')
+def event_logs():
+    """Event logs page"""
+    return render_template_string('''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Event Logs - E-Stop AI Status Reporter</title>
+        <style>
+            {{ nav_styles|safe }}
+            body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
+            .container { max-width: 1200px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            .page-header { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0; }
+            .page-header h2 { margin: 0 0 10px 0; color: #333; font-size: 28px; }
+            .page-header p { margin: 0; color: #666; font-size: 16px; }
+        </style>
+    </head>
+    <body>
+        {{ nav_html|safe }}
+        <div class="container">
+            <div class="page-header">
+                <h2>Event Logs</h2>
+                <p>Historical event logs and system activity</p>
+            </div>
+            <div style="text-align: center; padding: 50px;">
+                <h3>🚧 Coming Soon</h3>
+                <p>Event logs page is under development.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    ''', nav_html=NAV_TEMPLATE, nav_styles=NAV_STYLES)
+
+@app.route('/get_io_status')
+def get_io_status():
+    """Get current IO status from PLC"""
+    try:
+        plc = PLCCommunicator()
+        io_mapping = get_io_mapping()
+        io_data = {}
+        
+        if plc.connect():
+            # Read all configured IO points
+            for io_name, io_config in io_mapping.items():
+                try:
+                    value = plc.read_io(io_name)
+                    io_data[io_name] = {
+                        'value': value,
+                        'type': io_config['type'],
+                        'description': io_config['description'],
+                        'address': io_config['address'],
+                        'status': 'online' if value is not None else 'error'
+                    }
+                except Exception as e:
+                    io_data[io_name] = {
+                        'value': None,
+                        'type': io_config['type'],
+                        'description': io_config['description'],
+                        'address': io_config['address'],
+                        'status': 'error'
+                    }
+            plc.disconnect()
+        else:
+            # If PLC not connected, return configured IO with null values
+            for io_name, io_config in io_mapping.items():
+                io_data[io_name] = {
+                    'value': None,
+                    'type': io_config['type'],
+                    'description': io_config['description'],
+                    'address': io_config['address'],
+                    'status': 'offline'
+                }
+        
+        return jsonify({'io_data': io_data})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
