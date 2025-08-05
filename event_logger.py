@@ -10,6 +10,7 @@ class EventLogger:
         self.log_file = log_file
         self.previous_states = {}
         self.max_events = 1000  # Maximum number of events to keep
+        self.plc_communication_status = None  # Track overall PLC communication
         
     def log_event(self, io_name: str, old_value: Any, new_value: Any, io_config: Dict):
         """Log an IO state change event"""
@@ -27,14 +28,17 @@ class EventLogger:
             elif old_value == 1 and new_value == 0:
                 event_type = "deactivated"
         
-        # Special handling for E-Stop events
+        # Special handling for E-Stop events - only for real state changes
         priority = "normal"
         if "stop" in io_name.lower() or "estop" in io_name.lower():
             priority = "critical"
-            if new_value == 1 or new_value == True:
-                event_type = "emergency_stop"  # E-Stop activated
-            elif new_value == 0 or new_value == False:
-                event_type = "emergency_stop"  # E-Stop deactivated (still important!)
+            
+            # Only log E-Stop events when we have valid state transitions
+            if old_value is not None and new_value is not None:
+                if new_value == 1 or new_value == True:
+                    event_type = "emergency_stop"  # Real E-Stop activated
+                elif new_value == 0 or new_value == False:
+                    event_type = "emergency_stop"  # Real E-Stop deactivated
         elif "alarm" in io_name.lower() and new_value == 1:
             priority = "high"
         
@@ -54,6 +58,31 @@ class EventLogger:
         
         return event
     
+    def log_communication_event(self, is_connected: bool):
+        """Log PLC communication status changes"""
+        if self.plc_communication_status == is_connected:
+            return None  # No change in communication status
+            
+        timestamp = datetime.now().isoformat()
+        
+        event_type = "plc_connected" if is_connected else "plc_disconnected"
+        priority = "high" if not is_connected else "normal"
+        
+        event = {
+            'timestamp': timestamp,
+            'io_name': 'PLC_Communication',
+            'description': 'PLC communication status',
+            'address': 'SYSTEM',
+            'old_value': self.plc_communication_status,
+            'new_value': is_connected,
+            'event_type': event_type,
+            'priority': priority
+        }
+        
+        self.plc_communication_status = is_connected
+        self._save_event(event)
+        return event
+    
     def check_and_log_changes(self, current_io_data: Dict, io_mapping: Dict):
         """Check for changes in IO data and log events"""
         events = []
@@ -69,15 +98,18 @@ class EventLogger:
             
             # Check if value has actually changed
             if previous_value != current_value:
-                event = self.log_event(
-                    io_name, 
-                    previous_value, 
-                    current_value, 
-                    io_mapping.get(io_name, {})
-                )
-                events.append(event)
+                # Only log IO events for valid state changes (not communication issues)
+                # Communication issues are handled separately by log_communication_event()
+                if previous_value is not None and current_value is not None:
+                    event = self.log_event(
+                        io_name, 
+                        previous_value, 
+                        current_value, 
+                        io_mapping.get(io_name, {})
+                    )
+                    events.append(event)
                 
-                # Update previous state
+                # Always update previous state regardless
                 self.previous_states[io_name] = current_value
         
         return events
@@ -174,6 +206,10 @@ class EventLogger:
                     change_desc = "E-STOP ACTIVATED"
                 else:
                     change_desc = "E-STOP RELEASED"
+            elif event.get('event_type') == 'plc_connected':
+                change_desc = "PLC CONNECTED"
+            elif event.get('event_type') == 'plc_disconnected':
+                change_desc = "PLC DISCONNECTED"
             elif event.get('event_type') == 'activated':
                 change_desc = "ON"
             elif event.get('event_type') == 'deactivated':

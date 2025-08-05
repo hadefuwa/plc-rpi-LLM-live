@@ -1266,8 +1266,10 @@ def get_io_status():
         plc = PLCCommunicator()
         io_mapping = get_io_mapping()
         io_data = {}
+        plc_connected = False
         
         if plc.connect():
+            plc_connected = True
             # Read all configured IO points
             for io_name, io_config in io_mapping.items():
                 try:
@@ -1289,6 +1291,7 @@ def get_io_status():
                     }
             plc.disconnect()
         else:
+            plc_connected = False
             # If PLC not connected, return configured IO with null values
             for io_name, io_config in io_mapping.items():
                 io_data[io_name] = {
@@ -1299,10 +1302,15 @@ def get_io_status():
                     'status': 'offline'
                 }
         
-        # Check for changes and log events
-        events = event_logger.check_and_log_changes(io_data, io_mapping)
+        # Log PLC communication status changes (separate from IO events)
+        comm_event = event_logger.log_communication_event(plc_connected)
         
-        return jsonify({'io_data': io_data, 'new_events': len(events)})
+        # Check for changes and log IO events (only for valid state changes)
+        io_events = event_logger.check_and_log_changes(io_data, io_mapping)
+        
+        total_events = len(io_events) + (1 if comm_event else 0)
+        
+        return jsonify({'io_data': io_data, 'new_events': total_events})
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
