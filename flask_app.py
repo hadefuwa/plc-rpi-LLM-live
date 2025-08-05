@@ -2,9 +2,10 @@ from flask import Flask, render_template_string, request, jsonify
 import pandas as pd
 import json
 import requests
-from config import load_config, save_config, get_config_summary, update_plc_settings, update_io_mapping
+from config import load_config, save_config, get_config_summary, update_plc_settings, update_io_mapping, get_io_mapping
 from plc_communicator import PLCCommunicator
 from nav_template import NAV_TEMPLATE, NAV_STYLES
+from event_logger import event_logger
 
 app = Flask(__name__)
 
@@ -625,6 +626,37 @@ template = '''
             color: #666;
             font-size: 12px;
         }
+        .event-log-section {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .event-log-header {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+        }
+        .event-log-content {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .event-item {
+            padding: 3px 0;
+            font-family: monospace;
+            font-size: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .event-item:last-child {
+            border-bottom: none;
+        }
+        .no-events {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
         .page-header {
             margin-bottom: 30px;
             padding-bottom: 20px;
@@ -676,6 +708,17 @@ template = '''
             <div class="refresh-info">
                 <button class="btn" onclick="refreshIOStatus()" style="background-color: #28a745;">Refresh IO Status</button>
                 <span id="lastUpdate">Last update: Never</span>
+            </div>
+        </div>
+        
+        <div class="event-log-section">
+            <div class="event-log-header">
+                Recent Events Log
+                <button class="btn" onclick="clearEventLog()" style="float: right; font-size: 12px; padding: 5px 10px; background-color: #dc3545; margin-left: 5px;">Clear Log</button>
+                <button class="btn" onclick="refreshEventLog()" style="float: right; font-size: 12px; padding: 5px 10px;">Refresh</button>
+            </div>
+            <div class="event-log-content" id="eventLogContent">
+                <div class="no-events">Loading events...</div>
             </div>
         </div>
         
@@ -776,6 +819,79 @@ template = '''
             });
         }
         
+        function refreshEventLog() {
+            fetch('/get_event_log')
+            .then(response => response.json())
+            .then(data => {
+                updateEventLog(data.events);
+            })
+            .catch(error => {
+                console.error('Error refreshing event log:', error);
+                document.getElementById('eventLogContent').innerHTML = '<div class="no-events">Error loading events</div>';
+            });
+        }
+        
+        function clearEventLog() {
+            if (confirm('Are you sure you want to clear all event logs? This action cannot be undone.')) {
+                fetch('/clear_event_log', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('eventLogContent').innerHTML = '<div class="no-events">Event log cleared - no events recorded yet</div>';
+                        alert('Event log cleared successfully!');
+                    } else {
+                        alert('Error clearing event log: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error clearing event log:', error);
+                    alert('Error clearing event log: ' + error);
+                });
+            }
+        }
+        
+        function updateEventLog(events) {
+            const eventLogContent = document.getElementById('eventLogContent');
+            
+            if (!events || events.length === 0) {
+                eventLogContent.innerHTML = '<div class="no-events">No events recorded yet</div>';
+                return;
+            }
+            
+            let html = '';
+            events.forEach(event => {
+                // Only show events that represent actual changes (not initialization)
+                if (event.event_type === 'initialization') {
+                    return; // Skip initialization events
+                }
+                
+                // Format simple change description
+                let change = '';
+                if (event.event_type === 'emergency_stop') {
+                    change = 'EMERGENCY STOP';
+                } else if (event.event_type === 'activated') {
+                    change = 'ON';
+                } else if (event.event_type === 'deactivated') {
+                    change = 'OFF';
+                } else if (event.change_description.includes('→')) {
+                    change = event.change_description;
+                } else {
+                    change = event.change_description;
+                }
+                
+                html += `<div class="event-item">${event.formatted_time} - ${event.io_name}: ${change}</div>`;
+            });
+            
+            if (html === '') {
+                eventLogContent.innerHTML = '<div class="no-events">No changes recorded yet</div>';
+            } else {
+                eventLogContent.innerHTML = html;
+            }
+        }
+        
         function refreshIOStatus() {
             fetch('/get_io_status')
             .then(response => response.json())
@@ -862,11 +978,13 @@ template = '''
         
         // Auto-refresh every 5 seconds
         setInterval(refreshIOStatus, 5000);
+        setInterval(refreshEventLog, 10000); // Refresh events every 10 seconds
         setInterval(updateConnectionStatus, 10000); // Update connection status every 10 seconds
         
-        // Load initial IO status when page loads
+        // Load initial data when page loads
         document.addEventListener('DOMContentLoaded', function() {
             refreshIOStatus();
+            refreshEventLog();
             updateConnectionStatus();
             
             // Enter key handler
@@ -881,11 +999,19 @@ template = '''
 
 @app.route('/')
 def home():
-    # Calculate system metrics from live IO data
+    # Calculate system metrics from live IO data and event statistics
     try:
         plc = PLCCommunicator()
+        io_mapping = get_io_mapping()
+        
         if plc.connect():
-            io_data = plc.read_all_io()
+            io_data = {}
+            for io_name, io_config in io_mapping.items():
+                try:
+                    value = plc.read_io(io_name)
+                    io_data[io_name] = value
+                except:
+                    io_data[io_name] = None
             plc.disconnect()
             
             # Count active signals
@@ -894,18 +1020,27 @@ def home():
             system_status = f"{active_signals}/{total_signals} signals active"
         else:
             system_status = "PLC not connected"
+            total_signals = len(io_mapping)
             active_signals = 0
-            total_signals = 0
-    except:
+    except Exception as e:
         system_status = "Error reading PLC"
-        active_signals = 0
         total_signals = 0
+        active_signals = 0
+    
+    # Get event statistics
+    try:
+        event_stats = event_logger.get_event_statistics()
+        emergency_stops = event_stats.get('critical_events', 0)
+        data_points = event_stats.get('events_today', 0)
+    except:
+        emergency_stops = 0
+        data_points = 0
     
     return render_template_string(template,
         nav_html=NAV_TEMPLATE,
         nav_styles=NAV_STYLES,
-        data_points=total_signals,
-        emergency_stops=active_signals,
+        data_points=data_points,
+        emergency_stops=emergency_stops,
         system_status=system_status
     )
 
@@ -1164,12 +1299,50 @@ def get_io_status():
                     'status': 'offline'
                 }
         
-        return jsonify({'io_data': io_data})
+        # Check for changes and log events
+        events = event_logger.check_and_log_changes(io_data, io_mapping)
+        
+        return jsonify({'io_data': io_data, 'new_events': len(events)})
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/get_event_log')
+def get_event_log():
+    """Get recent event log entries"""
+    try:
+        # Get recent events
+        recent_events = event_logger.get_recent_events(limit=20)
+        
+        # Format events for display
+        formatted_events = [event_logger.format_event_for_display(event) for event in recent_events]
+        
+        # Get event statistics
+        stats = event_logger.get_event_statistics()
+        
+        return jsonify({
+            'events': formatted_events,
+            'statistics': stats
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/clear_event_log', methods=['POST'])
+def clear_event_log():
+    """Clear all event log entries"""
+    try:
+        # Clear the events by writing an empty array to the file
+        import json
+        with open('io_events.json', 'w') as f:
+            json.dump([], f)
+        
+        return jsonify({'status': 'success', 'message': 'Event log cleared successfully'})
+        
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='127.0.0.1', port=5001, debug=True)

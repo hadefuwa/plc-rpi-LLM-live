@@ -35,7 +35,7 @@ python flask_app.py
 
 ### 4. Access the Web Interface
 
-Open your browser and go to: `http://localhost:5000`
+Open your browser and go to: `http://localhost:5001`
 
 ## PLC Configuration
 

@@ -1,6 +1,6 @@
 {
   "plc": {
-    "ip": "192.168.1.100",
+    "ip": "192.168.0.99",
     "rack": 0,
     "slot": 1
   },
@@ -8,52 +8,7 @@
     "E_Stop_Status": {
       "type": "bit",
       "address": "DB1.DBX0.0",
-      "description": "Emergency stop activation (0=OFF, 1=ON)"
-    },
-    "Pump_Running": {
-      "type": "bit",
-      "address": "DB1.DBX0.1",
-      "description": "Pump operational status (0=OFF, 1=ON)"
-    },
-    "Tank_Level_Low": {
-      "type": "bit",
-      "address": "DB1.DBX0.2",
-      "description": "Low tank level indicator (0=OK, 1=LOW)"
-    },
-    "Valve_Open": {
-      "type": "bit",
-      "address": "DB1.DBX0.3",
-      "description": "Valve position (0=CLOSED, 1=OPEN)"
-    },
-    "Motor_Control": {
-      "type": "bit",
-      "address": "DB1.DBX0.4",
-      "description": "Motor control signal (0=OFF, 1=ON)"
-    },
-    "Alarm_Relay": {
-      "type": "bit",
-      "address": "DB1.DBX0.5",
-      "description": "Alarm relay status (0=OFF, 1=ON)"
-    },
-    "Pressure_High": {
-      "type": "bit",
-      "address": "DB1.DBX0.6",
-      "description": "High pressure indicator (0=OK, 1=HIGH)"
-    },
-    "Temperature_High": {
-      "type": "bit",
-      "address": "DB1.DBX0.7",
-      "description": "High temperature indicator (0=OK, 1=HIGH)"
-    },
-    "Flow_Rate": {
-      "type": "word",
-      "address": "DB1.DBW1",
-      "description": "System flow rate in L/min"
-    },
-    "TEST_IO": {
-      "type": "bit",
-      "address": "DB1.DBX0.0",
-      "description": "Test IO Point"
+      "description": "Emergency stop activation"
     }
   }
 }
