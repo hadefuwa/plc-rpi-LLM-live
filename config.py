@@ -59,10 +59,13 @@ DEFAULT_CONFIG = {
             "address": "DB1.DBW1",
             "description": "System flow rate in L/min"
         }
-    }
+    },
+    "io_groups": {}
 }
 
-CONFIG_FILE = "plc_config.json"
+# Store config under data/plc_config.json
+BASE_DIR = os.path.dirname(__file__)
+CONFIG_FILE = os.path.join(BASE_DIR, 'data', 'plc_config.json')
 
 def load_config():
     """Load configuration from file, create default if not exists"""
@@ -75,12 +78,16 @@ def load_config():
             return DEFAULT_CONFIG
     else:
         # Create default config file
+        # Ensure data directory exists
+        os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)
         save_config(DEFAULT_CONFIG)
         return DEFAULT_CONFIG
 
 def save_config(config):
     """Save configuration to file"""
     try:
+        # Ensure data directory exists
+        os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)
         with open(CONFIG_FILE, 'w') as f:
             json.dump(config, f, indent=2)
         return True
@@ -97,6 +104,29 @@ def get_io_mapping():
     """Get IO mapping configuration"""
     config = load_config()
     return config.get("io_mapping", {})
+
+def get_io_groups():
+    """Get IO groups configuration"""
+    config = load_config()
+    return config.get("io_groups", {})
+
+def update_io_group(group_name, io_names_list):
+    """Create or update an IO group with a list of IO names"""
+    if not isinstance(io_names_list, list):
+        raise ValueError("io_names_list must be a list of IO names")
+    config = load_config()
+    if "io_groups" not in config:
+        config["io_groups"] = {}
+    config["io_groups"][group_name] = io_names_list
+    return save_config(config)
+
+def remove_io_group(group_name):
+    """Remove an IO group by name"""
+    config = load_config()
+    if "io_groups" in config and group_name in config["io_groups"]:
+        del config["io_groups"][group_name]
+        return save_config(config)
+    return True
 
 def update_plc_settings(ip, rack=0, slot=1):
     """Update PLC connection settings"""

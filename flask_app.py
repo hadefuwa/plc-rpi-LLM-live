@@ -2,14 +2,23 @@ from flask import Flask, render_template_string, request, jsonify
 import pandas as pd
 import json
 import requests
-from config import load_config, save_config, get_config_summary, update_plc_settings, update_io_mapping, get_io_mapping
+import atexit
+from config import (
+    load_config, save_config, get_config_summary, update_plc_settings,
+    update_io_mapping, get_io_mapping, get_io_groups, update_io_group, remove_io_group
+)
 from plc_communicator import PLCCommunicator
 from nav_template import NAV_TEMPLATE, NAV_STYLES
 from event_logger import event_logger
+import os
 
 app = Flask(__name__)
 
 # No longer loading CSV data - using live PLC data instead
+
+# Create a single PLC communicator instance and clean up on exit
+plc = PLCCommunicator()
+atexit.register(plc.disconnect)
 
 def query_ollama(prompt, data_summary):
     """Send query to local Ollama API with Gemma3 1B model"""
@@ -60,6 +69,7 @@ config_template = '''
 <html>
 <head>
     <title>PLC Configuration - E-Stop AI Status Reporter</title>
+    <link rel="icon" href="/static/favicon.ico">
     <style>
         /* Navigation Styles */
         {{ nav_styles|safe }}
@@ -212,6 +222,24 @@ config_template = '''
             <h2>IO Mapping Configuration</h2>
             <p>Configure your PLC IO addresses. Current mapping has {{ config.io_count }} items.</p>
             
+            <div class="section">
+                <h3>IO Groups</h3>
+                <div id="groupsList"></div>
+                <h4>Add / Update Group</h4>
+                <form id="groupForm">
+                    <div class="form-group">
+                        <label for="group_name">Group Name:</label>
+                        <input type="text" id="group_name" name="group_name" placeholder="e.g., Digital Inputs" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="group_items">IO Names (comma separated):</label>
+                        <input type="text" id="group_items" name="group_items" placeholder="e.g., A0_State, A1_State">
+                    </div>
+                    <button type="submit" class="btn">Save Group</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteGroup()">Delete Group</button>
+                </form>
+            </div>
+
             <div id="ioMapping">
                 {% for io_name, io_config in config.io_mapping.items() %}
                 <div class="io-item">
@@ -440,6 +468,7 @@ template = '''
 <html>
 <head>
     <title>E-Stop AI Status Reporter</title>
+    <link rel="icon" href="/static/favicon.ico">
     <style>
         /* Navigation Styles */
         {{ nav_styles|safe }}
@@ -657,6 +686,12 @@ template = '''
             color: #666;
             font-style: italic;
         }
+        /* Grouped IO styles */
+        .group-item { margin: 10px 0; }
+        .group-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .group-title { font-weight: bold; font-size: 16px; }
+        .group-children { display: none; margin-left: 10px; }
+        .toggle-btn { font-size: 12px; padding: 4px 8px; }
         .page-header {
             margin-bottom: 30px;
             padding-bottom: 20px;
@@ -702,8 +737,8 @@ template = '''
         
         <h2>Live IO Status</h2>
         <div class="io-status-container">
-            <div class="io-grid" id="ioGrid">
-                <!-- IO status will be loaded here -->
+            <div id="ioGroupsContainer">
+                <!-- Grouped IO status will be inserted here -->
             </div>
             <div class="refresh-info">
                 <button class="btn" onclick="refreshIOStatus()" style="background-color: #28a745;">Refresh IO Status</button>
@@ -855,6 +890,7 @@ template = '''
         
         function updateEventLog(events) {
             const eventLogContent = document.getElementById('eventLogContent');
+            if (!eventLogContent) { return; }
             
             if (!events || events.length === 0) {
                 eventLogContent.innerHTML = '<div class="no-events">No events recorded yet</div>';
@@ -868,23 +904,57 @@ template = '''
                     return; // Skip initialization events
                 }
                 
-                // Format simple change description
-                let change = '';
-                if (event.event_type === 'emergency_stop') {
-                    change = 'EMERGENCY STOP';
-                } else if (event.event_type === 'activated') {
-                    change = 'ON';
-                } else if (event.event_type === 'deactivated') {
-                    change = 'OFF';
-                } else if (event.change_description.includes('→')) {
-                    change = event.change_description;
-                } else {
-                    change = event.change_description;
-                }
+                // Use the pre-formatted change description from the event logger
+                // The event logger already handles all the formatting logic correctly
+                let change = event.change_description || 'Unknown change';
                 
                 html += `<div class="event-item">${event.formatted_time} - ${event.io_name}: ${change}</div>`;
             });
             
+            // Load groups list on config page
+            loadGroups();
+
+            // Group form
+            document.getElementById('groupForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('group_name').value.trim();
+                const items = document.getElementById('group_items').value
+                    .split(',')
+                    .map(s => s.trim())
+                    .filter(Boolean);
+                fetch('/update_io_group', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ group_name: name, items: items })
+                })
+                .then(r => r.json())
+                .then(data => { if (data.success) { alert('Group saved'); loadGroups(); } else { alert('Error: ' + data.error); } });
+            });
+
+            window.deleteGroup = function() {
+                const name = document.getElementById('group_name').value.trim();
+                if (!name) { alert('Enter group name'); return; }
+                fetch('/remove_io_group', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ group_name: name })
+                }).then(r => r.json()).then(data => { if (data.success) { alert('Group deleted'); loadGroups(); } else { alert('Error: ' + data.error); } });
+            }
+
+            function loadGroups() {
+                fetch('/get_io_groups')
+                .then(r => r.json())
+                .then(data => {
+                    const div = document.getElementById('groupsList');
+                    const groups = data.io_groups || {};
+                    if (Object.keys(groups).length === 0) { div.innerHTML = '<div class="no-events">No groups defined</div>'; return; }
+                    let html = '';
+                    Object.entries(groups).forEach(([name, items]) => {
+                        html += `<div style="margin:8px 0;"><strong>${name}</strong>: ${items.join(', ')}</div>`;
+                    });
+                    div.innerHTML = html;
+                });
+            }
+
             if (html === '') {
                 eventLogContent.innerHTML = '<div class="no-events">No changes recorded yet</div>';
             } else {
@@ -896,7 +966,7 @@ template = '''
             fetch('/get_io_status')
             .then(response => response.json())
             .then(data => {
-                updateIOGrid(data.io_data);
+                updateGroupedIO(data.io_data, data.io_groups);
                 document.getElementById('lastUpdate').textContent = 'Last update: ' + new Date().toLocaleTimeString();
             })
             .catch(error => {
@@ -904,48 +974,148 @@ template = '''
                 document.getElementById('lastUpdate').textContent = 'Last update: Error - ' + new Date().toLocaleTimeString();
             });
         }
-        
-        function updateIOGrid(ioData) {
-            const ioGrid = document.getElementById('ioGrid');
-            ioGrid.innerHTML = '';
-            
-            for (const [ioName, ioInfo] of Object.entries(ioData)) {
-                const card = document.createElement('div');
-                card.className = 'io-card';
-                
-                // Determine status class
-                if (ioInfo.status === 'error') {
-                    card.classList.add('error');
-                } else if (ioInfo.value !== null) {
-                    card.classList.add('online');
-                } else {
-                    card.classList.add('offline');
-                }
-                
-                // Determine value class
-                let valueClass = 'number';
+
+        function renderCard(ioName, ioInfo) {
+            const card = document.createElement('div');
+            card.className = 'io-card';
+            if (ioInfo.status === 'error') {
+                card.classList.add('error');
+            } else if (ioInfo.value !== null) {
+                card.classList.add('online');
+            } else {
+                card.classList.add('offline');
+            }
+            let valueClass = 'number';
+            if (ioInfo.type === 'bit') {
+                valueClass = ioInfo.value ? 'on' : 'off';
+            }
+            let valueDisplay = 'ERROR';
+            if (ioInfo.value !== null) {
                 if (ioInfo.type === 'bit') {
-                    valueClass = ioInfo.value ? 'on' : 'off';
+                    valueDisplay = ioInfo.value ? 'ON' : 'OFF';
+                } else {
+                    valueDisplay = ioInfo.value.toString();
                 }
-                
-                // Format value display
-                let valueDisplay = 'ERROR';
-                if (ioInfo.value !== null) {
-                    if (ioInfo.type === 'bit') {
-                        valueDisplay = ioInfo.value ? 'ON' : 'OFF';
-                    } else {
-                        valueDisplay = ioInfo.value.toString();
+            }
+            card.innerHTML = `
+                <div class="io-name">${ioName}</div>
+                <div class="io-description">${ioInfo.description}</div>
+                <div class="io-value ${valueClass}">${valueDisplay}</div>
+                <div class="io-address">${ioInfo.address}</div>
+            `;
+            return card;
+        }
+
+        function updateGroupedIO(ioData, ioGroups) {
+            const container = document.getElementById('ioGroupsContainer');
+            container.innerHTML = '';
+
+            // If groups exist, render by group order; otherwise render all flat
+            if (ioGroups && Object.keys(ioGroups).length > 0) {
+                Object.entries(ioGroups).forEach(([groupName, ioList]) => {
+                    const section = document.createElement('div');
+                    section.className = 'section';
+                    const h3 = document.createElement('h3');
+                    h3.textContent = groupName;
+                    section.appendChild(h3);
+
+                    // Build hierarchical rows for Digital Inputs/Outputs and Analogue Inputs
+                    const grid = document.createElement('div');
+                    grid.className = 'io-grid';
+
+                    // Helper to create parent row with collapsible children
+                    function addParentWithChildren(parentName, childNames) {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'group-item';
+                        const header = document.createElement('div');
+                        header.className = 'group-header';
+                        const btn = document.createElement('button');
+                        btn.className = 'btn toggle-btn';
+                        btn.textContent = 'Show details';
+                        const title = document.createElement('div');
+                        title.className = 'group-title';
+                        title.textContent = parentName;
+                        header.appendChild(btn);
+                        header.appendChild(title);
+
+                        // Main parent card
+                        if (ioData[parentName]) {
+                            header.appendChild(renderCard(parentName, ioData[parentName]));
+                        }
+                        wrapper.appendChild(header);
+
+                        const children = document.createElement('div');
+                        children.className = 'group-children';
+                        (childNames || []).forEach(n => {
+                            if (ioData[n]) {
+                                children.appendChild(renderCard(n, ioData[n]));
+                            }
+                        });
+                        wrapper.appendChild(children);
+
+                        btn.addEventListener('click', function() {
+                            const visible = children.style.display === 'block';
+                            children.style.display = visible ? 'none' : 'block';
+                            btn.textContent = visible ? 'Show details' : 'Hide details';
+                        });
+
+                        grid.appendChild(wrapper);
                     }
-                }
-                
-                card.innerHTML = `
-                    <div class="io-name">${ioName}</div>
-                    <div class="io-description">${ioInfo.description}</div>
-                    <div class="io-value ${valueClass}">${valueDisplay}</div>
-                    <div class="io-address">${ioInfo.address}</div>
-                `;
-                
-                ioGrid.appendChild(card);
+
+                    // Decide how to group based on naming conventions
+                    if (groupName === 'Digital Inputs' || groupName === 'Digital Outputs') {
+                        const buckets = {};
+                        (ioList || []).forEach(name => {
+                            const base = name.split('_')[0]; // A0, A1, Out_A0, etc.
+                            if (!buckets[base]) buckets[base] = [];
+                            buckets[base].push(name);
+                        });
+                        Object.entries(buckets).forEach(([base, names]) => {
+                            // Parent preference: State if present, else first
+                            const parent = names.find(n => /_State$/i.test(n)) || names[0];
+                            const children = names.filter(n => n !== parent);
+                            addParentWithChildren(parent, children);
+                        });
+                    } else if (groupName === 'Analogue Inputs') {
+                        const buckets = {};
+                        (ioList || []).forEach(name => {
+                            const base = name.split('_')[0]; // AI0, AI1
+                            if (!buckets[base]) buckets[base] = [];
+                            buckets[base].push(name);
+                        });
+                        Object.entries(buckets).forEach(([base, names]) => {
+                            const parent = names.find(n => /_Scaled$/i.test(n)) || names[0];
+                            const children = names.filter(n => n !== parent);
+                            addParentWithChildren(parent, children);
+                        });
+                    } else {
+                        // Default: render cards flat
+                        (ioList || []).forEach(name => {
+                            if (ioData[name]) {
+                                grid.appendChild(renderCard(name, ioData[name]));
+                            }
+                        });
+                    }
+
+                    section.appendChild(grid);
+                    container.appendChild(section);
+                });
+            }
+
+            // Show any remaining IOs not listed in groups under "Ungrouped"
+            const groupedSet = new Set([].concat(...Object.values(ioGroups || {})));
+            const ungrouped = Object.entries(ioData).filter(([n]) => !groupedSet.has(n));
+            if (ungrouped.length > 0) {
+                const section = document.createElement('div');
+                section.className = 'section';
+                const h3 = document.createElement('h3');
+                h3.textContent = 'Ungrouped';
+                section.appendChild(h3);
+                const grid = document.createElement('div');
+                grid.className = 'io-grid';
+                ungrouped.forEach(([name, info]) => grid.appendChild(renderCard(name, info)));
+                section.appendChild(grid);
+                container.appendChild(section);
             }
         }
         
@@ -982,15 +1152,18 @@ template = '''
         setInterval(updateConnectionStatus, 10000); // Update connection status every 10 seconds
         
         // Load initial data when page loads
-        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function() {
             refreshIOStatus();
             refreshEventLog();
             updateConnectionStatus();
             
-            // Enter key handler
-            document.getElementById('questionInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') sendQuestion();
-            });
+            // Enter key handler (only if input exists on this page)
+            const qi = document.getElementById('questionInput');
+            if (qi) {
+                qi.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') sendQuestion();
+                });
+            }
         });
     </script>
 </body>
@@ -1193,6 +1366,34 @@ def remove_io_mapping():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/get_io_groups')
+def get_groups():
+    try:
+        return jsonify({'io_groups': get_io_groups()})
+    except Exception as e:
+        return jsonify({'io_groups': {}, 'error': str(e)})
+
+@app.route('/update_io_group', methods=['POST'])
+def update_group():
+    try:
+        data = request.json
+        name = data.get('group_name', '').strip()
+        items = data.get('items', [])
+        success = update_io_group(name, items)
+        return jsonify({'success': success})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/remove_io_group', methods=['POST'])
+def remove_group():
+    try:
+        data = request.json
+        name = data.get('group_name', '').strip()
+        success = remove_io_group(name)
+        return jsonify({'success': success})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/status')
 def system_status():
     """System status page"""
@@ -1201,6 +1402,7 @@ def system_status():
     <html>
     <head>
         <title>System Status - E-Stop AI Status Reporter</title>
+        <link rel="icon" href="/static/favicon.ico">
         <style>
             {{ nav_styles|safe }}
             body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
@@ -1234,6 +1436,7 @@ def event_logs():
     <html>
     <head>
         <title>Event Logs - E-Stop AI Status Reporter</title>
+        <link rel="icon" href="/static/favicon.ico">
         <style>
             {{ nav_styles|safe }}
             body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
@@ -1263,13 +1466,18 @@ def event_logs():
 def get_io_status():
     """Get current IO status from PLC"""
     try:
-        plc = PLCCommunicator()
         io_mapping = get_io_mapping()
+        io_groups = get_io_groups()
         io_data = {}
         plc_connected = False
-        
-        if plc.connect():
+
+        # Ensure persistent connection
+        if not plc.is_connected():
+            plc_connected = plc.connect()
+        else:
             plc_connected = True
+
+        if plc_connected:
             # Read all configured IO points
             for io_name, io_config in io_mapping.items():
                 try:
@@ -1289,9 +1497,7 @@ def get_io_status():
                         'address': io_config['address'],
                         'status': 'error'
                     }
-            plc.disconnect()
         else:
-            plc_connected = False
             # If PLC not connected, return configured IO with null values
             for io_name, io_config in io_mapping.items():
                 io_data[io_name] = {
@@ -1310,7 +1516,7 @@ def get_io_status():
         
         total_events = len(io_events) + (1 if comm_event else 0)
         
-        return jsonify({'io_data': io_data, 'new_events': total_events})
+        return jsonify({'io_data': io_data, 'io_groups': io_groups, 'new_events': total_events})
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -1353,4 +1559,6 @@ def clear_event_log():
 
 
 if __name__ == '__main__':
+    # Ensure folders exist for static assets
+    os.makedirs(os.path.join(os.path.dirname(__file__), 'static'), exist_ok=True)
     app.run(host='127.0.0.1', port=5001, debug=True)

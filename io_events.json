@@ -1,0 +1,22 @@
+[
+  {
+    "timestamp": "2025-08-05T13:21:52.560997",
+    "io_name": "E_Stop_Status",
+    "description": "Emergency stop activation",
+    "address": "DB1.DBX0.0",
+    "old_value": true,
+    "new_value": false,
+    "event_type": "emergency_stop_pressed",
+    "priority": "critical"
+  },
+  {
+    "timestamp": "2025-08-05T13:23:52.560997",
+    "io_name": "E_Stop_Status",
+    "description": "Emergency stop activation",
+    "address": "DB1.DBX0.0",
+    "old_value": false,
+    "new_value": true,
+    "event_type": "emergency_stop_reset",
+    "priority": "critical"
+  }
+]

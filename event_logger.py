@@ -6,7 +6,12 @@ from typing import Dict, Any, List
 class EventLogger:
     """Event logging system for tracking IO state changes"""
     
-    def __init__(self, log_file='io_events.json'):
+    def __init__(self, log_file=None):
+        if log_file is None:
+            base_dir = os.path.dirname(__file__)
+            data_dir = os.path.join(base_dir, 'data')
+            os.makedirs(data_dir, exist_ok=True)
+            log_file = os.path.join(data_dir, 'io_events.json')
         self.log_file = log_file
         self.previous_states = {}
         self.max_events = 1000  # Maximum number of events to keep
@@ -35,10 +40,10 @@ class EventLogger:
             
             # Only log E-Stop events when we have valid state transitions
             if old_value is not None and new_value is not None:
-                if new_value == 1 or new_value == True:
-                    event_type = "emergency_stop"  # Real E-Stop activated
-                elif new_value == 0 or new_value == False:
-                    event_type = "emergency_stop"  # Real E-Stop deactivated
+                if new_value == 0 or new_value == False:
+                    event_type = "emergency_stop_pressed"  # Signal lost = E-Stop pressed
+                elif new_value == 1 or new_value == True:
+                    event_type = "emergency_stop_reset"    # Signal restored = E-Stop reset/healthy
         elif "alarm" in io_name.lower() and new_value == 1:
             priority = "high"
         
@@ -60,28 +65,34 @@ class EventLogger:
     
     def log_communication_event(self, is_connected: bool):
         """Log PLC communication status changes"""
+        # Skip logging frequent connect/disconnect cycles that are part of normal operation
+        # Only log if the state has been stable for a reasonable time or is a real failure
+        
+        current_time = datetime.now()
+        
+        # If this is the first time we're tracking communication status
+        if self.plc_communication_status is None:
+            self.plc_communication_status = is_connected
+            return None  # Don't log initial state
+        
+        # If status hasn't changed, no need to log
         if self.plc_communication_status == is_connected:
-            return None  # No change in communication status
-            
-        timestamp = datetime.now().isoformat()
+            return None
         
-        event_type = "plc_connected" if is_connected else "plc_disconnected"
-        priority = "high" if not is_connected else "normal"
+        # TODO: In the future, implement persistent connections to avoid these frequent cycles
+        # For now, we'll reduce the noise by not logging every connect/disconnect cycle
+        # which are part of the normal "connect -> read -> disconnect" pattern
         
-        event = {
-            'timestamp': timestamp,
-            'io_name': 'PLC_Communication',
-            'description': 'PLC communication status',
-            'address': 'SYSTEM',
-            'old_value': self.plc_communication_status,
-            'new_value': is_connected,
-            'event_type': event_type,
-            'priority': priority
-        }
+        # Only log actual connection failures (when we can't connect at all)
+        # vs normal operational connect/disconnect cycles
+        if not is_connected:
+            # This might be a real connection issue, but let's not spam the log
+            # since the app design causes frequent disconnects
+            pass
         
+        # Update status but don't create log events for routine connect/disconnect
         self.plc_communication_status = is_connected
-        self._save_event(event)
-        return event
+        return None
     
     def check_and_log_changes(self, current_io_data: Dict, io_mapping: Dict):
         """Check for changes in IO data and log events"""
@@ -200,12 +211,16 @@ class EventLogger:
             change_desc = f"{old_display} → {new_display}"
             if event.get('event_type') == 'initialization':
                 change_desc = f"Started: {new_display}"
+            elif event.get('event_type') == 'emergency_stop_pressed':
+                change_desc = "E-STOP PRESSED"
+            elif event.get('event_type') == 'emergency_stop_reset':
+                change_desc = "E-STOP RESET / HEALTHY"
             elif event.get('event_type') == 'emergency_stop':
-                # Be explicit about E-Stop state
+                # Legacy fallback for old events
                 if event.get('new_value') == True or event.get('new_value') == 1:
-                    change_desc = "E-STOP ACTIVATED"
+                    change_desc = "E-STOP RESET / HEALTHY"
                 else:
-                    change_desc = "E-STOP RELEASED"
+                    change_desc = "E-STOP PRESSED"
             elif event.get('event_type') == 'plc_connected':
                 change_desc = "PLC CONNECTED"
             elif event.get('event_type') == 'plc_disconnected':

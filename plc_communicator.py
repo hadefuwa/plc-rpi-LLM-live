@@ -135,6 +135,19 @@ class PLCCommunicator:
             self.last_error = f"Error reading dword: {str(e)}"
             return None
     
+    def read_real(self, db_number, byte_offset):
+        """Read a real (32-bit IEEE float) from PLC"""
+        try:
+            if not self.is_connected():
+                return None
+
+            data = self.client.db_read(db_number, byte_offset, 4)
+            return get_real(data, 0)
+
+        except Exception as e:
+            self.last_error = f"Error reading real: {str(e)}"
+            return None
+    
     def parse_address(self, address):
         """Parse PLC address like 'DB1.DBX0.0' or 'DB1.DBW2'"""
         try:
@@ -172,7 +185,7 @@ class PLCCommunicator:
                 bit_offset = 0
                 
             elif data_part.startswith('DBD'):
-                # DWord reading: DBD4
+                # DWord reading: DBD4 (can represent unsigned int or real)
                 data_type = 'dword'
                 byte_offset = int(data_part[3:])
                 bit_offset = 0
@@ -219,6 +232,9 @@ class PLCCommunicator:
             elif data_type == 'dword':
                 value = self.read_dword(addr_info['db_number'], 
                                       addr_info['byte_offset'])
+            elif data_type == 'real':
+                value = self.read_real(addr_info['db_number'],
+                                       addr_info['byte_offset'])
             else:
                 raise ValueError(f"Unsupported data type: {data_type}")
             
