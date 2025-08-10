@@ -122,6 +122,7 @@
   },
   "io_groups": {
     "Digital Inputs": [
+      "E_Stop_Status",
       "A0_State","A0_ForcedState","A0_ForcedStatus",
       "A1_State","A1_ForcedState","A1_ForcedStatus",
       "A2_State","A2_ForcedState","A2_ForcedStatus",
@@ -129,7 +130,13 @@
       "A4_State","A4_ForcedState","A4_ForcedStatus",
       "A5_State","A5_ForcedState","A5_ForcedStatus",
       "A6_State","A6_ForcedState","A6_ForcedStatus",
-      "A7_State","A7_ForcedState","A7_ForcedStatus"
+      "A7_State","A7_ForcedState","A7_ForcedStatus",
+      "B0_State","B0_ForcedState","B0_ForcedStatus",
+      "B1_State","B1_ForcedState","B1_ForcedStatus",
+      "B2_State","B2_ForcedState","B2_ForcedStatus",
+      "B3_State","B3_ForcedState","B3_ForcedStatus",
+      "B4_State","B4_ForcedState","B4_ForcedStatus",
+      "B5_State","B5_ForcedState","B5_ForcedStatus"
     ],
     "Digital Outputs": [
       "Out_A0_State","Out_A0_ForcedState","Out_A0_ForcedStatus",
