@@ -74,26 +74,30 @@ config_template = '''
         /* Navigation Styles */
         {{ nav_styles|safe }}
         
-        /* Main Content Styles */
+        /* Main Content Styles - Dark Theme */
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #0b1220; /* deep slate */
+            color: #e5e7eb; /* light text */
         }
         .container { 
-            max-width: 800px; 
+            max-width: 900px; 
             margin: 0 auto; 
-            background-color: white;
+            background-color: #0f172a; /* card surface */
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(2,6,23,.5);
+            border: 1px solid #1f2937;
         }
         .section {
             margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 16px;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            background: #0f172a;
+            box-shadow: 0 1px 3px rgba(2,6,23,.5);
         }
         .form-group {
             margin: 10px 0;
@@ -151,10 +155,11 @@ config_template = '''
             border: 1px solid #f5c6cb;
         }
         .io-item {
-            border: 1px solid #ddd;
-            padding: 10px;
+            border: 1px solid #1f2937;
+            padding: 12px;
             margin: 10px 0;
-            border-radius: 5px;
+            border-radius: 10px;
+            background: #0b1220;
         }
         .io-header {
             display: flex;
@@ -166,10 +171,7 @@ config_template = '''
             font-weight: bold;
             font-size: 16px;
         }
-        .io-description {
-            color: #666;
-            font-size: 12px;
-        }
+        .io-description { color: #9ca3af; font-size: 12px; }
         .test-result {
             margin: 10px 0;
             padding: 10px;
@@ -191,7 +193,7 @@ config_template = '''
     <!-- Navigation -->
     {{ nav_html|safe }}
     
-    <div class="container">
+    <div class="container page-grid">
         <div class="page-header">
             <h2>PLC Configuration</h2>
             <p>Configure your PLC connection settings and IO mapping.</p>
@@ -468,26 +470,45 @@ template = '''
 <html>
 <head>
     <title>E-Stop AI Status Reporter</title>
-    <link rel="icon" href="/static/favicon.ico">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f2937'/%3E%3Cpath d='M14 3l-3 10h5l-2 8 7-11h-5l3-7z' fill='%23ffffff'/%3E%3C/svg%3E">
     <style>
         /* Navigation Styles */
         {{ nav_styles|safe }}
         
-        /* Main Content Styles */
+        /* Main Content Styles - Dark Theme */
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 0;
-            background-color: #f5f5f5;
+            background-color: #0b1220;
+            color: #e5e7eb;
         }
         .container { 
             max-width: 100%; 
             margin: 0; 
-            background-color: white;
+            background-color: #0f172a;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(2,6,23,.5);
+            border: 1px solid #1f2937;
         }
+        /* Page grid layout */
+        .page-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+        .section-card { grid-column: 1 / -1; }
+        @media (min-width: 1100px) {
+            #events { grid-column: 1 / 8; }
+            #ai { grid-column: 8 / -1; }
+        }
+
+        /* Generic panel/card styling */
+        .panel { background: #0f172a; border: 1px solid #1f2937; border-radius: 12px; box-shadow: 0 1px 3px rgba(2,6,23,.5); }
+        .panel-header { display:flex; align-items:center; justify-content:space-between; padding: 12px 16px; border-bottom:1px solid #1f2937; }
+        .panel-title { font-weight: 800; font-size: 16px; color:#e5e7eb; }
+        .panel-subtitle { color:#94a3b8; font-size:12px; margin-left:8px; }
+        .panel-body { padding: 12px 16px; }
+        .quick-actions { display:flex; gap:10px; align-items:center; }
+        .search-input { width: 260px; max-width: 100%; background:#111827; color:#e5e7eb; border:1px solid #253049; border-radius:8px; padding:8px 10px; }
+        .search-input:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 2px rgba(37,99,235,.25); }
         .plot { 
             margin: 20px 0; 
             border: 1px solid #ddd;
@@ -495,58 +516,20 @@ template = '''
             padding: 10px;
         }
         .ai-section {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
+            background-color: #0f172a;
+            padding: 16px;
+            border-radius: 12px;
             margin: 20px 0;
-            border-left: 4px solid #007bff;
+            border: 1px solid #1f2937;
+            box-shadow: 0 1px 3px rgba(2,6,23,.5);
         }
-        .chat-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin: 10px 0;
-            font-size: 16px;
-        }
-        .btn {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .btn:hover {
-            background-color: #0056b3;
-        }
-        .example-btn {
-            background-color: #6c757d;
-            color: white;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            margin: 5px;
-            font-size: 12px;
-        }
-        .example-btn:hover {
-            background-color: #545b62;
-        }
-        .response {
-            background-color: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            white-space: pre-wrap;
-        }
-        .loading {
-            display: none;
-            color: #007bff;
-            font-style: italic;
-        }
+        .chat-input { width: 100%; padding: 10px; border: 1px solid #253049; border-radius: 8px; margin: 10px 0; font-size: 16px; background: #111827; color: #e5e7eb; }
+        .btn { background-color: #2563eb; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background-color: #1d4ed8; }
+        .example-btn { background-color: #374151; color: #e5e7eb; padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; margin: 5px; font-size: 12px; }
+        .example-btn:hover { background-color: #4b5563; }
+        .response { background-color: #0b1220; padding: 15px; border-radius: 10px; margin: 10px 0; border: 1px solid #1f2937; white-space: pre-wrap; color: #e5e7eb; }
+        .loading { display: none; color: #60a5fa; font-style: italic; }
         .table {
             width: 100%;
             border-collapse: collapse;
@@ -554,6 +537,20 @@ template = '''
             font-size: 12px;
             table-layout: fixed;
         }
+        /* IO table (dark) */
+        .io-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+        .io-table th { text-align: left; background:#0b1220; color:#e5e7eb; border-bottom:1px solid #1f2937; padding:10px; position: sticky; top:0; z-index:1; vertical-align: middle; }
+        .io-table td { padding: 10px; border-bottom: 1px solid #1f2937; color:#e5e7eb; vertical-align: middle; }
+        .io-table tbody tr:nth-child(odd) { background:#0f172a; }
+        .io-table tbody tr:nth-child(even) { background:#0d1627; }
+        .io-table th:nth-child(3), .io-table td:nth-child(3) { text-align: right; }
+        .io-table tr:hover { background:#0d1627; }
+        .group-row td { background:#0f172a; color:#94a3b8; font-weight:700; padding-top:12px; }
+        .value-cell { font-weight:800; text-align: right; }
+        .value-cell.offline { color:#f59e0b; }
+        .value-cell.error { color:#ef4444; }
+        .subchips { margin-top:4px; color:#94a3b8; font-size:11px; }
+        .subchip { display:inline-block; background:#111827; border:1px solid #1f2937; border-radius:6px; padding:2px 6px; margin-right:6px; }
         .table th, .table td {
             border: 1px solid #ddd;
             padding: 6px;
@@ -569,113 +566,98 @@ template = '''
             overflow-x: auto;
             margin: 20px 0;
         }
-        .metrics {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-        }
-        .metric {
-            text-align: center;
-            padding: 10px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            margin: 0 10px;
-        }
-        .metric h3 {
-            margin: 0;
-            color: #007bff;
-        }
+        /* Header metrics - professional look */
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 20px 0; }
+        .metric { background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%); border: 1px solid #1f2937; border-radius: 10px; padding: 16px; text-align: left; box-shadow: 0 1px 2px rgba(2,6,23,.5); }
+        .metric h3 { margin: 0; font-size: 24px; color: #e5e7eb; }
+        .metric p { margin: 4px 0 0; color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
         .io-status-container {
             margin: 20px 0;
         }
-        .io-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .io-card {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+        .io-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin: 16px 0; }
+        .io-card { background: #0b1220; border: 1px solid #1f2937; border-radius: 10px; padding: 10px; box-shadow: 0 1px 3px rgba(2,6,23,.5); transition: box-shadow .2s ease, transform .1s ease; }
+        .io-card.io-new { padding: 12px; }
+        .io-card:hover { box-shadow: 0 4px 14px rgba(2,6,23,.6); transform: translateY(-1px); }
         .io-card.online {
-            border-left: 4px solid #28a745;
+            border-left: 4px solid #22c55e;
         }
         .io-card.offline {
-            border-left: 4px solid #dc3545;
+            border-left: 4px solid #ef4444;
         }
         .io-card.error {
-            border-left: 4px solid #ffc107;
+            border-left: 4px solid #f59e0b;
         }
-        .io-name {
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-        .io-description {
-            color: #666;
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-        .io-value {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .io-value.on {
-            color: #28a745;
-        }
-        .io-value.off {
-            color: #dc3545;
-        }
-        .io-value.number {
-            color: #007bff;
-        }
+        .io-name { font-weight: 700; font-size: 13px; color: #e5e7eb; margin-bottom: 4px; }
+        .io-name-secondary { color: #94a3b8; font-size: 11px; margin-bottom: 6px; }
+        .io-description { color: #94a3b8; font-size: 11px; margin-bottom: 8px; min-height: 15px; }
+        .io-value { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+        .io-value.on { color: #16a34a; }
+        .io-value.off { color: #dc2626; }
+        .io-value.number { color: #0ea5e9; }
         .io-address {
-            font-family: monospace;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
             font-size: 11px;
-            color: #888;
-            background: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 3px;
+            color: #94a3b8;
+            background: #111827;
+            border: 1px solid #1f2937;
+            padding: 4px 6px;
+            border-radius: 6px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+        .desc-input { width: 100%; background: #111827; color: #e5e7eb; border: 1px solid #253049; border-radius: 6px; padding: 6px 8px; font-size: 13px; margin-bottom: 6px; }
+        .desc-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,.25); }
+
+        /* New header layout for IO cards */
+        .io-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+        .io-title-wrap { display:flex; align-items:center; gap:8px; }
+        .status-dot-mini { width:8px; height:8px; border-radius:50%; background:#6b7280; }
+        .status-dot-mini.on { background:#22c55e; }
+        .status-dot-mini.off { background:#ef4444; }
+        .status-dot-mini.error { background:#f59e0b; }
+        .io-title { font-weight:800; font-size:14px; color:#e5e7eb; }
+        .io-tag { color:#94a3b8; font-size:11px; }
+        .value-badge { min-width:64px; text-align:right; font-weight:800; padding:6px 8px; border-radius:8px; background:#111827; border:1px solid #1f2937; }
+        .value-badge.on { color:#16a34a; }
+        .value-badge.off { color:#dc2626; }
+        .value-badge.number { color:#0ea5e9; }
+        .io-footer { display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
+        .type-label { color:#94a3b8; font-size:11px; }
         .refresh-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-top: 15px;
             padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
+            background: #0b1220;
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            color: #94a3b8;
         }
-        .refresh-info span {
-            color: #666;
-            font-size: 12px;
-        }
-        .event-log-section {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .event-log-header {
-            background: #f8f9fa;
-            padding: 10px 15px;
-            border-bottom: 1px solid #ddd;
-            font-weight: bold;
-        }
+        .refresh-info span { color: #94a3b8; font-size: 12px; }
+        .event-log-section { margin: 20px 0; border: 1px solid #1f2937; border-radius: 12px; background: #0f172a; box-shadow: 0 1px 3px rgba(2,6,23,.5); }
+        .event-log-header { background: #0b1220; padding: 10px 15px; border-bottom: 1px solid #1f2937; font-weight: 700; color: #e5e7eb; border-top-left-radius: 12px; border-top-right-radius: 12px; }
         .event-log-content {
-            max-height: 300px;
+            max-height: min(40vh, 360px);
             overflow-y: auto;
-            padding: 10px;
+            overflow-x: hidden;
+            padding: 10px 12px 10px 10px;
+            scrollbar-gutter: stable both-edges;
+            scrollbar-color: #1f2937 #0b1220; /* Firefox */
+            scrollbar-width: thin;           /* Firefox */
         }
+        .event-log-content::-webkit-scrollbar { width: 8px; }
+        .event-log-content::-webkit-scrollbar-track { background: #0b1220; border-radius: 8px; }
+        .event-log-content::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 8px; }
+        .event-log-content::-webkit-scrollbar-thumb:hover { background: #374151; }
         .event-item {
             padding: 3px 0;
-            font-family: monospace;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
             font-size: 12px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid #1f2937;
+            color: #e5e7eb;
         }
         .event-item:last-child {
             border-bottom: none;
@@ -683,7 +665,7 @@ template = '''
         .no-events {
             padding: 20px;
             text-align: center;
-            color: #666;
+            color: #94a3b8;
             font-style: italic;
         }
         /* Grouped IO styles */
@@ -695,13 +677,14 @@ template = '''
         /* Improved parent-with-children card */
         .group-parent { position: relative; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .card-title { font-weight: 600; font-size: 14px; color: #333; }
-        .details-toggle { background: none; border: none; color: #007bff; cursor: pointer; padding: 0; font-size: 12px; }
-        .child-list { display: none; margin-top: 8px; border-top: 1px dashed #eee; padding-top: 8px; }
-        .child-chip { background: #f8f9fa; border: 1px solid #eee; border-radius: 6px; padding: 6px; margin-bottom: 6px; }
-        .child-chip .chip-name { font-weight: 600; font-size: 12px; color: #333; }
+        .card-title { font-weight: 700; font-size: 13px; color: #e5e7eb; }
+        .details-toggle { background: none; border: none; color: #60a5fa; cursor: pointer; padding: 0; font-size: 12px; }
+        .details-toggle:hover { text-decoration: underline; }
+        .child-list { display: none; margin-top: 8px; border-top: 1px dashed #e5e7eb; padding-top: 8px; }
+        .child-chip { background: #0f172a; border: 1px solid #1f2937; border-radius: 8px; padding: 8px; margin-bottom: 8px; }
+        .child-chip .chip-name { font-weight: 700; font-size: 12px; color: #e5e7eb; }
         .child-chip .chip-value { font-weight: 600; margin-left: 6px; }
-        .child-chip .chip-address { display: block; font-family: monospace; color: #888; font-size: 11px; }
+        .child-chip .chip-address { display: block; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; color: #6b7280; font-size: 11px; }
         .page-header {
             margin-bottom: 30px;
             padding-bottom: 20px;
@@ -729,7 +712,18 @@ template = '''
             <p>Monitor PLC system status and generate intelligent operator reports using Gemma3 1B AI</p>
         </div>
         
-        <h2>System Overview</h2>
+        <div class="section-card panel" style="grid-column: 1 / -1;">
+        <div class="panel-header">
+            <div>
+                <span class="panel-title">Dashboard</span>
+                <span class="panel-subtitle">Live view of PLC status and insights</span>
+            </div>
+            <div class="quick-actions">
+                <input class="search-input" id="filterInput" placeholder="Filter IO (e.g., A1, Red, PWM)" oninput="applyFilter()">
+                <button class="btn" onclick="refreshIOStatus()">Refresh All</button>
+            </div>
+        </div>
+        <div class="panel-body">
         <div class="metrics">
             <div class="metric">
                 <h3>{{ data_points }}</h3>
@@ -744,32 +738,43 @@ template = '''
                 <p>Current Status</p>
             </div>
         </div>
+        </div>
+        </div>
         
-        <h2>Live IO Status</h2>
-        <div class="io-status-container">
+        <div class="section-card panel" style="grid-column: 1 / -1;">
+        <div class="panel-header">
+            <div class="panel-title">Live IO Status</div>
+            <div class="quick-actions">
+                <button class="btn" onclick="refreshIOStatus()" style="background-color: #28a745;">Refresh</button>
+                <span id="lastUpdate" class="panel-subtitle">Last update: Never</span>
+            </div>
+        </div>
+        <div class="panel-body io-status-container">
             <div id="ioGroupsContainer">
                 <!-- Grouped IO status will be inserted here -->
             </div>
-            <div class="refresh-info">
-                <button class="btn" onclick="refreshIOStatus()" style="background-color: #28a745;">Refresh IO Status</button>
-                <span id="lastUpdate">Last update: Never</span>
-            </div>
+        </div>
         </div>
         
-        <div class="event-log-section">
-            <div class="event-log-header">
-                Recent Events Log
-                <button class="btn" onclick="clearEventLog()" style="float: right; font-size: 12px; padding: 5px 10px; background-color: #dc3545; margin-left: 5px;">Clear Log</button>
-                <button class="btn" onclick="refreshEventLog()" style="float: right; font-size: 12px; padding: 5px 10px;">Refresh</button>
+        <div class="event-log-section section-card panel" id="events">
+            <div class="panel-header">
+                <div class="panel-title">Recent Events</div>
+                <div class="quick-actions">
+                    <button class="btn" onclick="refreshEventLog()">Refresh</button>
+                    <button class="btn" onclick="clearEventLog()" style="background-color:#dc3545;">Clear</button>
+                </div>
             </div>
-            <div class="event-log-content" id="eventLogContent">
+            <div class="panel-body event-log-content" id="eventLogContent">
                 <div class="no-events">Loading events...</div>
             </div>
         </div>
         
-        <div class="ai-section">
-            <h2>AI Analysis with Gemma3 1B</h2>
-            <p>Ask questions about the PLC system status and get AI-powered operator insights!</p>
+        <div class="ai-section section-card panel" id="ai">
+            <div class="panel-header">
+                <div class="panel-title">AI Analysis with Gemma3 1B</div>
+                <div class="panel-subtitle">Ask questions about the PLC system status</div>
+            </div>
+            <div class="panel-body">
             
             <div>
                 <strong>Example Questions:</strong><br>
@@ -787,6 +792,7 @@ template = '''
             
             <div class="loading" id="loading">AI is analyzing your data...</div>
             <div id="response" class="response" style="display: none;"></div>
+            </div>
         </div>
         
         <!-- Technical info box removed per request to keep the home page clean -->
@@ -881,84 +887,36 @@ template = '''
             }
         }
         
-        function updateEventLog(events) {
-            const eventLogContent = document.getElementById('eventLogContent');
-            if (!eventLogContent) { return; }
-            
-            if (!events || events.length === 0) {
-                eventLogContent.innerHTML = '<div class="no-events">No events recorded yet</div>';
-                return;
-            }
-            
-            let html = '';
-            events.forEach(event => {
-                // Only show events that represent actual changes (not initialization)
-                if (event.event_type === 'initialization') {
-                    return; // Skip initialization events
-                }
-                
-                // Use the pre-formatted change description from the event logger
-                // The event logger already handles all the formatting logic correctly
-                let change = event.change_description || 'Unknown change';
-                
-                html += `<div class="event-item">${event.formatted_time} - ${event.io_name}: ${change}</div>`;
-            });
-            
-            // Load groups list on config page
-            loadGroups();
-
-            // Group form
-            document.getElementById('groupForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const name = document.getElementById('group_name').value.trim();
-                const items = document.getElementById('group_items').value
-                    .split(',')
-                    .map(s => s.trim())
-                    .filter(Boolean);
-                fetch('/update_io_group', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ group_name: name, items: items })
-                })
-                .then(r => r.json())
-                .then(data => { if (data.success) { alert('Group saved'); loadGroups(); } else { alert('Error: ' + data.error); } });
-            });
-
-            window.deleteGroup = function() {
-                const name = document.getElementById('group_name').value.trim();
-                if (!name) { alert('Enter group name'); return; }
-                fetch('/remove_io_group', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ group_name: name })
-                }).then(r => r.json()).then(data => { if (data.success) { alert('Group deleted'); loadGroups(); } else { alert('Error: ' + data.error); } });
-            }
-
-            function loadGroups() {
-                fetch('/get_io_groups')
-                .then(r => r.json())
-                .then(data => {
-                    const div = document.getElementById('groupsList');
-                    const groups = data.io_groups || {};
-                    if (Object.keys(groups).length === 0) { div.innerHTML = '<div class="no-events">No groups defined</div>'; return; }
-                    let html = '';
-                    Object.entries(groups).forEach(([name, items]) => {
-                        html += `<div style="margin:8px 0;"><strong>${name}</strong>: ${items.join(', ')}</div>`;
-                    });
-                    div.innerHTML = html;
-                });
-            }
-
-            if (html === '') {
-                eventLogContent.innerHTML = '<div class="no-events">No changes recorded yet</div>';
-            } else {
-                eventLogContent.innerHTML = html;
-            }
-        }
+                 function updateEventLog(events) {
+             const eventLogContent = document.getElementById('eventLogContent');
+             if (!eventLogContent) { return; }
+             
+             if (!events || events.length === 0) {
+                 eventLogContent.innerHTML = '<div class="no-events">No events recorded yet</div>';
+                 return;
+             }
+             
+             let html = '';
+             events.forEach(event => {
+                 // Use the pre-formatted change description from the event logger
+                 // The event logger already handles all the formatting logic correctly
+                 let change = event.change_description || 'Unknown change';
+                 
+                 html += `<div class="event-item">${event.formatted_time} - ${event.io_name}: ${change}</div>`;
+             });
+             
+             if (html === '') {
+                 eventLogContent.innerHTML = '<div class="no-events">No events recorded yet</div>';
+             } else {
+                 eventLogContent.innerHTML = html;
+             }
+         }
         
         function refreshIOStatus() {
             fetch('/get_io_status')
             .then(response => response.json())
             .then(data => {
+                lastIoData = data.io_data || {};
                 updateGroupedIO(data.io_data, data.io_groups);
                 document.getElementById('lastUpdate').textContent = 'Last update: ' + new Date().toLocaleTimeString();
             })
@@ -966,6 +924,17 @@ template = '''
                 console.error('Error refreshing IO status:', error);
                 document.getElementById('lastUpdate').textContent = 'Last update: Error - ' + new Date().toLocaleTimeString();
             });
+        }
+
+        function formatIoValue(info) {
+            const v = info.value;
+            if (v === null || v === undefined) return 'ERROR';
+            if (info.type === 'bit') return v ? 'ON' : 'OFF';
+            if (info.type === 'real') {
+                const num = typeof v === 'number' ? v : parseFloat(v);
+                if (!isNaN(num)) return num.toFixed(2);
+            }
+            return v.toString();
         }
 
         function renderCard(ioName, ioInfo) {
@@ -982,22 +951,45 @@ template = '''
             if (ioInfo.type === 'bit') {
                 valueClass = ioInfo.value ? 'on' : 'off';
             }
-            let valueDisplay = 'ERROR';
-            if (ioInfo.value !== null) {
-                if (ioInfo.type === 'bit') {
-                    valueDisplay = ioInfo.value ? 'ON' : 'OFF';
-                } else {
-                    valueDisplay = ioInfo.value.toString();
-                }
-            }
-            card.innerHTML = `
-                <div class="io-name">${ioName}</div>
-                <div class="io-description">${ioInfo.description}</div>
-                <div class="io-value ${valueClass}">${valueDisplay}</div>
-                <div class="io-address">${ioInfo.address}</div>
-            `;
+            let valueDisplay = formatIoValue(ioInfo);
+            const safeDesc = (ioInfo.description || '').toString();
+            const descEditorHtml = `<input class="desc-input" type="text" value="${safeDesc.replace(/"/g,'&quot;')}" placeholder="Edit description and press Enter" onkeydown="if(event.key==='Enter'){updateDesc('${ioName}', this.value)}">`;
+            const dotClass = ioInfo.status === 'error' ? 'error' : (ioInfo.type === 'bit' ? (ioInfo.value ? 'on' : 'off') : '');
+            const header = `
+                <div class="io-header">
+                    <div class="io-title-wrap">
+                        <span class="status-dot-mini ${dotClass}"></span>
+                        <div>
+                            <div class="io-title">${safeDesc || ioName}</div>
+                            <div class="io-tag">${ioName}</div>
+                        </div>
+                    </div>
+                    <div class="value-badge ${valueClass}">${valueDisplay}</div>
+                </div>`;
+            const footer = `
+                <div class="io-footer">
+                    <span class="type-label">${ioInfo.type.toUpperCase()}</span>
+                    <span class="io-address">${ioInfo.address}</span>
+                </div>`;
+            card.innerHTML = `${header}${descEditorHtml}${footer}`;
             return card;
         }
+
+        // Update description mapping (simple client call)
+        function updateDesc(ioName, newDesc) {
+            fetch('/update_io_mapping', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ io_name: ioName, io_type: getIoType(ioName), io_address: getIoAddress(ioName), io_description: newDesc })
+            }).then(r => r.json()).then(data => {
+                refreshIOStatus();
+            }).catch(e => console.error('Error updating description', e));
+        }
+
+        // Helpers to read current type/address from last response cache
+        let lastIoData = {};
+        function getIoType(name){ return (lastIoData[name] && lastIoData[name].type) || 'bit'; }
+        function getIoAddress(name){ return (lastIoData[name] && lastIoData[name].address) || ''; }
 
         function renderParentWithChildren(parentName, childNames, ioData) {
             const wrapper = document.createElement('div');
@@ -1036,7 +1028,7 @@ template = '''
                 name.textContent = n;
                 const val = document.createElement('span');
                 val.className = 'chip-value ' + (info.type === 'bit' ? (info.value ? 'on' : 'off') : 'number');
-                val.textContent = info.type === 'bit' ? (info.value ? 'ON' : 'OFF') : (info.value ?? 'ERROR');
+                val.textContent = formatIoValue(info);
                 const addr = document.createElement('span');
                 addr.className = 'chip-address';
                 addr.textContent = info.address;
@@ -1060,89 +1052,144 @@ template = '''
             const container = document.getElementById('ioGroupsContainer');
             container.innerHTML = '';
 
-            // If groups exist, render by group order; otherwise render all flat
-            if (ioGroups && Object.keys(ioGroups).length > 0) {
-                Object.entries(ioGroups).forEach(([groupName, ioList]) => {
-                    const section = document.createElement('div');
-                    section.className = 'section';
-                    const h3 = document.createElement('h3');
-                    h3.textContent = groupName;
-                    section.appendChild(h3);
+            const filter = (document.getElementById('filterInput')?.value || '').toLowerCase();
+            const used = new Set();
 
-                    // Build hierarchical rows for Digital Inputs/Outputs and Analogue Inputs
-                    const grid = document.createElement('div');
-                    grid.className = 'io-grid';
-
-                    // Helper to create parent row with collapsible children
-                    function addParentWithChildren(parentName, childNames) {
-                        grid.appendChild(renderParentWithChildren(parentName, childNames, ioData));
-                    }
-
-                    // Decide how to group based on naming conventions
-                    if (groupName === 'Digital Inputs' || groupName === 'Digital Outputs') {
-                        const buckets = {};
-                        const getBase = (name) => {
-                            const parts = name.split('_');
-                            if (parts[0] === 'Out' && parts.length >= 2) {
-                                // Outputs like Out_A0_State → base 'Out_A0'
-                                return parts[0] + '_' + parts[1];
-                            }
-                            // Inputs like A0_State → base 'A0'
-                            return parts[0];
-                        };
-                        (ioList || []).forEach(name => {
-                            const base = getBase(name);
-                            if (!buckets[base]) buckets[base] = [];
-                            buckets[base].push(name);
-                        });
-                        Object.entries(buckets).forEach(([base, names]) => {
-                            // Parent preference: State if present, else first
-                            const parent = names.find(n => /_State$/i.test(n)) || names[0];
-                            const children = names.filter(n => n !== parent);
-                            addParentWithChildren(parent, children);
-                        });
-                    } else if (groupName === 'Analogue Inputs') {
-                        const buckets = {};
-                        (ioList || []).forEach(name => {
-                            const base = name.split('_')[0]; // AI0, AI1
-                            if (!buckets[base]) buckets[base] = [];
-                            buckets[base].push(name);
-                        });
-                        Object.entries(buckets).forEach(([base, names]) => {
-                            const parent = names.find(n => /_Scaled$/i.test(n)) || names[0];
-                            const children = names.filter(n => n !== parent);
-                            addParentWithChildren(parent, children);
-                        });
-                    } else {
-                        // Default: render cards flat
-                        (ioList || []).forEach(name => {
-                            if (ioData[name]) {
-                                grid.appendChild(renderCard(name, ioData[name]));
-                            }
-                        });
-                    }
-
-                    section.appendChild(grid);
-                    container.appendChild(section);
-                });
-            }
-
-            // Show any remaining IOs not listed in groups under "Ungrouped"
-            const groupedSet = new Set([].concat(...Object.values(ioGroups || {})));
-            const ungrouped = Object.entries(ioData).filter(([n]) => !groupedSet.has(n));
-            if (ungrouped.length > 0) {
+            function buildTable(title, names) {
+                if (!names || names.length === 0) return;
                 const section = document.createElement('div');
                 section.className = 'section';
                 const h3 = document.createElement('h3');
-                h3.textContent = 'Ungrouped';
+                h3.textContent = title;
                 section.appendChild(h3);
-                const grid = document.createElement('div');
-                grid.className = 'io-grid';
-                ungrouped.forEach(([name, info]) => grid.appendChild(renderCard(name, info)));
-                section.appendChild(grid);
+
+                const table = document.createElement('table');
+                table.className = 'io-table';
+                table.innerHTML = `<thead><tr>
+                    <th style="width:26%">Description</th>
+                    <th style="width:18%">IO Tag</th>
+                    <th style="width:14%">Value</th>
+                    <th style="width:10%">Type</th>
+                    <th>Address</th>
+                </tr></thead>`;
+                const tbody = document.createElement('tbody');
+
+                if (title === 'Analogue Inputs') {
+                    const buckets = {};
+                    (names||[]).forEach(n=>{ const base=n.split('_')[0]; (buckets[base]=buckets[base]||[]).push(n); });
+                    Object.entries(buckets).forEach(([base, list]) => {
+                        const scaledName = `${base}_Scaled`;
+                        const rawName = `${base}_Raw`;
+                        const offsetName = `${base}_Offset`;
+                        const scalarName = `${base}_Scalar`;
+                        const mainName = list.includes(scaledName) ? scaledName : list[0];
+                        const info = ioData[mainName];
+                        if (!info) return;
+                        used.add(mainName);
+                        const desc = (info.description||'').toString();
+                        if (filter && !(mainName.toLowerCase().includes(filter) || desc.toLowerCase().includes(filter))) return;
+                        const tr = document.createElement('tr');
+                        const valueDisplay = formatIoValue(info);
+                        const valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
+                        const statusDot = `<span class="status-dot-mini ${info.status==='error'?'error':(info.type==='bit'?(info.value?'on':'off'):'')}"></span>`;
+                        // Subchips
+                        const rawInfo = ioData[rawName]; if (rawInfo) used.add(rawName);
+                        const offInfo = ioData[offsetName]; if (offInfo) used.add(offsetName);
+                        const sclInfo = ioData[scalarName]; if (sclInfo) used.add(scalarName);
+                        const sub = `
+                            <div class="subchips">
+                                ${rawInfo?`<span class="subchip">Raw: ${formatIoValue(rawInfo)}</span>`:''}
+                                ${offInfo?`<span class="subchip">Offset: ${formatIoValue(offInfo)}</span>`:''}
+                                ${sclInfo?`<span class="subchip">Scalar: ${formatIoValue(sclInfo)}</span>`:''}
+                            </div>`;
+                        const valueStateClass = info.status==='error'?'error':(info.value===null?'offline':'');
+                        tr.innerHTML = `
+                            <td><input class="desc-input" value="${desc.replace(/"/g,'&quot;')}" placeholder="Edit and press Enter" onkeydown="if(event.key==='Enter'){updateDesc('${mainName}', this.value)}">${sub}</td>
+                            <td class="io-tag">${mainName}</td>
+                            <td class="value-cell ${valueClass} ${valueStateClass}">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
+                            <td>${(info.type||'').toUpperCase()}</td>
+                            <td><span class="io-address">${info.address||''}</span></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else if (title === 'Digital Inputs' || title === 'Digital Outputs') {
+                    const buckets = {};
+                    (names||[]).forEach(n=>{
+                        const parts=n.split('_');
+                        const base = parts[0]==='Out' && parts.length>1 ? `Out_${parts[1]}` : parts[0];
+                        (buckets[base]=buckets[base]||[]).push(n);
+                    });
+                    Object.entries(buckets).forEach(([base, list]) => {
+                        const stateName = list.find(n=>/_State$/i.test(n)) || list[0];
+                        const info = ioData[stateName];
+                        if (!info) return;
+                        used.add(stateName);
+                        const desc = (info.description||'').toString();
+                        if (filter && !(stateName.toLowerCase().includes(filter) || desc.toLowerCase().includes(filter))) return;
+                        const tr = document.createElement('tr');
+                        const valueDisplay = formatIoValue(info);
+                        const valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
+                        const statusDot = `<span class="status-dot-mini ${info.status==='error'?'error':(info.type==='bit'?(info.value?'on':'off'):'')}"></span>`;
+                        const forcedState = ioData[`${base}_ForcedState`]; if (forcedState) used.add(`${base}_ForcedState`);
+                        const forcedStatus = ioData[`${base}_ForcedStatus`]; if (forcedStatus) used.add(`${base}_ForcedStatus`);
+                        const sub = `
+                            <div class="subchips">
+                                ${forcedState?`<span class="subchip">ForcedState: ${formatIoValue(forcedState)}</span>`:''}
+                                ${forcedStatus?`<span class="subchip">ForcedStatus: ${formatIoValue(forcedStatus)}</span>`:''}
+                            </div>`;
+                        const valueStateClass2 = info.status==='error'?'error':(info.value===null?'offline':'');
+                        tr.innerHTML = `
+                            <td><input class="desc-input" value="${desc.replace(/"/g,'&quot;')}" placeholder="Edit and press Enter" onkeydown="if(event.key==='Enter'){updateDesc('${stateName}', this.value)}">${sub}</td>
+                            <td class="io-tag">${stateName}</td>
+                            <td class="value-cell ${valueClass} ${valueStateClass2}">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
+                            <td>${(info.type||'').toUpperCase()}</td>
+                            <td><span class="io-address">${info.address||''}</span></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    (names||[]).forEach(name => {
+                        const info = ioData[name];
+                        if (!info) return;
+                        used.add(name);
+                        const desc = (info.description||'').toString();
+                        if (filter && !(name.toLowerCase().includes(filter) || desc.toLowerCase().includes(filter))) return;
+                        const tr = document.createElement('tr');
+                        const valueDisplay = formatIoValue(info);
+                        const valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
+                        const statusDot = `<span class="status-dot-mini ${info.status==='error'?'error':(info.type==='bit'?(info.value?'on':'off'):'')}"></span>`;
+                        const valueStateClass3 = info.status==='error'?'error':(info.value===null?'offline':'');
+                        tr.innerHTML = `
+                            <td><input class="desc-input" value="${desc.replace(/"/g,'&quot;')}" placeholder="Edit and press Enter" onkeydown="if(event.key==='Enter'){updateDesc('${name}', this.value)}"></td>
+                            <td class="io-tag">${name}</td>
+                            <td class="value-cell ${valueClass} ${valueStateClass3}">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
+                            <td>${(info.type||'').toUpperCase()}</td>
+                            <td><span class="io-address">${info.address||''}</span></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+
+                table.appendChild(tbody);
+                section.appendChild(table);
                 container.appendChild(section);
             }
+
+            // Priority groups
+            const aiNames = (ioGroups && ioGroups['Analogue Inputs']) || [];
+            const diNames = (ioGroups && ioGroups['Digital Inputs']) || [];
+            const doNames = (ioGroups && ioGroups['Digital Outputs']) || [];
+
+            buildTable('Analogue Inputs', aiNames);
+            buildTable('Digital Inputs', diNames);
+            buildTable('Digital Outputs', doNames);
+
+            // Others: everything not used
+            const otherNames = Object.keys(ioData||{}).filter(n => !used.has(n));
+            buildTable('Others', otherNames);
         }
+
+        function applyFilter(){ refreshIOStatus(); }
         
         // Update connection status in navigation
         function updateConnectionStatus() {
@@ -1178,8 +1225,10 @@ template = '''
         
         // Load initial data when page loads
             document.addEventListener('DOMContentLoaded', function() {
-            refreshIOStatus();
-            refreshEventLog();
+            const ioGridExists = document.getElementById('ioGroupsContainer');
+            if (ioGridExists) { refreshIOStatus(); }
+            const logExists = document.getElementById('eventLogContent');
+            if (logExists) { refreshEventLog(); }
             updateConnectionStatus();
             
             // Enter key handler (only if input exists on this page)

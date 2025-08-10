@@ -5,166 +5,560 @@
     "slot": 1
   },
   "io_mapping": {
-    "E_Stop_Status": { "type": "bit",  "address": "DB1.DBX0.0",  "description": "Emergency stop activation" },
-
-    "A0_State":        { "type": "bit",  "address": "DB1.DBX0.0",  "description": "Safety Relay EStop - State" },
-    "A0_ForcedState":  { "type": "bit",  "address": "DB1.DBX0.1",  "description": "Safety Relay EStop - ForcedState" },
-    "A0_ForcedStatus": { "type": "bit",  "address": "DB1.DBX0.2",  "description": "Safety Relay EStop - ForcedStatus" },
-
-    "A1_State":        { "type": "bit",  "address": "DB1.DBX2.0",  "description": "Switch Left - State" },
-    "A1_ForcedState":  { "type": "bit",  "address": "DB1.DBX2.1",  "description": "Switch Left - ForcedState" },
-    "A1_ForcedStatus": { "type": "bit",  "address": "DB1.DBX2.2",  "description": "Switch Left - ForcedStatus" },
-
-    "A2_State":        { "type": "bit",  "address": "DB1.DBX4.0",  "description": "Switch Right - State" },
-    "A2_ForcedState":  { "type": "bit",  "address": "DB1.DBX4.1",  "description": "Switch Right - ForcedState" },
-    "A2_ForcedStatus": { "type": "bit",  "address": "DB1.DBX4.2",  "description": "Switch Right - ForcedStatus" },
-
-    "A3_State":        { "type": "bit",  "address": "DB1.DBX6.0",  "description": "Green Button - State" },
-    "A3_ForcedState":  { "type": "bit",  "address": "DB1.DBX6.1",  "description": "Green Button - ForcedState" },
-    "A3_ForcedStatus": { "type": "bit",  "address": "DB1.DBX6.2",  "description": "Green Button - ForcedStatus" },
-
-    "A4_State":        { "type": "bit",  "address": "DB1.DBX8.0",  "description": "Red Button - State" },
-    "A4_ForcedState":  { "type": "bit",  "address": "DB1.DBX8.1",  "description": "Red Button - ForcedState" },
-    "A4_ForcedStatus": { "type": "bit",  "address": "DB1.DBX8.2",  "description": "Red Button - ForcedStatus" },
-
-    "A5_State":        { "type": "bit",  "address": "DB1.DBX10.0", "description": "A[5] - State" },
-    "A5_ForcedState":  { "type": "bit",  "address": "DB1.DBX10.1", "description": "A[5] - ForcedState" },
-    "A5_ForcedStatus": { "type": "bit",  "address": "DB1.DBX10.2", "description": "A[5] - ForcedStatus" },
-
-    "A6_State":        { "type": "bit",  "address": "DB1.DBX12.0", "description": "A[6] - State" },
-    "A6_ForcedState":  { "type": "bit",  "address": "DB1.DBX12.1", "description": "A[6] - ForcedState" },
-    "A6_ForcedStatus": { "type": "bit",  "address": "DB1.DBX12.2", "description": "A[6] - ForcedStatus" },
-
-    "A7_State":        { "type": "bit",  "address": "DB1.DBX14.0", "description": "A[7] - State" },
-    "A7_ForcedState":  { "type": "bit",  "address": "DB1.DBX14.1", "description": "A[7] - ForcedState" },
-    "A7_ForcedStatus": { "type": "bit",  "address": "DB1.DBX14.2", "description": "A[7] - ForcedStatus" },
-
-    "B0_State":        { "type": "bit",  "address": "DB1.DBX16.0", "description": "B[0] - State" },
-    "B0_ForcedState":  { "type": "bit",  "address": "DB1.DBX16.1", "description": "B[0] - ForcedState" },
-    "B0_ForcedStatus": { "type": "bit",  "address": "DB1.DBX16.2", "description": "B[0] - ForcedStatus" },
-
-    "B1_State":        { "type": "bit",  "address": "DB1.DBX18.0", "description": "B[1] - State" },
-    "B1_ForcedState":  { "type": "bit",  "address": "DB1.DBX18.1", "description": "B[1] - ForcedState" },
-    "B1_ForcedStatus": { "type": "bit",  "address": "DB1.DBX18.2", "description": "B[1] - ForcedStatus" },
-
-    "B2_State":        { "type": "bit",  "address": "DB1.DBX20.0", "description": "B[2] - State" },
-    "B2_ForcedState":  { "type": "bit",  "address": "DB1.DBX20.1", "description": "B[2] - ForcedState" },
-    "B2_ForcedStatus": { "type": "bit",  "address": "DB1.DBX20.2", "description": "B[2] - ForcedStatus" },
-
-    "B3_State":        { "type": "bit",  "address": "DB1.DBX22.0", "description": "B[3] - State" },
-    "B3_ForcedState":  { "type": "bit",  "address": "DB1.DBX22.1", "description": "B[3] - ForcedState" },
-    "B3_ForcedStatus": { "type": "bit",  "address": "DB1.DBX22.2", "description": "B[3] - ForcedStatus" },
-
-    "B4_State":        { "type": "bit",  "address": "DB1.DBX24.0", "description": "B[4] - State" },
-    "B4_ForcedState":  { "type": "bit",  "address": "DB1.DBX24.1", "description": "B[4] - ForcedState" },
-    "B4_ForcedStatus": { "type": "bit",  "address": "DB1.DBX24.2", "description": "B[4] - ForcedStatus" },
-
-    "B5_State":        { "type": "bit",  "address": "DB1.DBX26.0", "description": "B[5] - State" },
-    "B5_ForcedState":  { "type": "bit",  "address": "DB1.DBX26.1", "description": "B[5] - ForcedState" },
-    "B5_ForcedStatus": { "type": "bit",  "address": "DB1.DBX26.2", "description": "B[5] - ForcedStatus" },
-
-    "AI0_Raw":         { "type": "word", "address": "DB1.DBW28",   "description": "AI0 Raw (Int)" },
-    "AI1_Raw":         { "type": "word", "address": "DB1.DBW42",   "description": "AI1 Raw (Int)" },
-    
-    "AI0_Scaled":      { "type": "real", "address": "DB1.DBD30",  "description": "AI0 Scaled (Real)" },
-    "AI0_Offset":      { "type": "real", "address": "DB1.DBD34",  "description": "AI0 Offset (Real)" },
-    "AI0_Scalar":      { "type": "real", "address": "DB1.DBD38",  "description": "AI0 Scalar (Real)" },
-    
-    "AI1_Scaled":      { "type": "real", "address": "DB1.DBD44",  "description": "AI1 Scaled (Real)" },
-    "AI1_Offset":      { "type": "real", "address": "DB1.DBD48",  "description": "AI1 Offset (Real)" },
-    "AI1_Scalar":      { "type": "real", "address": "DB1.DBD52",  "description": "AI1 Scalar (Real)" },
-
-    "Out_A0_State":    { "type": "bit",  "address": "DB1.DBX56.0", "description": "Output Red LED - State" },
-    "Out_A0_ForcedState": { "type": "bit",  "address": "DB1.DBX56.1", "description": "Output Red LED - ForcedState" },
-    "Out_A0_ForcedStatus": { "type": "bit",  "address": "DB1.DBX56.2", "description": "Output Red LED - ForcedStatus" },
-    "Out_A1_State":    { "type": "bit",  "address": "DB1.DBX58.0", "description": "Output Green LED - State" },
-    "Out_A1_ForcedState": { "type": "bit",  "address": "DB1.DBX58.1", "description": "Output Green LED - ForcedState" },
-    "Out_A1_ForcedStatus": { "type": "bit",  "address": "DB1.DBX58.2", "description": "Output Green LED - ForcedStatus" },
-    "Out_A2_State":    { "type": "bit",  "address": "DB1.DBX60.0", "description": "Output E-Stop LED - State" },
-    "Out_A2_ForcedState": { "type": "bit",  "address": "DB1.DBX60.1", "description": "Output E-Stop LED - ForcedState" },
-    "Out_A2_ForcedStatus": { "type": "bit",  "address": "DB1.DBX60.2", "description": "Output E-Stop LED - ForcedStatus" },
-    "Out_A3_State":    { "type": "bit",  "address": "DB1.DBX62.0", "description": "Output A[3] - State" },
-    "Out_A3_ForcedState": { "type": "bit",  "address": "DB1.DBX62.1", "description": "Output A[3] - ForcedState" },
-    "Out_A3_ForcedStatus": { "type": "bit",  "address": "DB1.DBX62.2", "description": "Output A[3] - ForcedStatus" },
-    "Out_A4_State":    { "type": "bit",  "address": "DB1.DBX64.0", "description": "Output A[4] - State" },
-    "Out_A4_ForcedState": { "type": "bit",  "address": "DB1.DBX64.1", "description": "Output A[4] - ForcedState" },
-    "Out_A4_ForcedStatus": { "type": "bit",  "address": "DB1.DBX64.2", "description": "Output A[4] - ForcedStatus" },
-    "Out_A5_State":    { "type": "bit",  "address": "DB1.DBX66.0", "description": "Output A[5] - State" },
-    "Out_A5_ForcedState": { "type": "bit",  "address": "DB1.DBX66.1", "description": "Output A[5] - ForcedState" },
-    "Out_A5_ForcedStatus": { "type": "bit",  "address": "DB1.DBX66.2", "description": "Output A[5] - ForcedStatus" },
-    "Out_A6_State":    { "type": "bit",  "address": "DB1.DBX68.0", "description": "Output A[6] - State" },
-    "Out_A6_ForcedState": { "type": "bit",  "address": "DB1.DBX68.1", "description": "Output A[6] - ForcedState" },
-    "Out_A6_ForcedStatus": { "type": "bit",  "address": "DB1.DBX68.2", "description": "Output A[6] - ForcedStatus" },
-    "Out_A7_State":    { "type": "bit",  "address": "DB1.DBX70.0", "description": "Output A[7] - State" },
-    "Out_A7_ForcedState": { "type": "bit",  "address": "DB1.DBX70.1", "description": "Output A[7] - ForcedState" },
-    "Out_A7_ForcedStatus": { "type": "bit",  "address": "DB1.DBX70.2", "description": "Output A[7] - ForcedStatus" },
-
-    "Out_B0_State":    { "type": "bit",  "address": "DB1.DBX72.0", "description": "Output B[0] - State" },
-    "Out_B0_ForcedState": { "type": "bit",  "address": "DB1.DBX72.1", "description": "Output B[0] - ForcedState" },
-    "Out_B0_ForcedStatus": { "type": "bit",  "address": "DB1.DBX72.2", "description": "Output B[0] - ForcedStatus" },
-    "Out_B1_State":    { "type": "bit",  "address": "DB1.DBX74.0", "description": "Output B[1] - State" },
-    "Out_B1_ForcedState": { "type": "bit",  "address": "DB1.DBX74.1", "description": "Output B[1] - ForcedState" },
-    "Out_B1_ForcedStatus": { "type": "bit",  "address": "DB1.DBX74.2", "description": "Output B[1] - ForcedStatus" },
-
-    "HMI_ClearForcing":{ "type": "bit",  "address": "DB1.DBX76.0", "description": "HMI Button - Clear Forcing" },
-    "HMI_FaultReset":  { "type": "bit",  "address": "DB1.DBX76.1", "description": "HMI Button - Fault Reset" },
-
-    "Stats_ForcingActive": { "type": "bit",  "address": "DB1.DBX78.0", "description": "Forcing Active" },
-    "Stats_ForcedCount":   { "type": "word", "address": "DB1.DBW80",   "description": "Forced Count (Int)" },
-
-    "PWM0_Duty_Cycle": { "type": "word", "address": "DB1.DBW82",   "description": "PWM[0] Duty Cycle (Int)" },
-    "PWM0_High_Duty":  { "type": "word", "address": "DB1.DBW84",   "description": "PWM[0] High Duty (Int)" },
-    "PWM0_Low_Duty":   { "type": "word", "address": "DB1.DBW86",   "description": "PWM[0] Low Duty (Int)" },
-
-    "PWM1_Duty_Cycle": { "type": "word", "address": "DB1.DBW88",   "description": "PWM[1] Duty Cycle (Int)" },
-    "PWM1_High_Duty":  { "type": "word", "address": "DB1.DBW90",   "description": "PWM[1] High Duty (Int)" },
-    "PWM1_Low_Duty":   { "type": "word", "address": "DB1.DBW92",   "description": "PWM[1] Low Duty (Int)" }
+    "A0_State": {
+      "type": "bit",
+      "address": "DB1.DBX0.0",
+      "description": "Safety Relay EStop - State"
+    },
+    "A0_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX0.1",
+      "description": "Safety Relay EStop - ForcedState"
+    },
+    "A0_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX0.2",
+      "description": "Safety Relay EStop - ForcedStatus"
+    },
+    "A1_State": {
+      "type": "bit",
+      "address": "DB1.DBX2.0",
+      "description": "Switch Left - State"
+    },
+    "A1_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX2.1",
+      "description": "Switch Left - ForcedState"
+    },
+    "A1_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX2.2",
+      "description": "Switch Left - ForcedStatus"
+    },
+    "A2_State": {
+      "type": "bit",
+      "address": "DB1.DBX4.0",
+      "description": "Switch Right - State"
+    },
+    "A2_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX4.1",
+      "description": "Switch Right - ForcedState"
+    },
+    "A2_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX4.2",
+      "description": "Switch Right - ForcedStatus"
+    },
+    "A3_State": {
+      "type": "bit",
+      "address": "DB1.DBX6.0",
+      "description": "Green Button - State"
+    },
+    "A3_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX6.1",
+      "description": "Green Button - ForcedState"
+    },
+    "A3_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX6.2",
+      "description": "Green Button - ForcedStatus"
+    },
+    "A4_State": {
+      "type": "bit",
+      "address": "DB1.DBX8.0",
+      "description": "Red Button - State"
+    },
+    "A4_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX8.1",
+      "description": "Red Button - ForcedState"
+    },
+    "A4_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX8.2",
+      "description": "Red Button - ForcedStatus"
+    },
+    "A5_State": {
+      "type": "bit",
+      "address": "DB1.DBX10.0",
+      "description": "A[5] - State"
+    },
+    "A5_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX10.1",
+      "description": "A[5] - ForcedState"
+    },
+    "A5_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX10.2",
+      "description": "A[5] - ForcedStatus"
+    },
+    "A6_State": {
+      "type": "bit",
+      "address": "DB1.DBX12.0",
+      "description": "A[6] - State"
+    },
+    "A6_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX12.1",
+      "description": "A[6] - ForcedState"
+    },
+    "A6_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX12.2",
+      "description": "A[6] - ForcedStatus"
+    },
+    "A7_State": {
+      "type": "bit",
+      "address": "DB1.DBX14.0",
+      "description": "A[7] - State"
+    },
+    "A7_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX14.1",
+      "description": "A[7] - ForcedState"
+    },
+    "A7_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX14.2",
+      "description": "A[7] - ForcedStatus"
+    },
+    "B0_State": {
+      "type": "bit",
+      "address": "DB1.DBX16.0",
+      "description": "B[0] - State"
+    },
+    "B0_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX16.1",
+      "description": "B[0] - ForcedState"
+    },
+    "B0_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX16.2",
+      "description": "B[0] - ForcedStatus"
+    },
+    "B1_State": {
+      "type": "bit",
+      "address": "DB1.DBX18.0",
+      "description": "B[1] - State"
+    },
+    "B1_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX18.1",
+      "description": "B[1] - ForcedState"
+    },
+    "B1_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX18.2",
+      "description": "B[1] - ForcedStatus"
+    },
+    "B2_State": {
+      "type": "bit",
+      "address": "DB1.DBX20.0",
+      "description": "B[2] - State"
+    },
+    "B2_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX20.1",
+      "description": "B[2] - ForcedState"
+    },
+    "B2_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX20.2",
+      "description": "B[2] - ForcedStatus"
+    },
+    "B3_State": {
+      "type": "bit",
+      "address": "DB1.DBX22.0",
+      "description": "B[3] - State"
+    },
+    "B3_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX22.1",
+      "description": "B[3] - ForcedState"
+    },
+    "B3_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX22.2",
+      "description": "B[3] - ForcedStatus"
+    },
+    "B4_State": {
+      "type": "bit",
+      "address": "DB1.DBX24.0",
+      "description": "B[4] - State"
+    },
+    "B4_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX24.1",
+      "description": "B[4] - ForcedState"
+    },
+    "B4_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX24.2",
+      "description": "B[4] - ForcedStatus"
+    },
+    "B5_State": {
+      "type": "bit",
+      "address": "DB1.DBX26.0",
+      "description": "B[5] - State"
+    },
+    "B5_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX26.1",
+      "description": "B[5] - ForcedState"
+    },
+    "B5_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX26.2",
+      "description": "B[5] - ForcedStatus"
+    },
+    "AI0_Raw": {
+      "type": "word",
+      "address": "DB1.DBW28",
+      "description": "AI0 Raw (Int)"
+    },
+    "AI1_Raw": {
+      "type": "word",
+      "address": "DB1.DBW42",
+      "description": "AI1 Raw (Int)"
+    },
+    "AI0_Scaled": {
+      "type": "real",
+      "address": "DB1.DBD30",
+      "description": "AI0 Scaled (Real)"
+    },
+    "AI0_Offset": {
+      "type": "real",
+      "address": "DB1.DBD34",
+      "description": "AI0 Offset (Real)"
+    },
+    "AI0_Scalar": {
+      "type": "real",
+      "address": "DB1.DBD38",
+      "description": "AI0 Scalar (Real)"
+    },
+    "AI1_Scaled": {
+      "type": "real",
+      "address": "DB1.DBD44",
+      "description": "AI1 Scaled (Real)"
+    },
+    "AI1_Offset": {
+      "type": "real",
+      "address": "DB1.DBD48",
+      "description": "AI1 Offset (Real)"
+    },
+    "AI1_Scalar": {
+      "type": "real",
+      "address": "DB1.DBD52",
+      "description": "AI1 Scalar (Real)"
+    },
+    "Out_A0_State": {
+      "type": "bit",
+      "address": "DB1.DBX56.0",
+      "description": "Output Red LED - State"
+    },
+    "Out_A0_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX56.1",
+      "description": "Output Red LED - ForcedState"
+    },
+    "Out_A0_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX56.2",
+      "description": "Output Red LED - ForcedStatus"
+    },
+    "Out_A1_State": {
+      "type": "bit",
+      "address": "DB1.DBX58.0",
+      "description": "Output Green LED - State"
+    },
+    "Out_A1_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX58.1",
+      "description": "Output Green LED - ForcedState"
+    },
+    "Out_A1_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX58.2",
+      "description": "Output Green LED - ForcedStatus"
+    },
+    "Out_A2_State": {
+      "type": "bit",
+      "address": "DB1.DBX60.0",
+      "description": "Output E-Stop LED - State"
+    },
+    "Out_A2_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX60.1",
+      "description": "Output E-Stop LED - ForcedState"
+    },
+    "Out_A2_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX60.2",
+      "description": "Output E-Stop LED - ForcedStatus"
+    },
+    "Out_A3_State": {
+      "type": "bit",
+      "address": "DB1.DBX62.0",
+      "description": "Output A[3] - State"
+    },
+    "Out_A3_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX62.1",
+      "description": "Output A[3] - ForcedState"
+    },
+    "Out_A3_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX62.2",
+      "description": "Output A[3] - ForcedStatus"
+    },
+    "Out_A4_State": {
+      "type": "bit",
+      "address": "DB1.DBX64.0",
+      "description": "Output A[4] - State"
+    },
+    "Out_A4_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX64.1",
+      "description": "Output A[4] - ForcedState"
+    },
+    "Out_A4_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX64.2",
+      "description": "Output A[4] - ForcedStatus"
+    },
+    "Out_A5_State": {
+      "type": "bit",
+      "address": "DB1.DBX66.0",
+      "description": "Output A[5] - State"
+    },
+    "Out_A5_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX66.1",
+      "description": "Output A[5] - ForcedState"
+    },
+    "Out_A5_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX66.2",
+      "description": "Output A[5] - ForcedStatus"
+    },
+    "Out_A6_State": {
+      "type": "bit",
+      "address": "DB1.DBX68.0",
+      "description": "Output A[6] - State"
+    },
+    "Out_A6_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX68.1",
+      "description": "Output A[6] - ForcedState"
+    },
+    "Out_A6_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX68.2",
+      "description": "Output A[6] - ForcedStatus"
+    },
+    "Out_A7_State": {
+      "type": "bit",
+      "address": "DB1.DBX70.0",
+      "description": "Output A[7] - State"
+    },
+    "Out_A7_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX70.1",
+      "description": "Output A[7] - ForcedState"
+    },
+    "Out_A7_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX70.2",
+      "description": "Output A[7] - ForcedStatus"
+    },
+    "Out_B0_State": {
+      "type": "bit",
+      "address": "DB1.DBX72.0",
+      "description": "Output B[0] - State"
+    },
+    "Out_B0_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX72.1",
+      "description": "Output B[0] - ForcedState"
+    },
+    "Out_B0_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX72.2",
+      "description": "Output B[0] - ForcedStatus"
+    },
+    "Out_B1_State": {
+      "type": "bit",
+      "address": "DB1.DBX74.0",
+      "description": "Output B[1] - State"
+    },
+    "Out_B1_ForcedState": {
+      "type": "bit",
+      "address": "DB1.DBX74.1",
+      "description": "Output B[1] - ForcedState"
+    },
+    "Out_B1_ForcedStatus": {
+      "type": "bit",
+      "address": "DB1.DBX74.2",
+      "description": "Output B[1] - ForcedStatus"
+    },
+    "HMI_ClearForcing": {
+      "type": "bit",
+      "address": "DB1.DBX76.0",
+      "description": "HMI Button - Clear Forcing"
+    },
+    "HMI_FaultReset": {
+      "type": "bit",
+      "address": "DB1.DBX76.1",
+      "description": "HMI Button - Fault Reset"
+    },
+    "Stats_ForcingActive": {
+      "type": "bit",
+      "address": "DB1.DBX78.0",
+      "description": "Forcing Active"
+    },
+    "Stats_ForcedCount": {
+      "type": "word",
+      "address": "DB1.DBW80",
+      "description": "Forced Count (Int)"
+    },
+    "PWM0_Duty_Cycle": {
+      "type": "word",
+      "address": "DB1.DBW82",
+      "description": "PWM[0] Duty Cycle (Int)"
+    },
+    "PWM0_High_Duty": {
+      "type": "word",
+      "address": "DB1.DBW84",
+      "description": "PWM[0] High Duty (Int)"
+    },
+    "PWM0_Low_Duty": {
+      "type": "word",
+      "address": "DB1.DBW86",
+      "description": "PWM[0] Low Duty (Int)"
+    },
+    "PWM1_Duty_Cycle": {
+      "type": "word",
+      "address": "DB1.DBW88",
+      "description": "PWM[1] Duty Cycle (Int)"
+    },
+    "PWM1_High_Duty": {
+      "type": "word",
+      "address": "DB1.DBW90",
+      "description": "PWM[1] High Duty (Int)"
+    },
+    "PWM1_Low_Duty": {
+      "type": "word",
+      "address": "DB1.DBW92",
+      "description": "PWM[1] Low Duty (Int)"
+    }
   },
   "io_groups": {
     "Digital Inputs": [
       "E_Stop_Status",
-      "A0_State","A0_ForcedState","A0_ForcedStatus",
-      "A1_State","A1_ForcedState","A1_ForcedStatus",
-      "A2_State","A2_ForcedState","A2_ForcedStatus",
-      "A3_State","A3_ForcedState","A3_ForcedStatus",
-      "A4_State","A4_ForcedState","A4_ForcedStatus",
-      "A5_State","A5_ForcedState","A5_ForcedStatus",
-      "A6_State","A6_ForcedState","A6_ForcedStatus",
-      "A7_State","A7_ForcedState","A7_ForcedStatus",
-      "B0_State","B0_ForcedState","B0_ForcedStatus",
-      "B1_State","B1_ForcedState","B1_ForcedStatus",
-      "B2_State","B2_ForcedState","B2_ForcedStatus",
-      "B3_State","B3_ForcedState","B3_ForcedStatus",
-      "B4_State","B4_ForcedState","B4_ForcedStatus",
-      "B5_State","B5_ForcedState","B5_ForcedStatus"
+      "A0_State",
+      "A0_ForcedState",
+      "A0_ForcedStatus",
+      "A1_State",
+      "A1_ForcedState",
+      "A1_ForcedStatus",
+      "A2_State",
+      "A2_ForcedState",
+      "A2_ForcedStatus",
+      "A3_State",
+      "A3_ForcedState",
+      "A3_ForcedStatus",
+      "A4_State",
+      "A4_ForcedState",
+      "A4_ForcedStatus",
+      "A5_State",
+      "A5_ForcedState",
+      "A5_ForcedStatus",
+      "A6_State",
+      "A6_ForcedState",
+      "A6_ForcedStatus",
+      "A7_State",
+      "A7_ForcedState",
+      "A7_ForcedStatus",
+      "B0_State",
+      "B0_ForcedState",
+      "B0_ForcedStatus",
+      "B1_State",
+      "B1_ForcedState",
+      "B1_ForcedStatus",
+      "B2_State",
+      "B2_ForcedState",
+      "B2_ForcedStatus",
+      "B3_State",
+      "B3_ForcedState",
+      "B3_ForcedStatus",
+      "B4_State",
+      "B4_ForcedState",
+      "B4_ForcedStatus",
+      "B5_State",
+      "B5_ForcedState",
+      "B5_ForcedStatus"
     ],
     "Digital Outputs": [
-      "Out_A0_State","Out_A0_ForcedState","Out_A0_ForcedStatus",
-      "Out_A1_State","Out_A1_ForcedState","Out_A1_ForcedStatus",
-      "Out_A2_State","Out_A2_ForcedState","Out_A2_ForcedStatus",
-      "Out_A3_State","Out_A3_ForcedState","Out_A3_ForcedStatus",
-      "Out_A4_State","Out_A4_ForcedState","Out_A4_ForcedStatus",
-      "Out_A5_State","Out_A5_ForcedState","Out_A5_ForcedStatus",
-      "Out_A6_State","Out_A6_ForcedState","Out_A6_ForcedStatus",
-      "Out_A7_State","Out_A7_ForcedState","Out_A7_ForcedStatus",
-      "Out_B0_State","Out_B0_ForcedState","Out_B0_ForcedStatus",
-      "Out_B1_State","Out_B1_ForcedState","Out_B1_ForcedStatus"
+      "Out_A0_State",
+      "Out_A0_ForcedState",
+      "Out_A0_ForcedStatus",
+      "Out_A1_State",
+      "Out_A1_ForcedState",
+      "Out_A1_ForcedStatus",
+      "Out_A2_State",
+      "Out_A2_ForcedState",
+      "Out_A2_ForcedStatus",
+      "Out_A3_State",
+      "Out_A3_ForcedState",
+      "Out_A3_ForcedStatus",
+      "Out_A4_State",
+      "Out_A4_ForcedState",
+      "Out_A4_ForcedStatus",
+      "Out_A5_State",
+      "Out_A5_ForcedState",
+      "Out_A5_ForcedStatus",
+      "Out_A6_State",
+      "Out_A6_ForcedState",
+      "Out_A6_ForcedStatus",
+      "Out_A7_State",
+      "Out_A7_ForcedState",
+      "Out_A7_ForcedStatus",
+      "Out_B0_State",
+      "Out_B0_ForcedState",
+      "Out_B0_ForcedStatus",
+      "Out_B1_State",
+      "Out_B1_ForcedState",
+      "Out_B1_ForcedStatus"
     ],
     "Analogue Inputs": [
-      "AI0_Raw","AI1_Raw",
-      "AI0_Scaled","AI0_Offset","AI0_Scalar",
-      "AI1_Scaled","AI1_Offset","AI1_Scalar"
+      "AI0_Raw",
+      "AI1_Raw",
+      "AI0_Scaled",
+      "AI0_Offset",
+      "AI0_Scalar",
+      "AI1_Scaled",
+      "AI1_Offset",
+      "AI1_Scalar"
     ],
     "HMI Buttons": [
-      "HMI_ClearForcing","HMI_FaultReset"
+      "HMI_ClearForcing",
+      "HMI_FaultReset"
     ],
     "Stats": [
-      "Stats_ForcingActive","Stats_ForcedCount"
+      "Stats_ForcingActive",
+      "Stats_ForcedCount"
     ],
     "PWM": [
-      "PWM0_Duty_Cycle","PWM0_High_Duty","PWM0_Low_Duty",
-      "PWM1_Duty_Cycle","PWM1_High_Duty","PWM1_Low_Duty"
+      "PWM0_Duty_Cycle",
+      "PWM0_High_Duty",
+      "PWM0_Low_Duty",
+      "PWM1_Duty_Cycle",
+      "PWM1_High_Duty",
+      "PWM1_Low_Duty"
     ]
   }
 }
-

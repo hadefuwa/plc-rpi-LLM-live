@@ -36,13 +36,14 @@ NAV_TEMPLATE = '''
 
 NAV_STYLES = '''
 .top-nav {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: #0b1220;
+    color: #e5e7eb;
     padding: 0;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px rgba(2,6,23,.5);
     position: sticky;
     top: 0;
     z-index: 1000;
+    border-bottom: 1px solid #1f2937;
 }
 
 .nav-container {
@@ -54,41 +55,16 @@ NAV_STYLES = '''
     padding: 0 20px;
 }
 
-.nav-brand h1 {
-    margin: 0;
-    font-size: 24px;
-    font-weight: 600;
-    color: white;
-}
+.nav-brand h1 { margin: 0; font-size: 20px; font-weight: 700; color: #e5e7eb; }
 
 .nav-menu {
     display: flex;
     gap: 20px;
 }
 
-.nav-link {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: rgba(255,255,255,0.8);
-    text-decoration: none;
-    padding: 12px 16px;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.nav-link:hover {
-    background: rgba(255,255,255,0.1);
-    color: white;
-    transform: translateY(-1px);
-}
-
-.nav-link.active {
-    background: rgba(255,255,255,0.2);
-    color: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
+.nav-link { display: flex; align-items: center; gap: 8px; color: #cbd5e1; text-decoration: none; padding: 12px 16px; border-radius: 6px; transition: background .2s ease; font-weight: 500; }
+.nav-link:hover { background: #111827; color: #e5e7eb; }
+.nav-link.active { background: #111827; color: #e5e7eb; box-shadow: inset 0 -2px 0 #2563eb; }
 
 .nav-icon {
     font-size: 16px;
@@ -107,13 +83,7 @@ NAV_STYLES = '''
     font-weight: 500;
 }
 
-.status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #ffc107;
-    animation: pulse 2s infinite;
-}
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; animation: pulse 2s infinite; }
 
 .status-dot.connected {
     background: #28a745;
