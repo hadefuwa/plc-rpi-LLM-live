@@ -2,6 +2,30 @@
 
 All notable changes to the E-Stop AI Status Reporter project will be documented in this file.
 
+## [1.1.0] - 2025-08-10
+
+### Added
+- IO grouping on Dashboard with collapsible sub-parts:
+  - Digital groups show `<AX_State>` as the parent; `ForcedState`/`ForcedStatus` are hidden under a toggle
+  - Analogue groups show `<AIx_Scaled>` as the parent; `Offset`/`Scalar` are hidden under a toggle
+- Group management UI on the PLC Configuration page (create, edit, delete groups)
+- API endpoints for groups: `GET /get_io_groups`, `POST /update_io_group`, `POST /remove_io_group`
+- Support for 32-bit Real (float) values (`type: "real"`) in PLC reads
+- Favicon support; pages now link to `/static/favicon.ico`
+
+### Changed
+- Persistent PLC connection reused across requests (reduces console spam and overhead)
+- Config and logs are now stored under `data/` (`data/plc_config.json`, `data/io_events.json`)
+- README updated: Real type documented, file structure and deploy paths clarified
+
+### Removed
+- Home page “Data Structure” box for a cleaner UI
+- Unused CSV files and leftover scripts no longer used by the app
+
+### Fixed
+- Prevented JavaScript errors from null DOM references on pages without certain elements
+- Improved IO status rendering robustness and grouping logic
+
 ## [1.0.0] - 2024-12-19
 
 ### Added
