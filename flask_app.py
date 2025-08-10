@@ -779,24 +779,7 @@ template = '''
             <div id="response" class="response" style="display: none;"></div>
         </div>
         
-        <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 5px;">
-            <h3>Technical Information</h3>
-            <p><strong>Data Structure:</strong></p>
-            <ul>
-                <li>E_Stop_Status: Emergency stop activation (0=OFF, 1=ON)</li>
-                <li>Pump_Running: Pump operational status (0=OFF, 1=ON)</li>
-                <li>Tank_Level_Low: Low tank level indicator (0=OK, 1=LOW)</li>
-                <li>Valve_Open: Valve position (0=CLOSED, 1=OPEN)</li>
-                <li>Motor_Control: Motor control signal (0=OFF, 1=ON)</li>
-                <li>Alarm_Relay: Alarm relay status (0=OFF, 1=ON)</li>
-                <li>Pressure_High: High pressure indicator (0=OK, 1=HIGH)</li>
-                <li>Temperature_High: High temperature indicator (0=OK, 1=HIGH)</li>
-                <li>Flow_Rate: System flow rate in L/min</li>
-            </ul>
-            <p><strong>AI Model:</strong> Gemma3 1B running locally via Ollama<br>
-            <strong>Visualization:</strong> Interactive Plotly charts<br>
-            <strong>Framework:</strong> Flask</p>
-        </div>
+        <!-- Technical info box removed per request to keep the home page clean -->
     </div>
     
     <script>
