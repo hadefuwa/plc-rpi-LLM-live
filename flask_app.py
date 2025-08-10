@@ -1081,8 +1081,17 @@ template = '''
                     // Decide how to group based on naming conventions
                     if (groupName === 'Digital Inputs' || groupName === 'Digital Outputs') {
                         const buckets = {};
+                        const getBase = (name) => {
+                            const parts = name.split('_');
+                            if (parts[0] === 'Out' && parts.length >= 2) {
+                                // Outputs like Out_A0_State → base 'Out_A0'
+                                return parts[0] + '_' + parts[1];
+                            }
+                            // Inputs like A0_State → base 'A0'
+                            return parts[0];
+                        };
                         (ioList || []).forEach(name => {
-                            const base = name.split('_')[0]; // A0, A1, Out_A0, etc.
+                            const base = getBase(name);
                             if (!buckets[base]) buckets[base] = [];
                             buckets[base].push(name);
                         });
