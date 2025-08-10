@@ -692,6 +692,16 @@ template = '''
         .group-title { font-weight: bold; font-size: 16px; }
         .group-children { display: none; margin-left: 10px; }
         .toggle-btn { font-size: 12px; padding: 4px 8px; }
+        /* Improved parent-with-children card */
+        .group-parent { position: relative; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .card-title { font-weight: 600; font-size: 14px; color: #333; }
+        .details-toggle { background: none; border: none; color: #007bff; cursor: pointer; padding: 0; font-size: 12px; }
+        .child-list { display: none; margin-top: 8px; border-top: 1px dashed #eee; padding-top: 8px; }
+        .child-chip { background: #f8f9fa; border: 1px solid #eee; border-radius: 6px; padding: 6px; margin-bottom: 6px; }
+        .child-chip .chip-name { font-weight: 600; font-size: 12px; color: #333; }
+        .child-chip .chip-value { font-weight: 600; margin-left: 6px; }
+        .child-chip .chip-address { display: block; font-family: monospace; color: #888; font-size: 11px; }
         .page-header {
             margin-bottom: 30px;
             padding-bottom: 20px;
@@ -989,6 +999,63 @@ template = '''
             return card;
         }
 
+        function renderParentWithChildren(parentName, childNames, ioData) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'io-card group-parent';
+
+            // Build header with inline toggle link
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            const title = document.createElement('div');
+            title.className = 'card-title';
+            title.textContent = parentName;
+            const toggle = document.createElement('button');
+            toggle.className = 'details-toggle';
+            toggle.textContent = 'Show details';
+            header.appendChild(title);
+            header.appendChild(toggle);
+            wrapper.appendChild(header);
+
+            // Insert parent main card visuals beneath header
+            if (ioData[parentName]) {
+                const main = renderCard(parentName, ioData[parentName]);
+                main.style.marginTop = '8px';
+                wrapper.appendChild(main);
+            }
+
+            // Child list as compact chips
+            const childList = document.createElement('div');
+            childList.className = 'child-list';
+            (childNames || []).forEach(n => {
+                if (!ioData[n]) return;
+                const info = ioData[n];
+                const chip = document.createElement('div');
+                chip.className = 'child-chip';
+                const name = document.createElement('span');
+                name.className = 'chip-name';
+                name.textContent = n;
+                const val = document.createElement('span');
+                val.className = 'chip-value ' + (info.type === 'bit' ? (info.value ? 'on' : 'off') : 'number');
+                val.textContent = info.type === 'bit' ? (info.value ? 'ON' : 'OFF') : (info.value ?? 'ERROR');
+                const addr = document.createElement('span');
+                addr.className = 'chip-address';
+                addr.textContent = info.address;
+                chip.appendChild(name);
+                chip.appendChild(val);
+                chip.appendChild(addr);
+                childList.appendChild(chip);
+            });
+            wrapper.appendChild(childList);
+
+            toggle.addEventListener('click', function() {
+                const visible = childList.style.display === 'block';
+                childList.style.display = visible ? 'none' : 'block';
+                toggle.textContent = visible ? 'Show details' : 'Hide details';
+            });
+
+            return wrapper;
+        }
+
         function updateGroupedIO(ioData, ioGroups) {
             const container = document.getElementById('ioGroupsContainer');
             container.innerHTML = '';
@@ -1008,41 +1075,7 @@ template = '''
 
                     // Helper to create parent row with collapsible children
                     function addParentWithChildren(parentName, childNames) {
-                        const wrapper = document.createElement('div');
-                        wrapper.className = 'group-item';
-                        const header = document.createElement('div');
-                        header.className = 'group-header';
-                        const btn = document.createElement('button');
-                        btn.className = 'btn toggle-btn';
-                        btn.textContent = 'Show details';
-                        const title = document.createElement('div');
-                        title.className = 'group-title';
-                        title.textContent = parentName;
-                        header.appendChild(btn);
-                        header.appendChild(title);
-
-                        // Main parent card
-                        if (ioData[parentName]) {
-                            header.appendChild(renderCard(parentName, ioData[parentName]));
-                        }
-                        wrapper.appendChild(header);
-
-                        const children = document.createElement('div');
-                        children.className = 'group-children';
-                        (childNames || []).forEach(n => {
-                            if (ioData[n]) {
-                                children.appendChild(renderCard(n, ioData[n]));
-                            }
-                        });
-                        wrapper.appendChild(children);
-
-                        btn.addEventListener('click', function() {
-                            const visible = children.style.display === 'block';
-                            children.style.display = visible ? 'none' : 'block';
-                            btn.textContent = visible ? 'Show details' : 'Hide details';
-                        });
-
-                        grid.appendChild(wrapper);
+                        grid.appendChild(renderParentWithChildren(parentName, childNames, ioData));
                     }
 
                     // Decide how to group based on naming conventions
