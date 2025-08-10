@@ -1527,6 +1527,10 @@ def get_io_status():
         # Log PLC communication status changes (separate from IO events)
         comm_event = event_logger.log_communication_event(plc_connected)
         
+        # On first successful read, log a full system snapshot so the log isn't empty
+        if plc_connected and not event_logger.initial_snapshot_logged:
+            event_logger.log_system_snapshot(io_data)
+
         # Check for changes and log IO events (only for valid state changes)
         io_events = event_logger.check_and_log_changes(io_data, io_mapping)
         

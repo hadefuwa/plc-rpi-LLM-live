@@ -16,6 +16,7 @@ class EventLogger:
         self.previous_states = {}
         self.max_events = 1000  # Maximum number of events to keep
         self.plc_communication_status = None  # Track overall PLC communication
+        self.initial_snapshot_logged = False  # Track whether we've logged a system snapshot
         
     def log_event(self, io_name: str, old_value: Any, new_value: Any, io_config: Dict):
         """Log an IO state change event"""
@@ -93,6 +94,45 @@ class EventLogger:
         # Update status but don't create log events for routine connect/disconnect
         self.plc_communication_status = is_connected
         return None
+
+    def log_system_snapshot(self, io_data: Dict[str, Dict]):
+        """Log a single summary event capturing the current system IO snapshot.
+
+        The snapshot is stored as a lightweight dictionary of name -> value and
+        some simple counts so the UI (and future reports) can read it.
+        """
+        try:
+            total = len(io_data)
+            online = sum(1 for v in io_data.values() if v.get('status') == 'online')
+            errors = sum(1 for v in io_data.values() if v.get('status') == 'error')
+            offline = total - online - errors
+
+            snapshot = {name: info.get('value') for name, info in io_data.items()}
+
+            event = {
+                'timestamp': datetime.now().isoformat(),
+                'io_name': 'SYSTEM',
+                'description': 'Initial system snapshot',
+                'address': '',
+                'old_value': None,
+                'new_value': None,
+                'event_type': 'system_snapshot',
+                'priority': 'normal',
+                'snapshot': snapshot,
+                'snapshot_counts': {
+                    'total': total,
+                    'online': online,
+                    'offline': offline,
+                    'errors': errors
+                }
+            }
+
+            self._save_event(event)
+            self.initial_snapshot_logged = True
+            return event
+        except Exception as e:
+            print(f"Error logging system snapshot: {e}")
+            return None
     
     def check_and_log_changes(self, current_io_data: Dict, io_mapping: Dict):
         """Check for changes in IO data and log events"""
@@ -211,6 +251,11 @@ class EventLogger:
             change_desc = f"{old_display} → {new_display}"
             if event.get('event_type') == 'initialization':
                 change_desc = f"Started: {new_display}"
+            elif event.get('event_type') == 'system_snapshot':
+                counts = (event.get('snapshot_counts') or {})
+                total = counts.get('total', 0)
+                online = counts.get('online', 0)
+                change_desc = f"System snapshot saved ({online}/{total} online)"
             elif event.get('event_type') == 'emergency_stop_pressed':
                 change_desc = "E-STOP PRESSED"
             elif event.get('event_type') == 'emergency_stop_reset':
