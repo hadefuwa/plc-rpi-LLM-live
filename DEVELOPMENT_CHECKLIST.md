@@ -20,7 +20,7 @@
   - [x] Implement configurable AI prompts
   - [x] Add system settings management
 
-## Phase 2: PLC Integration (IN PROGRESS)
+## Phase 2: PLC Integration (COMPLETE)
 - [x] **PLC Communication Setup**
   - [x] Install and configure python-snap7 (already in requirements.txt)
   - [x] Create PLC connection class
@@ -35,7 +35,7 @@
   - [x] Create configurable IO mapping system
   - [x] Add real-time IO monitoring
 
-- [ ] **E-Stop Detection**
+- [ ] **E-Stop Detection (Planned)**
   - [ ] Implement continuous E-Stop polling
   - [ ] Add edge detection logic (OFF → ON transition)
   - [ ] Create E-Stop trigger handling
@@ -61,15 +61,21 @@
   - [ ] View single report and download
   - [ ] Link from navbar
 
-## Phase 4: Advanced Features
+## Phase 3.5: Event Logging & Daily Rotation (COMPLETE)
+- [x] Switch to daily event files `data/io_events_YYYY-MM-DD.json`
+- [x] Fix "Clear" to wipe the correct log
+- [x] Show "Events Today" from today’s file; aggregate totals across files
+- [x] Log individual IO values at startup (initialization events)
+
+## Phase 4: Advanced Features (IN PROGRESS)
 - [ ] **Real-time Monitoring**
   - [ ] Implement live IO status updates (ENHANCE)
   - [ ] Add system health monitoring
   - [ ] Create alert system for critical conditions
   - [ ] Add performance metrics
 
-- [ ] **Data Management**
-  - [ ] Implement event logging to database/file (optional DB)
+- [x] **Data Management**
+  - [x] Implement event logging to JSON (daily rotation)
   - [ ] Add data export functionality
   - [ ] Create backup and restore system
   - [ ] Add data retention policies
@@ -142,7 +148,7 @@ PROMPT_TEMPLATES = {
 }
 ```
 
-## Current Status: Phase 2 Complete ✅
+## Current Status: Phase 2 Complete ✅; Phase 3.5 Complete ✅
 - ✅ PLC communication class with python-snap7
 - ✅ Configuration system with web interface
 - ✅ IO mapping system supporting all data types
@@ -153,12 +159,12 @@ PROMPT_TEMPLATES = {
 - ✅ AI integration with Phi-3 Mini model
 - ✅ Web interface for data viewing and analysis
 
-## Next Steps: Phase 3 - Real-time PLC Integration
-1. ✅ Install python-snap7 library (already done)
-2. ✅ Create PLC connection class (COMPLETE)
-3. ✅ Implement IO reading functions (COMPLETE)
-4. ✅ Add configuration system (COMPLETE)
-5. 🔄 Replace CSV data with live PLC data (IN PROGRESS)
-6. ⏳ Test with real PLC hardware
-7. ⏳ Implement real-time monitoring
-8. ⏳ Add E-Stop detection and triggering 
+## Next Steps
+- Phase 3: Scheduled Reporting
+  - Build generator (snapshot → summarize → Ollama → save JSON+MD)
+  - Background scheduler every 30 minutes
+  - Reports UI (list, view, download)
+- Phase 4: Advanced UI and monitoring
+  - Improve responsive design and alerts
+  - Add performance/health metrics
+  - Data export and retention
