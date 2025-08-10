@@ -13,6 +13,8 @@ from event_logger import event_logger
 import os
 import pathlib
 from datetime import datetime
+import threading
+import time
 
 app = Flask(__name__)
 
@@ -21,6 +23,103 @@ app = Flask(__name__)
 # Create a single PLC communicator instance and clean up on exit
 plc = PLCCommunicator()
 atexit.register(plc.disconnect)
+
+# Background polling state
+latest_snapshot = None
+snapshot_lock = threading.Lock()
+USE_BULK_READ = False  # temporarily disable bulk reads to restore functionality
+
+def _build_io_snapshot() -> dict:
+    """Build a full IO snapshot and perform change logging.
+    Runs in the background poller.
+    """
+    io_mapping = get_io_mapping()
+    io_groups = get_io_groups()
+    io_data = {}
+    plc_connected = False
+
+    # Ensure persistent connection
+    if not plc.is_connected():
+        plc_connected = plc.connect()
+    else:
+        plc_connected = True
+
+    if plc_connected:
+        # Choose read strategy
+        values = None
+        if USE_BULK_READ:
+            try:
+                values = plc.read_all_io()
+            except Exception:
+                values = None
+        if values is None or not isinstance(values, dict) or not values:
+            # Per-tag reads (safe fallback)
+            for io_name, io_config in io_mapping.items():
+                try:
+                    value = plc.read_io(io_name)
+                except Exception:
+                    value = None
+                io_data[io_name] = {
+                    'value': value,
+                    'type': io_config['type'],
+                    'description': io_config['description'],
+                    'address': io_config['address'],
+                    'status': 'online' if value is not None else 'error'
+                }
+        else:
+            for io_name, io_config in io_mapping.items():
+                value = values.get(io_name)
+                io_data[io_name] = {
+                    'value': value,
+                    'type': io_config['type'],
+                    'description': io_config['description'],
+                    'address': io_config['address'],
+                    'status': 'online' if value is not None else 'error'
+                }
+    else:
+        # If PLC not connected, return configured IO with null values
+        for io_name, io_config in io_mapping.items():
+            io_data[io_name] = {
+                'value': None,
+                'type': io_config['type'],
+                'description': io_config['description'],
+                'address': io_config['address'],
+                'status': 'offline'
+            }
+
+    # On first successful read, log a full system snapshot so the log isn't empty
+    if plc_connected and not event_logger.initial_snapshot_logged:
+        event_logger.log_system_snapshot(io_data)
+
+    # Check for changes and log IO events (only for valid state changes)
+    try:
+        event_logger.check_and_log_changes(io_data, io_mapping)
+    except Exception:
+        pass
+
+    return {
+        'timestamp': datetime.now().isoformat(),
+        'io_data': io_data,
+        'io_groups': io_groups,
+        'connected': plc_connected,
+    }
+
+def _poller_loop(poll_interval_sec: float = 0.2):
+    """Continuously poll the PLC and update a shared snapshot."""
+    global latest_snapshot
+    while True:
+        try:
+            snap = _build_io_snapshot()
+            with snapshot_lock:
+                latest_snapshot = snap
+        except Exception:
+            # Keep looping even if a cycle fails
+            pass
+        time.sleep(poll_interval_sec)
+
+# Start the background poller thread (daemon so it won't block shutdown)
+_t = threading.Thread(target=_poller_loop, kwargs={'poll_interval_sec': 0.2}, daemon=True)
+_t.start()
 
 def query_ollama(prompt, data_summary):
     """Send query to local Ollama API with Gemma3 1B model"""
@@ -836,7 +935,7 @@ template = '''
                     <button class="btn" onclick="clearEventLog()" style="background-color:#dc3545;">Clear</button>
                 </div>
             </div>
-            <div class="panel-body event-log-content" id="eventLogContent">
+            <div class="panel-body event-log-content" id="eventLogContent" style="max-height: 360px; overflow-y: auto;">
                 <div class="no-events">Loading events...</div>
             </div>
         </div>
@@ -1008,7 +1107,8 @@ template = '''
                  // The event logger already handles all the formatting logic correctly
                  let change = event.change_description || 'Unknown change';
                  
-                 html += `<div class="event-item">${event.formatted_time} - ${event.io_name}: ${change}</div>`;
+                 const label = (event.description && event.description.trim()) ? event.description : event.io_name;
+                 html += `<div class="event-item">${event.formatted_time} - ${label}: ${change}</div>`;
              });
              
              if (html === '') {
@@ -2031,64 +2131,19 @@ def event_logs():
 
 @app.route('/get_io_status')
 def get_io_status():
-    """Get current IO status from PLC"""
+    """Return the latest background snapshot quickly without polling the PLC here."""
     try:
-        io_mapping = get_io_mapping()
-        io_groups = get_io_groups()
-        io_data = {}
-        plc_connected = False
-
-        # Ensure persistent connection
-        if not plc.is_connected():
-            plc_connected = plc.connect()
-        else:
-            plc_connected = True
-
-        if plc_connected:
-            # Read all configured IO points
-            for io_name, io_config in io_mapping.items():
-                try:
-                    value = plc.read_io(io_name)
-                    io_data[io_name] = {
-                        'value': value,
-                        'type': io_config['type'],
-                        'description': io_config['description'],
-                        'address': io_config['address'],
-                        'status': 'online' if value is not None else 'error'
-                    }
-                except Exception as e:
-                    io_data[io_name] = {
-                        'value': None,
-                        'type': io_config['type'],
-                        'description': io_config['description'],
-                        'address': io_config['address'],
-                        'status': 'error'
-                    }
-        else:
-            # If PLC not connected, return configured IO with null values
-            for io_name, io_config in io_mapping.items():
-                io_data[io_name] = {
-                    'value': None,
-                    'type': io_config['type'],
-                    'description': io_config['description'],
-                    'address': io_config['address'],
-                    'status': 'offline'
-                }
-        
-        # Log PLC communication status changes (separate from IO events)
-        comm_event = event_logger.log_communication_event(plc_connected)
-        
-        # On first successful read, log a full system snapshot so the log isn't empty
-        if plc_connected and not event_logger.initial_snapshot_logged:
-            event_logger.log_system_snapshot(io_data)
-
-        # Check for changes and log IO events (only for valid state changes)
-        io_events = event_logger.check_and_log_changes(io_data, io_mapping)
-        
-        total_events = len(io_events) + (1 if comm_event else 0)
-        
-        return jsonify({'io_data': io_data, 'io_groups': io_groups, 'new_events': total_events})
-        
+        with snapshot_lock:
+            snap = latest_snapshot
+        if not snap:
+            # If poller hasn't produced a snapshot yet, build one synchronously once
+            snap = _build_io_snapshot()
+        return jsonify({
+            'io_data': snap['io_data'],
+            'io_groups': snap['io_groups'],
+            'connected': snap['connected'],
+            'timestamp': snap['timestamp']
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -2096,8 +2151,8 @@ def get_io_status():
 def get_event_log():
     """Get recent event log entries"""
     try:
-        # Get recent events
-        recent_events = event_logger.get_recent_events(limit=20)
+        # Get recent events (larger window so scrolling makes sense)
+        recent_events = event_logger.get_recent_events(limit=200)
         
         # Format events for display
         formatted_events = [event_logger.format_event_for_display(event) for event in recent_events]

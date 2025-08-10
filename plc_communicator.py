@@ -245,19 +245,81 @@ class PLCCommunicator:
             return None
     
     def read_all_io(self):
-        """Read all configured IO points"""
+        """Read all configured IO points using a single bulk DB read per DB number.
+        Currently assumes most tags are in DB1; supports multiple DBs if present.
+        """
         try:
             io_mapping = get_io_mapping()
-            results = {}
-            
-            for io_name in io_mapping.keys():
-                value = self.read_io(io_name)
-                results[io_name] = value
-                
+            # Group addresses by DB
+            db_to_offsets: Dict[int, int] = {}
+            parsed: Dict[str, Dict[str, int]] = {}
+            for name, cfg in io_mapping.items():
+                info = self.parse_address(cfg['address'])
+                parsed[name] = info
+                end_offset = info['byte_offset'] + (1 if cfg['type']=='bit' else (4 if cfg['type'] in ('dword','real') else 2))
+                db_to_offsets[info['db_number']] = max(db_to_offsets.get(info['db_number'], 0), end_offset)
+
+            # Read buffers per DB
+            db_buffers: Dict[int, bytes] = {}
+            for db_num, size in db_to_offsets.items():
+                if size <= 0:
+                    continue
+                # add small safety margin
+                read_size = size + 2
+                try:
+                    db_buffers[db_num] = self.client.db_read(db_num, 0, read_size)
+                except Exception:
+                    # Leave buffer missing for this DB; we'll fallback to per-tag reads
+                    db_buffers[db_num] = None
+
+            # Decode values from buffers
+            results: Dict[str, Any] = {}
+            for name, cfg in io_mapping.items():
+                info = parsed[name]
+                buf = db_buffers.get(info['db_number'])
+                if not buf:
+                    results[name] = None
+                    continue
+                try:
+                    if buf is not None:
+                        if cfg['type'] == 'bit':
+                            results[name] = get_bool(buf, info['byte_offset'], info['bit_offset'])
+                        elif cfg['type'] == 'byte':
+                            results[name] = buf[info['byte_offset']]
+                        elif cfg['type'] == 'word':
+                            results[name] = get_int(bytearray(buf[info['byte_offset']:info['byte_offset']+2]), 0)
+                        elif cfg['type'] == 'dword':
+                            results[name] = get_dword(bytearray(buf[info['byte_offset']:info['byte_offset']+4]), 0)
+                        elif cfg['type'] == 'real':
+                            results[name] = get_real(bytearray(buf[info['byte_offset']:info['byte_offset']+4]), 0)
+                        else:
+                            results[name] = None
+                        continue
+                except Exception:
+                    # fall through to per-tag read
+                    pass
+
+                # Fallback: per-tag read if buffer missing/failed
+                try:
+                    if cfg['type'] == 'bit':
+                        results[name] = self.read_bit(info['db_number'], info['byte_offset'], info['bit_offset'])
+                    elif cfg['type'] == 'byte':
+                        results[name] = self.read_byte(info['db_number'], info['byte_offset'])
+                    elif cfg['type'] == 'word':
+                        results[name] = self.read_word(info['db_number'], info['byte_offset'])
+                    elif cfg['type'] == 'dword':
+                        results[name] = self.read_dword(info['db_number'], info['byte_offset'])
+                    elif cfg['type'] == 'real':
+                        results[name] = self.read_real(info['db_number'], info['byte_offset'])
+                    else:
+                        results[name] = None
+                except Exception:
+                    results[name] = None
+
             return results
-            
+
         except Exception as e:
-            self.last_error = f"Error reading all IO: {str(e)}"
+            self.last_error = f"Error reading all IO (bulk): {str(e)}"
             return {}
     
     def test_connection(self):

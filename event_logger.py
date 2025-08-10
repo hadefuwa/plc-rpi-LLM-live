@@ -3,6 +3,7 @@ import os
 from datetime import datetime, date
 import glob
 from typing import Dict, Any, List
+import re
 
 class EventLogger:
     """Event logging system for tracking IO state changes"""
@@ -23,6 +24,16 @@ class EventLogger:
         self.max_events = 5000  # Per-file cap to avoid huge daily files
         self.plc_communication_status = None  # Track overall PLC communication
         self.initial_snapshot_logged = False  # Track whether we've logged a system snapshot
+        # Debounce removed to capture all fast IO edges
+
+    def _is_fault_tag(self, io_name: str, io_cfg: Dict) -> bool:
+        # Only treat explicit fault array items and fault_count as fault-like
+        try:
+            if io_name == 'fault_count':
+                return True
+            return bool(re.match(r'^Faults\[\d+\]$', io_name))
+        except Exception:
+            return False
 
     def _today_log_path(self) -> str:
         today_str = date.today().isoformat()
@@ -112,32 +123,47 @@ class EventLogger:
         return None
 
     def log_system_snapshot(self, io_data: Dict[str, Dict]):
-        """Log individual events for each IO point with their current values.
-        
-        This creates a detailed record of all IO states at startup for better visibility.
-        """
+        """Log a single summary snapshot once per day, not per IO item."""
         try:
-            events = []
-            for io_name, io_info in (io_data or {}).items():
-                value = io_info.get('value')
-                description = io_info.get('description', '')
-                address = io_info.get('address', '')
-                
-                event = {
-                    'timestamp': datetime.now().isoformat(),
-                    'io_name': io_name,
-                    'description': description,
-                    'address': address,
-                    'old_value': None,
-                    'new_value': value,
-                    'event_type': 'initialization',
-                    'priority': 'normal'
+            # Avoid duplicate daily snapshots (e.g., dev reload)
+            existing = self._load_events()
+            if any(e.get('event_type') == 'system_snapshot' for e in (existing or [])):
+                self.initial_snapshot_logged = True
+                return []
+
+            total = len(io_data or {})
+            online = sum(1 for v in (io_data or {}).values() if v.get('status') == 'online')
+            errors = sum(1 for v in (io_data or {}).values() if v.get('status') == 'error')
+            # Simple faults count: count tags that look like Faults[n] and are ON/True
+            faults_active = 0
+            try:
+                for name, info in (io_data or {}).items():
+                    if self._is_fault_tag(name, info):
+                        val = info.get('value')
+                        if isinstance(val, (int, bool)) and bool(val):
+                            faults_active += 1
+            except Exception:
+                pass
+
+            snapshot_event = {
+                'timestamp': datetime.now().isoformat(),
+                'io_name': 'SYSTEM',
+                'description': 'System startup snapshot',
+                'address': '',
+                'old_value': None,
+                'new_value': None,
+                'event_type': 'system_snapshot',
+                'priority': 'normal',
+                'snapshot_counts': {
+                    'total': total,
+                    'online': online,
+                    'errors': errors,
+                    'faults_active': faults_active
                 }
-                events.append(event)
-                self._save_event(event)
-            
+            }
+            self._save_event(snapshot_event)
             self.initial_snapshot_logged = True
-            return events
+            return [snapshot_event]
         except Exception as e:
             print(f"Error logging system snapshot: {e}")
             return []
@@ -150,22 +176,20 @@ class EventLogger:
             current_value = current_info.get('value')
             previous_value = self.previous_states.get(io_name)
             
-            # Skip if this is the first reading (initialization) - just store the state
+            # If this is the first reading for this tag, set previous and also log an initialization if value is known
             if io_name not in self.previous_states:
                 self.previous_states[io_name] = current_value
+                if current_value is not None:
+                    event = self.log_event(io_name, None, current_value, io_mapping.get(io_name, {}))
+                    events.append(event)
                 continue
             
             # Check if value has actually changed
             if previous_value != current_value:
-                # Only log IO events for valid state changes (not communication issues)
-                # Communication issues are handled separately by log_communication_event()
-                if previous_value is not None and current_value is not None:
-                    event = self.log_event(
-                        io_name, 
-                        previous_value, 
-                        current_value, 
-                        io_mapping.get(io_name, {})
-                    )
+                # Log change when current value is known (even if previous was unknown)
+                if current_value is not None:
+                    io_cfg = io_mapping.get(io_name, {})
+                    event = self.log_event(io_name, previous_value, current_value, io_cfg)
                     events.append(event)
                 
                 # Always update previous state regardless
