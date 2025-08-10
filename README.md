@@ -7,6 +7,7 @@ A Flask-based web application for monitoring PLC systems and generating intellig
 - **Live PLC Communication**: Connect to Siemens S7 PLCs using python-snap7
 - **Configurable IO Mapping**: Easy web interface to configure PLC addresses and data types
 - **Real-time Monitoring**: Live status updates and system health monitoring
+- **Scheduled Reports (Planned)**: Automatic 30‑minute status reports with local AI summary
 - **AI-Powered Analysis**: Intelligent operator reports using local AI (Gemma3 1B)
 - **Interactive Visualizations**: Real-time charts and system status displays
 - **Emergency Stop Detection**: Automatic detection and reporting of E-Stop events
@@ -59,6 +60,11 @@ Open your browser and go to: `http://localhost:5001`
 - **IO Status**: Monitor all configured PLC inputs and outputs
 - **Event Log**: View recent system events and E-Stop activations
 - **AI Analysis**: Ask questions about your system data
+
+### Reports (Coming Next)
+- The app will generate a report every 30 minutes.
+- Reports will include: timestamp, key IO summary, and a short AI-written summary.
+- Reports will be saved under `data/reports/` and visible in a new “Reports” page.
 
 ### PLC Configuration
 1. Click **"PLC Configuration"** in the navigation menu

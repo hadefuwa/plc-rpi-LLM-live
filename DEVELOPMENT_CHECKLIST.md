@@ -41,34 +41,41 @@
   - [ ] Create E-Stop trigger handling
   - [ ] Add debouncing for reliable detection
 
-## Phase 3: AI Integration Enhancement
-- [ ] **Enhanced AI System**
-  - [ ] Improve prompt engineering for PLC data
-  - [ ] Add context-aware AI responses
-  - [ ] Implement different report types based on scenarios
-  - [ ] Add AI response caching
+## Phase 3: Scheduled Reporting (NEXT)
+- [ ] **Report Format**
+  - [ ] Define simple 2–3 sentence template (status, risks, actions)
+  - [ ] Include grouped Digital/Analogue summaries
+  - [ ] Save as both JSON (raw) and MD (readable)
 
-- [ ] **Report Generation**
-  - [ ] Create structured report templates
-  - [ ] Implement automatic report generation on E-Stop
-  - [ ] Add timestamp and event logging
-  - [ ] Create report history system
+- [ ] **Report Generator**
+  - [ ] Build function to snapshot IO → summarize → call Ollama → save
+  - [ ] Handle PLC offline case with a short fallback report
+
+- [ ] **Scheduler**
+  - [ ] Background loop to run every 30 minutes (configurable later)
+  - [ ] Create `data/reports/YYYY-MM-DD/HHMM.(json|md)` files
+  - [ ] Keep last N reports cached for fast UI
+
+- [ ] **Reports UI**
+  - [ ] New Reports page to list today’s reports
+  - [ ] View single report and download
+  - [ ] Link from navbar
 
 ## Phase 4: Advanced Features
 - [ ] **Real-time Monitoring**
-  - [ ] Implement live IO status updates
+  - [ ] Implement live IO status updates (ENHANCE)
   - [ ] Add system health monitoring
   - [ ] Create alert system for critical conditions
   - [ ] Add performance metrics
 
 - [ ] **Data Management**
-  - [ ] Implement event logging to database/file
+  - [ ] Implement event logging to database/file (optional DB)
   - [ ] Add data export functionality
   - [ ] Create backup and restore system
   - [ ] Add data retention policies
 
 - [ ] **User Interface Enhancements**
-  - [ ] Create mobile-responsive design
+  - [ ] Create mobile-responsive design (improve)
   - [ ] Add real-time status dashboard
   - [ ] Implement user authentication
   - [ ] Add configuration management UI
