@@ -1,5 +1,595 @@
 [
   {
+    "timestamp": "2025-08-10T17:58:05.915491",
+    "io_name": "Out_A2_ForcedStatus",
+    "description": "Output E-Stop LED - ForcedStatus",
+    "address": "DB1.DBX60.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.874455",
+    "io_name": "Out_A2_ForcedState",
+    "description": "Output E-Stop LED - ForcedState",
+    "address": "DB1.DBX60.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.830409",
+    "io_name": "Out_A2_State",
+    "description": "Output E-Stop LED - State",
+    "address": "DB1.DBX60.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.785369",
+    "io_name": "Out_A1_ForcedStatus",
+    "description": "Output Green LED - ForcedStatus",
+    "address": "DB1.DBX58.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.740327",
+    "io_name": "Out_A1_ForcedState",
+    "description": "Output Green LED - ForcedState",
+    "address": "DB1.DBX58.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.697288",
+    "io_name": "Out_A1_State",
+    "description": "Output Green LED - State",
+    "address": "DB1.DBX58.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.659254",
+    "io_name": "Out_A0_ForcedStatus",
+    "description": "Output Red LED - ForcedStatus",
+    "address": "DB1.DBX56.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.624222",
+    "io_name": "Out_A0_ForcedState",
+    "description": "Output Red LED - ForcedState",
+    "address": "DB1.DBX56.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.591192",
+    "io_name": "Out_A0_State",
+    "description": "Output Red LED - State",
+    "address": "DB1.DBX56.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.557161",
+    "io_name": "AI1_Scalar",
+    "description": "AI1 Scalar (Real)",
+    "address": "DB1.DBD52",
+    "old_value": null,
+    "new_value": 10.0,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.524131",
+    "io_name": "AI1_Offset",
+    "description": "AI1 Offset (Real)",
+    "address": "DB1.DBD48",
+    "old_value": null,
+    "new_value": 1.2000000476837158,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.491101",
+    "io_name": "AI1_Scaled",
+    "description": "AI1 Scaled (Real)",
+    "address": "DB1.DBD44",
+    "old_value": null,
+    "new_value": 1.2000000476837158,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.456069",
+    "io_name": "AI0_Scalar",
+    "description": "AI0 Scalar (Real)",
+    "address": "DB1.DBD38",
+    "old_value": null,
+    "new_value": 10.0,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.423039",
+    "io_name": "AI0_Offset",
+    "description": "AI0 Offset (Real)",
+    "address": "DB1.DBD34",
+    "old_value": null,
+    "new_value": 2.0,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.392011",
+    "io_name": "AI0_Scaled",
+    "description": "AI0 Scaled (Real)",
+    "address": "DB1.DBD30",
+    "old_value": null,
+    "new_value": 2.0,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.358981",
+    "io_name": "AI1_Raw",
+    "description": "AI1 Raw (Int)",
+    "address": "DB1.DBW42",
+    "old_value": null,
+    "new_value": 0,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.325951",
+    "io_name": "AI0_Raw",
+    "description": "AI0 Raw (Int)",
+    "address": "DB1.DBW28",
+    "old_value": null,
+    "new_value": 0,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.292921",
+    "io_name": "B5_ForcedStatus",
+    "description": "B[5] - ForcedStatus",
+    "address": "DB1.DBX26.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.259891",
+    "io_name": "B5_ForcedState",
+    "description": "B[5] - ForcedState",
+    "address": "DB1.DBX26.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.224859",
+    "io_name": "B5_State",
+    "description": "B[5] - State",
+    "address": "DB1.DBX26.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.191829",
+    "io_name": "B4_ForcedStatus",
+    "description": "B[4] - ForcedStatus",
+    "address": "DB1.DBX24.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.158799",
+    "io_name": "B4_ForcedState",
+    "description": "B[4] - ForcedState",
+    "address": "DB1.DBX24.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.126770",
+    "io_name": "B4_State",
+    "description": "B[4] - State",
+    "address": "DB1.DBX24.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.093739",
+    "io_name": "B3_ForcedStatus",
+    "description": "B[3] - ForcedStatus",
+    "address": "DB1.DBX22.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.054704",
+    "io_name": "B3_ForcedState",
+    "description": "B[3] - ForcedState",
+    "address": "DB1.DBX22.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:05.021674",
+    "io_name": "B3_State",
+    "description": "B[3] - State",
+    "address": "DB1.DBX22.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.988644",
+    "io_name": "B2_ForcedStatus",
+    "description": "B[2] - ForcedStatus",
+    "address": "DB1.DBX20.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.924586",
+    "io_name": "B2_ForcedState",
+    "description": "B[2] - ForcedState",
+    "address": "DB1.DBX20.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.890555",
+    "io_name": "B2_State",
+    "description": "B[2] - State",
+    "address": "DB1.DBX20.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.857525",
+    "io_name": "B1_ForcedStatus",
+    "description": "B[1] - ForcedStatus",
+    "address": "DB1.DBX18.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.821492",
+    "io_name": "B1_ForcedState",
+    "description": "B[1] - ForcedState",
+    "address": "DB1.DBX18.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.788463",
+    "io_name": "B1_State",
+    "description": "B[1] - State",
+    "address": "DB1.DBX18.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.756433",
+    "io_name": "B0_ForcedStatus",
+    "description": "B[0] - ForcedStatus",
+    "address": "DB1.DBX16.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.723403",
+    "io_name": "B0_ForcedState",
+    "description": "B[0] - ForcedState",
+    "address": "DB1.DBX16.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.691374",
+    "io_name": "B0_State",
+    "description": "B[0] - State",
+    "address": "DB1.DBX16.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.659345",
+    "io_name": "A7_ForcedStatus",
+    "description": "A[7] - ForcedStatus",
+    "address": "DB1.DBX14.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.627316",
+    "io_name": "A7_ForcedState",
+    "description": "A[7] - ForcedState",
+    "address": "DB1.DBX14.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.596287",
+    "io_name": "A7_State",
+    "description": "A[7] - State",
+    "address": "DB1.DBX14.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.564258",
+    "io_name": "A6_ForcedStatus",
+    "description": "A[6] - ForcedStatus",
+    "address": "DB1.DBX12.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.532229",
+    "io_name": "A6_ForcedState",
+    "description": "A[6] - ForcedState",
+    "address": "DB1.DBX12.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.499199",
+    "io_name": "A6_State",
+    "description": "A[6] - State",
+    "address": "DB1.DBX12.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.467159",
+    "io_name": "A5_ForcedStatus",
+    "description": "A[5] - ForcedStatus",
+    "address": "DB1.DBX10.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.437121",
+    "io_name": "A5_ForcedState",
+    "description": "A[5] - ForcedState",
+    "address": "DB1.DBX10.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.405092",
+    "io_name": "A5_State",
+    "description": "A[5] - State",
+    "address": "DB1.DBX10.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.375065",
+    "io_name": "A4_ForcedStatus",
+    "description": "Red Button - ForcedStatus",
+    "address": "DB1.DBX8.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.342035",
+    "io_name": "A4_ForcedState",
+    "description": "Red Button - ForcedState",
+    "address": "DB1.DBX8.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.310006",
+    "io_name": "A4_State",
+    "description": "Red Button - State",
+    "address": "DB1.DBX8.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.277471",
+    "io_name": "A3_ForcedStatus",
+    "description": "Green Button - ForcedStatus",
+    "address": "DB1.DBX6.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.243440",
+    "io_name": "A3_ForcedState",
+    "description": "Green Button - ForcedState",
+    "address": "DB1.DBX6.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.212412",
+    "io_name": "A3_State",
+    "description": "Green Button - State",
+    "address": "DB1.DBX6.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.180382",
+    "io_name": "A2_ForcedStatus",
+    "description": "Switch Right - ForcedStatus",
+    "address": "DB1.DBX4.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.145351",
+    "io_name": "A2_ForcedState",
+    "description": "Switch Right - ForcedState",
+    "address": "DB1.DBX4.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.112816",
+    "io_name": "A2_State",
+    "description": "Switch Right - State",
+    "address": "DB1.DBX4.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.080787",
+    "io_name": "A1_ForcedStatus",
+    "description": "Switch Left - ForcedStatus",
+    "address": "DB1.DBX2.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.048758",
+    "io_name": "A1_ForcedState",
+    "description": "Switch Left - ForcedState",
+    "address": "DB1.DBX2.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:04.016729",
+    "io_name": "A1_State",
+    "description": "Switch Left - State",
+    "address": "DB1.DBX2.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:03.984699",
+    "io_name": "A0_ForcedStatus",
+    "description": "Safety Relay EStop - ForcedStatus",
+    "address": "DB1.DBX0.2",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:03.949668",
+    "io_name": "A0_ForcedState",
+    "description": "Safety Relay EStop - ForcedState",
+    "address": "DB1.DBX0.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-08-10T17:58:03.927141",
+    "io_name": "A0_State",
+    "description": "Safety Relay EStop - State",
+    "address": "DB1.DBX0.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
     "timestamp": "2025-08-10T17:47:02.479075",
     "io_name": "PWM1_Low_Duty",
     "description": "PWM[1] Low Duty (Int)",

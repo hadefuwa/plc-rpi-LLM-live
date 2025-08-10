@@ -1,0 +1,5 @@
+.ts-header { cursor: pointer; }
+.ts-header:after { content: ''; float: right; margin-left: 6px; border-width: 5px; border-style: solid; border-color: #64748b transparent transparent transparent; opacity: .6; }
+th[aria-sort="ascending"].ts-header:after { border-color: transparent transparent #93c5fd transparent; }
+th[aria-sort="descending"].ts-header:after { border-color: #93c5fd transparent transparent transparent; }
+

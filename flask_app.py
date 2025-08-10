@@ -471,6 +471,7 @@ template = '''
 <head>
     <title>E-Stop AI Status Reporter</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f2937'/%3E%3Cpath d='M14 3l-3 10h5l-2 8 7-11h-5l3-7z' fill='%23ffffff'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="/static/vendor/tablesort.css">
     <style>
         /* Navigation Styles */
         {{ nav_styles|safe }}
@@ -1311,6 +1312,12 @@ template = '''
                     tableContainer.style.maxHeight = (heightPx || 400) + 'px';
                     tableContainer.style.overflowY = 'auto';
                 } catch (e) { /* fallback to CSS max-height */ }
+
+                // Enable client-side sorting via Tablesort (simple, offline)
+                try {
+                    table.querySelectorAll('th').forEach(th => th.classList.add('ts-header'));
+                    if (window.Tablesort) { new Tablesort(table); }
+                } catch (e) { /* optional */ }
             }
 
             // Priority groups
@@ -1378,6 +1385,7 @@ template = '''
             }
         });
     </script>
+    <script src="/static/vendor/tablesort.min.js"></script>
 </body>
 </html>
 '''
