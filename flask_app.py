@@ -42,10 +42,11 @@ Please provide a clear, CONCISE technical analysis based on this PLC data. Keep 
                 "prompt": full_prompt,
                 "stream": False,
                 "options": {
-                    "num_predict": 100,  # Limit response to ~100 tokens
-                    "temperature": 0.1   # Lower temperature for more focused responses
+                    "num_predict": 350,  # longer answer budget
+                    "temperature": 0.2   # slightly higher for readability
                 }
-            }
+            },
+            timeout=300
         )
         
         if response.status_code == 200:
@@ -61,7 +62,7 @@ Please provide a clear, CONCISE technical analysis based on this PLC data. Keep 
     except requests.exceptions.ConnectionError:
         return "Error: Could not connect to Ollama. Make sure Ollama is running locally on port 11434."
     except requests.exceptions.Timeout:
-        return "Error: Request timed out after 2 minutes. The Raspberry Pi might need more time to process your request. Try a simpler question or wait for the model to fully load."
+        return "Error: Ollama request timed out. The model may still be loading. Please try again in a minute."
     except Exception as e:
         return f"Error: {str(e)}"
 
@@ -504,14 +505,15 @@ template = '''
         }
 
         /* Generic panel/card styling */
-        .panel { background: #0f172a; border: 1px solid #1f2937; border-radius: 12px; box-shadow: 0 1px 3px rgba(2,6,23,.5); }
-        .panel-header { display:flex; align-items:center; justify-content:space-between; padding: 12px 16px; border-bottom:1px solid #1f2937; }
+        .panel { position:relative; background: #0f172a; border: 1px solid #1f2937; border-radius: 12px; box-shadow: 0 6px 16px rgba(2,6,23,.6); }
+        .panel::before { content:""; position:absolute; inset:0; border-radius:12px; pointer-events:none; box-shadow: 0 0 0 1px #26324a inset, 0 0 22px rgba(37,99,235,.18); }
+        .panel-header { display:flex; align-items:center; justify-content:space-between; padding: 12px 16px; border-bottom:1px solid #1f2937; background:#0b1220; border-top-left-radius:12px; border-top-right-radius:12px; }
         .panel-title { font-weight: 800; font-size: 16px; color:#e5e7eb; }
         .panel-subtitle { color:#94a3b8; font-size:12px; margin-left:8px; }
         .panel-body { padding: 12px 16px; }
         .quick-actions { display:flex; gap:10px; align-items:center; }
-        .collapse-btn { background:#374151; color:#e5e7eb; border:1px solid #4b5563; padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer; }
-        .collapse-btn:hover { background:#4b5563; }
+        .collapse-icon { background:none; border:none; color:#e5e7eb; font-size:16px; cursor:pointer; padding:4px 6px; }
+        .collapse-icon:hover { color:#93c5fd; }
         .panel.collapsed .panel-body { display:none; }
         .search-input { width: 260px; max-width: 100%; background:#111827; color:#e5e7eb; border:1px solid #253049; border-radius:8px; padding:8px 10px; }
         .search-input:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 2px rgba(37,99,235,.25); }
@@ -786,7 +788,7 @@ template = '''
                 <span class="panel-subtitle">Live view of PLC status and insights</span>
             </div>
             <div class="quick-actions">
-                <button class="collapse-btn" onclick="toggleSection('metricsSection', this)">Hide</button>
+                <button class="collapse-icon" title="Collapse/Expand" onclick="toggleSection('metricsSection', this)">▼</button>
                 <input class="search-input" id="filterInput" placeholder="Filter IO (e.g., A1, Red, PWM)" oninput="applyFilter()">
                 <button class="btn" onclick="refreshIOStatus()">Refresh All</button>
             </div>
@@ -813,7 +815,7 @@ template = '''
         <div class="panel-header">
             <div class="panel-title">Live IO Status</div>
             <div class="quick-actions">
-                <button class="collapse-btn" onclick="toggleSection('liveIoSection', this)">Hide</button>
+                <button class="collapse-icon" title="Collapse/Expand" onclick="toggleSection('liveIoSection', this)">▼</button>
                 <button class="btn" onclick="refreshIOStatus()" style="background-color: #28a745;">Refresh</button>
                 <span id="lastUpdate" class="panel-subtitle">Last update: Never</span>
             </div>
@@ -829,6 +831,7 @@ template = '''
             <div class="panel-header">
                 <div class="panel-title">Recent Events</div>
                 <div class="quick-actions">
+                    <button class="collapse-icon" title="Collapse/Expand" onclick="toggleSection('eventLogContent', this)">▼</button>
                     <button class="btn" onclick="refreshEventLog()">Refresh</button>
                     <button class="btn" onclick="clearEventLog()" style="background-color:#dc3545;">Clear</button>
                 </div>
@@ -843,7 +846,7 @@ template = '''
                 <div class="panel-title">AI Analysis with Gemma3 1B</div>
                 <div class="panel-subtitle">Ask questions about the PLC system status</div>
                 <div class="quick-actions">
-                    <button class="collapse-btn" onclick="toggleSection('aiSectionBody', this)">Hide</button>
+                    <button class="collapse-icon" title="Collapse/Expand" onclick="toggleSection('aiSectionBody', this)">▼</button>
                 </div>
             </div>
             <div class="panel-body" id="aiSectionBody">
@@ -864,6 +867,9 @@ template = '''
             
             <div class="loading" id="loading">AI is analyzing your data...</div>
             <div id="response" class="response" style="display: none;"></div>
+            <div style="margin-top:12px; display:flex; justify-content:flex-end;">
+                <button class="btn" id="generateReportBtn" onclick="generateReport()" title="Generate an AI operator report">Generate Report Now</button>
+            </div>
             </div>
         </div>
         
@@ -877,7 +883,7 @@ template = '''
             if(!el) return;
             const isHidden = el.style.display === 'none';
             el.style.display = isHidden ? '' : 'none';
-            if(btn){ btn.textContent = isHidden ? 'Hide' : 'Show'; }
+            if(btn){ btn.textContent = isHidden ? '▼' : '▲'; }
         }
         function setQuestion(question) {
             document.getElementById('questionInput').value = question;
@@ -931,6 +937,26 @@ template = '''
                 document.getElementById('response').style.display = 'block';
                 document.getElementById('response').textContent = 'AI Connection Test: FAILED\\n\\nError: ' + error;
             });
+        }
+
+        function generateReport(){
+            const btn = document.getElementById('generateReportBtn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
+            fetch('/generate_report', {method:'POST'})
+                .then(r=>r.json())
+                .then(d=>{
+                    if (d.status === 'success') {
+                        alert('Report saved.');
+                        if (d.ai_summary) {
+                            const resp = document.getElementById('response');
+                            if (resp) { resp.style.display='block'; resp.textContent = d.ai_summary; }
+                        }
+                    } else {
+                        alert(d.message || 'AI generation failed');
+                    }
+                })
+                .catch(e=>{ alert('Error: '+e); })
+                .finally(()=>{ if (btn) { btn.disabled = false; btn.textContent = 'Generate Report Now'; } });
         }
         
         function refreshEventLog() {
@@ -1359,6 +1385,78 @@ template = '''
             buildTable('Digital Inputs', diNames);
             buildTable('Digital Outputs', doNames);
 
+            // Active Faults section (show all faults with current state)
+            try {
+                const configuredFaults = (ioGroups && (ioGroups['Active Faults'] || ioGroups['Faults'])) || [];
+                let faultNames = [];
+                if (configuredFaults.length > 0) {
+                    faultNames = configuredFaults.slice();
+                } else {
+                    faultNames = Object.keys(ioData||{}).filter(n => /fault|alarm/i.test(n));
+                }
+                // Mark all fault tags as used so they don't appear in Others
+                faultNames.forEach(n => used.add(n));
+                // Build the section regardless of activity
+                const section = document.createElement('div');
+                section.className = 'section';
+                const h3 = document.createElement('h3');
+                h3.textContent = 'Active Faults';
+                section.appendChild(h3);
+
+                const tableContainer = document.createElement('div');
+                tableContainer.className = 'table-container';
+                const table = document.createElement('table');
+                table.className = 'io-table';
+                table.innerHTML = `<thead><tr>
+                    <th style="width:70%">Fault Tag</th>
+                    <th style="width:30%">State</th>
+                </tr></thead>`;
+                const tbody = document.createElement('tbody');
+
+                faultNames.forEach(name => {
+                    const info = ioData[name] || {value:null, type:'bit', address:'', status:'offline', description:name};
+                    const tr = document.createElement('tr');
+                    const valueDisplay = formatIoValue(info);
+                    let valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
+                    const valueStateClass = info.status==='error'?'error':(info.value===null?'offline':'');
+                    const detailsId = `details_${name.replace(/[^a-zA-Z0-9_\[\]]/g,'_')}`;
+                    const desc = (info.description||'').toString();
+                    tr.innerHTML = `
+                        <td>
+                            <div class="desc-inline">
+                                <span class="desc-text" contenteditable="true" onkeydown="if(event.key==='Enter'){event.preventDefault();updateDesc('${name}', this.innerText.trim())}">${(desc||name).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+                                <button class="details-toggle-btn" onclick="toggleDetails('${detailsId}')">Details</button>
+                            </div>
+                        </td>
+                        <td class="value-cell ${valueClass} ${valueStateClass}">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
+                    `;
+                    const dtr = document.createElement('tr');
+                    dtr.className = 'details-row';
+                    dtr.id = detailsId;
+                    dtr.style.display = 'none';
+                    dtr.innerHTML = `
+                        <td colspan="3">
+                            <div class="details-box">
+                                <div><span class="detail-label">IO Tag</span><span class="detail-value mono">${name}</span></div>
+                                <div><span class="detail-label">Type</span><span class="detail-value">${(info.type||'').toUpperCase()}</span></div>
+                                <div><span class="detail-label">Address</span><span class="detail-value mono">${info.address||''}</span></div>
+                            </div>
+                        </td>`;
+                    tbody.appendChild(tr);
+                    tbody.appendChild(dtr);
+                });
+
+                table.appendChild(tbody);
+                tableContainer.appendChild(table);
+                // Ensure vertical scroll for faults table
+                try {
+                    tableContainer.style.maxHeight = '320px';
+                    tableContainer.style.overflowY = 'auto';
+                } catch (e) { /* ignore */ }
+                section.appendChild(tableContainer);
+                groupsContainer.appendChild(section);
+            } catch(e) { /* ignore */ }
+
             // Others: everything not used
             const otherNames = Object.keys(ioData||{}).filter(n => !used.has(n));
             buildTable('Others', otherNames);
@@ -1585,6 +1683,32 @@ def ask_ai():
 
 # --- Reporting (Phase 3) ---
 def build_report_payload(io_data: dict) -> dict:
+    # Derive forced IO metrics (only consider ..._ForcedState as the indicator for forcing)
+    forced_state_names = [k for k in io_data.keys() if k.lower().endswith('_forcedstate')]
+    active_forced = [k for k in forced_state_names if bool(io_data.get(k, {}).get('value'))]
+
+    # Derive active alarms/faults (simple heuristic by tag name and truthy/positive value)
+    active_alarm_names = []
+    for tag_name, tag_info in (io_data or {}).items():
+        try:
+            name_lower = tag_name.lower()
+            tag_type = (tag_info or {}).get('type')
+            tag_value = (tag_info or {}).get('value')
+            looks_alarm = ('alarm' in name_lower) or ('fault' in name_lower) or ('active_fault' in name_lower)
+            if not looks_alarm:
+                continue
+            if tag_type == 'bit' and bool(tag_value):
+                active_alarm_names.append(tag_name)
+            elif tag_type != 'bit':
+                # numeric: consider > 0 as active
+                try:
+                    num = float(tag_value)
+                    if num > 0:
+                        active_alarm_names.append(tag_name)
+                except Exception:
+                    pass
+        except Exception:
+            continue
     summary = {
         'timestamp': datetime.now().isoformat(),
         'counts': {
@@ -1593,7 +1717,16 @@ def build_report_payload(io_data: dict) -> dict:
             'errors': sum(1 for v in io_data.values() if v.get('status') == 'error'),
         },
         'digital_on': [k for k,v in io_data.items() if v.get('type')=='bit' and v.get('value')==1],
-        'analog_samples': {k:v.get('value') for k,v in io_data.items() if v.get('type')=='real'}
+        'analog_samples': {k:v.get('value') for k,v in io_data.items() if v.get('type')=='real'},
+        'forced': {
+            'total_tags': len(forced_state_names),
+            'active': len(active_forced),
+            'active_names': active_forced[:20]
+        },
+        'alarms': {
+            'count': len(active_alarm_names),
+            'active_names': active_alarm_names[:50]
+        }
     }
     return summary
 
@@ -1615,10 +1748,13 @@ def write_report_files(payload: dict, ai_text: str):
     json_path = os.path.join(out_dir, f'{ts}.json')
     md_path = os.path.join(out_dir, f'{ts}.md')
     import json
-    with open(json_path, 'w') as f:
-        json.dump(payload, f, indent=2)
-    with open(md_path, 'w') as f:
-        f.write('# 30‑minute PLC Report\n\n')
+    # Attach the AI summary into the JSON payload
+    payload_with_ai = dict(payload)
+    payload_with_ai['ai_summary'] = ai_text
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(payload_with_ai, f, indent=2, ensure_ascii=False)
+    with open(md_path, 'w', encoding='utf-8') as f:
+        f.write('# 30-minute PLC Report\n\n')
         f.write(ai_text + '\n')
     return json_path, md_path
 
@@ -1653,16 +1789,54 @@ def generate_report():
 
         payload = build_report_payload(io_data)
 
+        # Add recent events context for the AI
+        try:
+            recent = event_logger.get_recent_events(limit=100)
+            recent_fmt = []
+            for e in recent[::-1]:  # oldest to newest
+                try:
+                    fe = event_logger.format_event_for_display(e)
+                    recent_fmt.append(f"{fe['formatted_time']} - {fe['io_name']}: {fe['change_description']}")
+                except Exception:
+                    pass
+            events_summary = "\n".join(recent_fmt[-100:])
+        except Exception:
+            events_summary = ""
+
         # Ask AI for a brief summary
-        ai_summary = query_ollama(
-            "Provide a short 2-3 sentence operator report (status, risks, actions).",
-            f"IO counts: {payload['counts']}; Digital ON: {len(payload['digital_on'])}; Analog samples: {len(payload['analog_samples'])}"
+        ai_prompt = (
+            "You are an industrial controls engineer preparing an operator report for a Siemens S7-1200 PLC system. "
+            "This is a safety-critical environment (E-Stop present). Use ONLY the recent event log provided to infer behavior. "
+            "Interpret bit values as OFF/ON, and treat 'forced' items as manual overrides that may mask true process state. "
+            "Task: (1) Summarize current system status, (2) Explain what most likely happened during this period, "
+            "(3) If an Emergency Stop occurred, explicitly call it out and describe the key IO changes immediately before it, "
+            "(4) Mention any IO that appears to be forced if provided. "
+            "Write 1–2 short paragraphs (3–6 sentences total), clear and operator-friendly. Avoid speculation beyond the events."
         )
-        if not ai_summary or 'Error' in ai_summary:
-            ai_summary = generate_report_text(payload)
+        forced_line = ""
+        try:
+            if payload.get('forced', {}).get('active'):
+                names = payload['forced'].get('active_names') or []
+                if names:
+                    forced_line = "\nActive forced IO: " + ", ".join(names[:20])
+        except Exception:
+            forced_line = ""
+        alarms_line = ""
+        try:
+            if (payload.get('alarms') or {}).get('count'):
+                anames = (payload['alarms'].get('active_names') or [])
+                alarms_line = f"\nActive alarms: {payload['alarms']['count']}" + (" (" + ", ".join(anames[:20]) + ")" if anames else "")
+        except Exception:
+            alarms_line = ""
+        data_context = (
+            f"Recent events (oldest→newest):\n{events_summary}{forced_line}{alarms_line}"
+        )
+        ai_summary = query_ollama(ai_prompt, data_context)
+        if not ai_summary or ai_summary.startswith('Error:'):
+            return jsonify({'status': 'error', 'message': ai_summary or 'AI generation failed'}), 502
 
         json_path, md_path = write_report_files(payload, ai_summary)
-        return jsonify({'status': 'success', 'message': 'Report generated', 'json': json_path, 'md': md_path})
+        return jsonify({'status': 'success', 'message': 'Report generated', 'json': json_path, 'md': md_path, 'ai_summary': ai_summary})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 

@@ -189,7 +189,7 @@ class EventLogger:
                 events = events[:self.max_events]
             
             # Save back to file
-             with open(self.log_file, 'w') as f:
+            with open(self.log_file, 'w') as f:
                 json.dump(events, f, indent=2)
                 
         except Exception as e:

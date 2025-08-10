@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-08-10T19:44:22.500061",
+  "counts": {
+    "total": 90,
+    "online": 0,
+    "errors": 0
+  },
+  "digital_on": [],
+  "analog_samples": {
+    "AI0_Scaled": null,
+    "AI0_Offset": null,
+    "AI0_Scalar": null,
+    "AI1_Scaled": null,
+    "AI1_Offset": null,
+    "AI1_Scalar": null
+  }
+}

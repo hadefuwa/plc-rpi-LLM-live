@@ -228,7 +228,7 @@
     "AI0_Scaled": {
       "type": "real",
       "address": "DB1.DBD30",
-      "description": "AI0 Scaled (Real)"
+      "description": "AI0"
     },
     "AI0_Offset": {
       "type": "real",
@@ -243,7 +243,7 @@
     "AI1_Scaled": {
       "type": "real",
       "address": "DB1.DBD44",
-      "description": "AI1 Scaled (Real)"
+      "description": "AI1"
     },
     "AI1_Offset": {
       "type": "real",
@@ -454,6 +454,66 @@
       "type": "word",
       "address": "DB1.DBW92",
       "description": "PWM[1] Low Duty (Int)"
+    },
+    "fault_count": {
+      "type": "word",
+      "address": "DB1.DBW96",
+      "description": "Active Faults Count"
+    },
+    "Faults[0]": {
+      "type": "bit",
+      "address": "DB1.DBX94.0",
+      "description": "Faults[0]"
+    },
+    "Faults[1]": {
+      "type": "bit",
+      "address": "DB1.DBX94.1",
+      "description": "Faults[1]"
+    },
+    "Faults[2]": {
+      "type": "bit",
+      "address": "DB1.DBX94.2",
+      "description": "Faults[2]"
+    },
+    "Faults[3]": {
+      "type": "bit",
+      "address": "DB1.DBX94.3",
+      "description": "Faults[3]"
+    },
+    "Faults[4]": {
+      "type": "bit",
+      "address": "DB1.DBX94.4",
+      "description": "Faults[4]"
+    },
+    "Faults[5]": {
+      "type": "bit",
+      "address": "DB1.DBX94.5",
+      "description": "Faults[5]"
+    },
+    "Faults[6]": {
+      "type": "bit",
+      "address": "DB1.DBX94.6",
+      "description": "Faults[6]"
+    },
+    "Faults[7]": {
+      "type": "bit",
+      "address": "DB1.DBX94.7",
+      "description": "Faults[7]"
+    },
+    "Faults[8]": {
+      "type": "bit",
+      "address": "DB1.DBX95.0",
+      "description": "Faults[8]"
+    },
+    "Faults[9]": {
+      "type": "bit",
+      "address": "DB1.DBX95.1",
+      "description": "Faults[9]"
+    },
+    "Faults[10]": {
+      "type": "bit",
+      "address": "DB1.DBX95.2",
+      "description": "Faults[10]"
     }
   },
   "io_groups": {
@@ -559,6 +619,20 @@
       "PWM1_Duty_Cycle",
       "PWM1_High_Duty",
       "PWM1_Low_Duty"
+    ],
+    "Active Faults": [
+      "Faults[0]",
+      "Faults[1]",
+      "Faults[2]",
+      "Faults[3]",
+      "Faults[4]",
+      "Faults[5]",
+      "Faults[6]",
+      "Faults[7]",
+      "Faults[8]",
+      "Faults[9]",
+      "Faults[10]",
+      "fault_count"
     ]
   }
 }
