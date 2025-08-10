@@ -538,18 +538,75 @@ template = '''
             table-layout: fixed;
         }
         /* IO table (dark) */
-        .io-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
-        .io-table th { text-align: left; background:#0b1220; color:#e5e7eb; border-bottom:1px solid #1f2937; padding:10px; position: sticky; top:0; z-index:1; vertical-align: middle; }
-        .io-table td { padding: 10px; border-bottom: 1px solid #1f2937; color:#e5e7eb; vertical-align: middle; }
+        .io-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 12px 0; font-size: 13px; background:#0b1220; }
+        .io-table th { text-align: left; background: linear-gradient(180deg, #101827 0%, #0b1220 100%); color:#f3f4f6; border-bottom:1px solid #253049; padding:12px; position: sticky; top:0; z-index:1; vertical-align: middle; font-weight:800; letter-spacing:.03em; text-transform: uppercase; font-size:12px; }
+        .io-table td { padding: 12px; border-bottom: 1px solid #1f2937; color:#e5e7eb; vertical-align: middle; }
+        .io-table td + td, .io-table th + th { border-left:1px solid #132036; }
         .io-table tbody tr:nth-child(odd) { background:#0f172a; }
         .io-table tbody tr:nth-child(even) { background:#0d1627; }
-        .io-table th:nth-child(3), .io-table td:nth-child(3) { text-align: right; }
-        .io-table tr:hover { background:#0d1627; }
+        .io-table tbody tr:nth-child(odd):hover { background:#1e293b; }
+        .io-table tbody tr:nth-child(even):hover { background:#1e293b; }
+        .io-table th:nth-child(2), .io-table td:nth-child(2) { text-align: right; }
         .group-row td { background:#0f172a; color:#94a3b8; font-weight:700; padding-top:12px; }
         .value-cell { font-weight:800; text-align: right; }
         .value-cell.offline { color:#f59e0b; }
         .value-cell.error { color:#ef4444; }
         .subchips { margin-top:4px; color:#94a3b8; font-size:11px; }
+        
+        /* Scrollable table containers */
+        .table-container { 
+            max-height: 400px; 
+            overflow-y: auto; 
+            border: 1px solid #253049; 
+            border-radius: 10px; 
+            margin: 12px 0;
+            box-shadow: 0 8px 24px rgba(0,0,0,.35);
+            overflow: hidden;
+        }
+        .table-container::-webkit-scrollbar { width: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #0f172a; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+        
+        /* Show more/less controls */
+        .table-controls { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin: 8px 0; 
+            padding: 8px 12px; 
+            background: #0b1220; 
+            border-radius: 6px; 
+            border: 1px solid #1f2937;
+        }
+        .table-count { 
+            color: #94a3b8; 
+            font-size: 12px; 
+        }
+        .show-more-btn { 
+            background: #3b82f6; 
+            color: white; 
+            border: none; 
+            padding: 4px 12px; 
+            border-radius: 4px; 
+            font-size: 11px; 
+            cursor: pointer; 
+            transition: background 0.2s;
+        }
+        .show-more-btn:hover { background: #2563eb; }
+        .show-more-btn.showing-all { background: #6b7280; }
+        .show-more-btn.showing-all:hover { background: #4b5563; }
+        /* Details dropdown + inline edit */
+        .details-toggle-btn { background:#1f2937; color:#93c5fd; border:1px solid #253049; border-radius:6px; padding:4px 8px; font-size:11px; cursor:pointer; margin-left:8px; }
+        .details-toggle-btn:hover { background:#253049; }
+        .details-row { background:#0b1220; }
+        .details-box { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; padding:10px; }
+        .detail-label { color:#94a3b8; font-size:11px; text-transform:uppercase; letter-spacing:.04em; display:block; }
+        .detail-value { color:#e5e7eb; font-size:12px; font-weight:600; }
+        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+        .desc-inline { display:flex; align-items:center; gap:8px; }
+        .desc-text { cursor:text; padding:4px 6px; border-radius:4px; }
+        .desc-text:hover { background:#111827; }
         .subchip { display:inline-block; background:#111827; border:1px solid #1f2937; border-radius:6px; padding:2px 6px; margin-right:6px; }
         .table th, .table td {
             border: 1px solid #ddd;
@@ -727,7 +784,7 @@ template = '''
         <div class="metrics">
             <div class="metric">
                 <h3>{{ data_points }}</h3>
-                <p>Total Events</p>
+                <p>Events Today</p>
             </div>
             <div class="metric">
                 <h3>{{ emergency_stops }}</h3>
@@ -926,6 +983,14 @@ template = '''
             });
         }
 
+        // Toggle details row by id
+        function toggleDetails(id){
+            const row = document.getElementById(id);
+            if (!row) return;
+            const isHidden = row.style.display === 'none' || row.style.display === '';
+            row.style.display = isHidden ? 'table-row' : 'none';
+        }
+
         function formatIoValue(info) {
             const v = info.value;
             if (v === null || v === undefined) return 'ERROR';
@@ -1049,8 +1114,8 @@ template = '''
         }
 
         function updateGroupedIO(ioData, ioGroups) {
-            const container = document.getElementById('ioGroupsContainer');
-            container.innerHTML = '';
+            const groupsContainer = document.getElementById('ioGroupsContainer');
+            groupsContainer.innerHTML = '';
 
             const filter = (document.getElementById('filterInput')?.value || '').toLowerCase();
             const used = new Set();
@@ -1063,14 +1128,18 @@ template = '''
                 h3.textContent = title;
                 section.appendChild(h3);
 
+                // No table controls; container will scroll showing ~10 rows
+
+                // Create scrollable container
+                const tableContainer = document.createElement('div');
+                tableContainer.className = 'table-container';
+
                 const table = document.createElement('table');
                 table.className = 'io-table';
                 table.innerHTML = `<thead><tr>
-                    <th style="width:26%">Description</th>
-                    <th style="width:18%">IO Tag</th>
-                    <th style="width:14%">Value</th>
-                    <th style="width:10%">Type</th>
-                    <th>Address</th>
+                    <th style=\"width:60%\">Description</th>
+                    <th style=\"width:20%\">Value</th>
+                    <th style=\"width:20%\"></th>
                 </tr></thead>`;
                 const tbody = document.createElement('tbody');
 
@@ -1091,26 +1160,45 @@ template = '''
                         const tr = document.createElement('tr');
                         const valueDisplay = formatIoValue(info);
                         const valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
-                        const statusDot = `<span class="status-dot-mini ${info.status==='error'?'error':(info.type==='bit'?(info.value?'on':'off'):'')}"></span>`;
+                        const statusDot = `<span class=\"status-dot-mini ${info.status==='error'?'error':(info.type==='bit'?(info.value?'on':'off'):'')}\"></span>`;
                         // Subchips
                         const rawInfo = ioData[rawName]; if (rawInfo) used.add(rawName);
                         const offInfo = ioData[offsetName]; if (offInfo) used.add(offsetName);
                         const sclInfo = ioData[scalarName]; if (sclInfo) used.add(scalarName);
                         const sub = `
-                            <div class="subchips">
-                                ${rawInfo?`<span class="subchip">Raw: ${formatIoValue(rawInfo)}</span>`:''}
-                                ${offInfo?`<span class="subchip">Offset: ${formatIoValue(offInfo)}</span>`:''}
-                                ${sclInfo?`<span class="subchip">Scalar: ${formatIoValue(sclInfo)}</span>`:''}
+                            <div class=\"subchips\">
+                                ${rawInfo?`<span class=\"subchip\">Raw: ${formatIoValue(rawInfo)}</span>`:''}
+                                ${offInfo?`<span class=\"subchip\">Offset: ${formatIoValue(offInfo)}</span>`:''}
+                                ${sclInfo?`<span class=\"subchip\">Scalar: ${formatIoValue(sclInfo)}</span>`:''}
                             </div>`;
                         const valueStateClass = info.status==='error'?'error':(info.value===null?'offline':'');
+                        const detailsId = `details_${mainName.replace(/[^a-zA-Z0-9_]/g,'_')}`;
                         tr.innerHTML = `
-                            <td><input class="desc-input" value="${desc.replace(/"/g,'&quot;')}" placeholder="Edit and press Enter" onkeydown="if(event.key==='Enter'){updateDesc('${mainName}', this.value)}">${sub}</td>
-                            <td class="io-tag">${mainName}</td>
-                            <td class="value-cell ${valueClass} ${valueStateClass}">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
-                            <td>${(info.type||'').toUpperCase()}</td>
-                            <td><span class="io-address">${info.address||''}</span></td>
+                            <td>
+                                <div class=\"desc-inline\">
+                                    <span class=\"desc-text\" contenteditable=\"true\" onkeydown=\"if(event.key==='Enter'){event.preventDefault();updateDesc('${mainName}', this.innerText.trim())}\">${(desc||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+                                    <button class=\"details-toggle-btn\" onclick=\"toggleDetails('${detailsId}')\">Details</button>
+                                </div>
+                                ${sub}
+                            </td>
+                            <td class=\"value-cell ${valueClass} ${valueStateClass}\">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
+                            <td></td>
                         `;
+                        // Details row
+                        const dtr = document.createElement('tr');
+                        dtr.className = 'details-row';
+                        dtr.id = detailsId;
+                        dtr.style.display = 'none';
+                        dtr.innerHTML = `
+                            <td colspan=\"3\">
+                                <div class=\"details-box\">
+                                    <div><span class=\"detail-label\">IO Tag</span><span class=\"detail-value mono\">${mainName}</span></div>
+                                    <div><span class=\"detail-label\">Type</span><span class=\"detail-value\">${(info.type||'').toUpperCase()}</span></div>
+                                    <div><span class=\"detail-label\">Address</span><span class=\"detail-value mono\">${info.address||''}</span></div>
+                                </div>
+                            </td>`;
                         tbody.appendChild(tr);
+                        tbody.appendChild(dtr);
                     });
                 } else if (title === 'Digital Inputs' || title === 'Digital Outputs') {
                     const buckets = {};
@@ -1129,23 +1217,41 @@ template = '''
                         const tr = document.createElement('tr');
                         const valueDisplay = formatIoValue(info);
                         const valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
-                        const statusDot = `<span class="status-dot-mini ${info.status==='error'?'error':(info.type==='bit'?(info.value?'on':'off'):'')}"></span>`;
+                        const statusDot = `<span class=\"status-dot-mini ${info.status==='error'?'error':(info.type==='bit'?(info.value?'on':'off'):'')}\"></span>`;
                         const forcedState = ioData[`${base}_ForcedState`]; if (forcedState) used.add(`${base}_ForcedState`);
                         const forcedStatus = ioData[`${base}_ForcedStatus`]; if (forcedStatus) used.add(`${base}_ForcedStatus`);
                         const sub = `
-                            <div class="subchips">
-                                ${forcedState?`<span class="subchip">ForcedState: ${formatIoValue(forcedState)}</span>`:''}
-                                ${forcedStatus?`<span class="subchip">ForcedStatus: ${formatIoValue(forcedStatus)}</span>`:''}
+                            <div class=\"subchips\">
+                                ${forcedState?`<span class=\"subchip\">ForcedState: ${formatIoValue(forcedState)}</span>`:''}
+                                ${forcedStatus?`<span class=\"subchip\">ForcedStatus: ${formatIoValue(forcedStatus)}</span>`:''}
                             </div>`;
                         const valueStateClass2 = info.status==='error'?'error':(info.value===null?'offline':'');
+                        const detailsId2 = `details_${stateName.replace(/[^a-zA-Z0-9_]/g,'_')}`;
                         tr.innerHTML = `
-                            <td><input class="desc-input" value="${desc.replace(/"/g,'&quot;')}" placeholder="Edit and press Enter" onkeydown="if(event.key==='Enter'){updateDesc('${stateName}', this.value)}">${sub}</td>
-                            <td class="io-tag">${stateName}</td>
-                            <td class="value-cell ${valueClass} ${valueStateClass2}">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
-                            <td>${(info.type||'').toUpperCase()}</td>
-                            <td><span class="io-address">${info.address||''}</span></td>
+                            <td>
+                                <div class=\"desc-inline\">
+                                    <span class=\"desc-text\" contenteditable=\"true\" onkeydown=\"if(event.key==='Enter'){event.preventDefault();updateDesc('${stateName}', this.innerText.trim())}\">${(desc||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+                                    <button class=\"details-toggle-btn\" onclick=\"toggleDetails('${detailsId2}')\">Details</button>
+                                </div>
+                                ${sub}
+                            </td>
+                            <td class=\"value-cell ${valueClass} ${valueStateClass2}\">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
+                            <td></td>
                         `;
+                        const dtr = document.createElement('tr');
+                        dtr.className = 'details-row';
+                        dtr.id = detailsId2;
+                        dtr.style.display = 'none';
+                        dtr.innerHTML = `
+                            <td colspan=\"3\">
+                                <div class=\"details-box\">
+                                    <div><span class=\"detail-label\">IO Tag</span><span class=\"detail-value mono\">${stateName}</span></div>
+                                    <div><span class=\"detail-label\">Type</span><span class=\"detail-value\">${(info.type||'').toUpperCase()}</span></div>
+                                    <div><span class=\"detail-label\">Address</span><span class=\"detail-value mono\">${info.address||''}</span></div>
+                                </div>
+                            </td>`;
                         tbody.appendChild(tr);
+                        tbody.appendChild(dtr);
                     });
                 } else {
                     (names||[]).forEach(name => {
@@ -1157,22 +1263,54 @@ template = '''
                         const tr = document.createElement('tr');
                         const valueDisplay = formatIoValue(info);
                         const valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
-                        const statusDot = `<span class="status-dot-mini ${info.status==='error'?'error':(info.type==='bit'?(info.value?'on':'off'):'')}"></span>`;
+                        const statusDot = `<span class=\"status-dot-mini ${info.status==='error'?'error':(info.type==='bit'?(info.value?'on':'off'):'')}\"></span>`;
                         const valueStateClass3 = info.status==='error'?'error':(info.value===null?'offline':'');
+                        const detailsId3 = `details_${name.replace(/[^a-zA-Z0-9_]/g,'_')}`;
                         tr.innerHTML = `
-                            <td><input class="desc-input" value="${desc.replace(/"/g,'&quot;')}" placeholder="Edit and press Enter" onkeydown="if(event.key==='Enter'){updateDesc('${name}', this.value)}"></td>
-                            <td class="io-tag">${name}</td>
-                            <td class="value-cell ${valueClass} ${valueStateClass3}">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
-                            <td>${(info.type||'').toUpperCase()}</td>
-                            <td><span class="io-address">${info.address||''}</span></td>
+                            <td>
+                                <div class=\"desc-inline\">
+                                    <span class=\"desc-text\" contenteditable=\"true\" onkeydown=\"if(event.key==='Enter'){event.preventDefault();updateDesc('${name}', this.innerText.trim())}\">${(desc||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+                                    <button class=\"details-toggle-btn\" onclick=\"toggleDetails('${detailsId3}')\">Details</button>
+                                </div>
+                            </td>
+                            <td class=\"value-cell ${valueClass} ${valueStateClass3}\">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
+                            <td></td>
                         `;
+                        const dtr = document.createElement('tr');
+                        dtr.className = 'details-row';
+                        dtr.id = detailsId3;
+                        dtr.style.display = 'none';
+                        dtr.innerHTML = `
+                            <td colspan=\"3\">
+                                <div class=\"details-box\">
+                                    <div><span class=\"detail-label\">IO Tag</span><span class=\"detail-value mono\">${name}</span></div>
+                                    <div><span class=\"detail-label\">Type</span><span class=\"detail-value\">${(info.type||'').toUpperCase()}</span></div>
+                                    <div><span class=\"detail-label\">Address</span><span class=\"detail-value mono\">${info.address||''}</span></div>
+                                </div>
+                            </td>`;
                         tbody.appendChild(tr);
+                        tbody.appendChild(dtr);
                     });
                 }
 
                 table.appendChild(tbody);
-                section.appendChild(table);
-                container.appendChild(section);
+                tableContainer.appendChild(table);
+                section.appendChild(tableContainer);
+                // Append completed section to the main groups container
+                groupsContainer.appendChild(section);
+                
+                // After inserting into DOM, size container to fit ~10 rows + header
+                try {
+                    const headerEl = table.querySelector('thead');
+                    const rowEls = Array.from(tbody.querySelectorAll('tr'));
+                    let heightPx = (headerEl ? headerEl.offsetHeight : 0);
+                    const visibleCount = Math.min(10, rowEls.length);
+                    for (let i = 0; i < visibleCount; i++) {
+                        heightPx += rowEls[i].offsetHeight || 0;
+                    }
+                    tableContainer.style.maxHeight = (heightPx || 400) + 'px';
+                    tableContainer.style.overflowY = 'auto';
+                } catch (e) { /* fallback to CSS max-height */ }
             }
 
             // Priority groups
