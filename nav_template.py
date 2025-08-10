@@ -23,6 +23,10 @@ NAV_TEMPLATE = '''
                 <i class="nav-icon">📋</i>
                 Event Logs
             </a>
+            <a href="/reports" class="nav-link {% if request.endpoint == "reports" %}active{% endif %}">
+                <i class="nav-icon">📝</i>
+                Reports
+            </a>
         </div>
         <div class="nav-status">
             <span id="connectionStatus" class="status-indicator">

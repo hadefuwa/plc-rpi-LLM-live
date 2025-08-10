@@ -11,6 +11,8 @@ from plc_communicator import PLCCommunicator
 from nav_template import NAV_TEMPLATE, NAV_STYLES
 from event_logger import event_logger
 import os
+import pathlib
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -1465,6 +1467,57 @@ def home():
         system_status=system_status
     )
 
+@app.route('/reports')
+def reports():
+    """Simple Reports page – lists today's reports if present and a button to generate one now."""
+    reports_dir = os.path.join(os.path.dirname(__file__), 'data', 'reports')
+    today = datetime.now().date().isoformat()
+    today_dir = os.path.join(reports_dir, today)
+    os.makedirs(today_dir, exist_ok=True)
+
+    items = []
+    if os.path.exists(today_dir):
+        for p in sorted(os.listdir(today_dir)):
+            if p.endswith('.json') or p.endswith('.md'):
+                items.append(p)
+
+    page = '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Reports - E-Stop AI Status Reporter</title>
+        <style>{{ nav_styles|safe }} body{font-family:Arial,sans-serif;margin:0;padding:0;background:#0b1220;color:#e5e7eb} .container{max-width:1000px;margin:0 auto;padding:20px} .panel{background:#0f172a;border:1px solid #1f2937;border-radius:12px;box-shadow:0 1px 3px rgba(2,6,23,.5);} .panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #1f2937;} .panel-body{padding:12px 16px;} .btn{background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer} .btn:hover{background:#1d4ed8} .list{margin:0;padding:0;list-style:none} .list li{padding:8px;border-bottom:1px solid #1f2937} .list li a{color:#93c5fd;text-decoration:none} .list li a:hover{text-decoration:underline}
+        </style>
+    </head>
+    <body>
+        {{ nav_html|safe }}
+        <div class="container panel">
+            <div class="panel-header">
+                <div>Reports (Today)</div>
+                <div>
+                    <button class="btn" onclick="generateReport()">Generate Report Now</button>
+                </div>
+            </div>
+            <div class="panel-body">
+                {% if items %}
+                <ul class="list">
+                    {% for it in items %}
+                    <li><a href="/download_report/{{ today }}/{{ it }}" target="_blank">{{ it }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div>No reports yet today.</div>
+                {% endif %}
+            </div>
+        </div>
+        <script>
+        function generateReport(){ fetch('/generate_report', {method:'POST'}).then(r=>r.json()).then(d=>{alert(d.message||'Done'); location.reload();}).catch(e=>alert('Error: '+e)); }
+        </script>
+    </body>
+    </html>
+    '''
+    return render_template_string(page, nav_html=NAV_TEMPLATE, nav_styles=NAV_STYLES, items=items, today=today)
+
 @app.route('/test_ollama')
 def test_ollama():
     """Simple test endpoint to check if Ollama is working"""
@@ -1529,6 +1582,98 @@ def ask_ai():
     
     response = query_ollama(question, data_summary)
     return jsonify({'response': response})
+
+# --- Reporting (Phase 3) ---
+def build_report_payload(io_data: dict) -> dict:
+    summary = {
+        'timestamp': datetime.now().isoformat(),
+        'counts': {
+            'total': len(io_data),
+            'online': sum(1 for v in io_data.values() if v.get('status') == 'online'),
+            'errors': sum(1 for v in io_data.values() if v.get('status') == 'error'),
+        },
+        'digital_on': [k for k,v in io_data.items() if v.get('type')=='bit' and v.get('value')==1],
+        'analog_samples': {k:v.get('value') for k,v in io_data.items() if v.get('type')=='real'}
+    }
+    return summary
+
+def generate_report_text(payload: dict) -> str:
+    lines = [
+        f"Report time: {payload['timestamp']}",
+        f"Signals online: {payload['counts']['online']}/{payload['counts']['total']}",
+        f"Errors: {payload['counts']['errors']}",
+        f"Digital ON: {', '.join(payload['digital_on'][:10])}{'...' if len(payload['digital_on'])>10 else ''}",
+    ]
+    return "\n".join(lines)
+
+def write_report_files(payload: dict, ai_text: str):
+    reports_root = os.path.join(os.path.dirname(__file__), 'data', 'reports')
+    today = datetime.now().date().isoformat()
+    out_dir = os.path.join(reports_root, today)
+    os.makedirs(out_dir, exist_ok=True)
+    ts = datetime.now().strftime('%H%M%S')
+    json_path = os.path.join(out_dir, f'{ts}.json')
+    md_path = os.path.join(out_dir, f'{ts}.md')
+    import json
+    with open(json_path, 'w') as f:
+        json.dump(payload, f, indent=2)
+    with open(md_path, 'w') as f:
+        f.write('# 30‑minute PLC Report\n\n')
+        f.write(ai_text + '\n')
+    return json_path, md_path
+
+@app.route('/generate_report', methods=['POST'])
+def generate_report():
+    try:
+        # Build current IO snapshot
+        io_mapping = get_io_mapping()
+        io_data = {}
+        if plc.connect():
+            for name in io_mapping.keys():
+                try:
+                    value = plc.read_io(name)
+                except Exception:
+                    value = None
+                io_data[name] = {
+                    'value': value,
+                    'type': io_mapping[name]['type'],
+                    'description': io_mapping[name]['description'],
+                    'address': io_mapping[name]['address'],
+                    'status': 'online' if value is not None else 'error'
+                }
+        else:
+            for name, cfg in io_mapping.items():
+                io_data[name] = {
+                    'value': None,
+                    'type': cfg['type'],
+                    'description': cfg['description'],
+                    'address': cfg['address'],
+                    'status': 'offline'
+                }
+
+        payload = build_report_payload(io_data)
+
+        # Ask AI for a brief summary
+        ai_summary = query_ollama(
+            "Provide a short 2-3 sentence operator report (status, risks, actions).",
+            f"IO counts: {payload['counts']}; Digital ON: {len(payload['digital_on'])}; Analog samples: {len(payload['analog_samples'])}"
+        )
+        if not ai_summary or 'Error' in ai_summary:
+            ai_summary = generate_report_text(payload)
+
+        json_path, md_path = write_report_files(payload, ai_summary)
+        return jsonify({'status': 'success', 'message': 'Report generated', 'json': json_path, 'md': md_path})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/download_report/<day>/<name>')
+def download_report(day, name):
+    base = os.path.join(os.path.dirname(__file__), 'data', 'reports')
+    path = os.path.join(base, day, name)
+    if not os.path.exists(path):
+        return 'Not found', 404
+    from flask import send_file
+    return send_file(path, as_attachment=True)
 
 # Configuration routes
 @app.route('/config')
