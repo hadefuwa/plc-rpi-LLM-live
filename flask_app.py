@@ -508,6 +508,9 @@ template = '''
         .panel-subtitle { color:#94a3b8; font-size:12px; margin-left:8px; }
         .panel-body { padding: 12px 16px; }
         .quick-actions { display:flex; gap:10px; align-items:center; }
+        .collapse-btn { background:#374151; color:#e5e7eb; border:1px solid #4b5563; padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer; }
+        .collapse-btn:hover { background:#4b5563; }
+        .panel.collapsed .panel-body { display:none; }
         .search-input { width: 260px; max-width: 100%; background:#111827; color:#e5e7eb; border:1px solid #253049; border-radius:8px; padding:8px 10px; }
         .search-input:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 2px rgba(37,99,235,.25); }
         .plot { 
@@ -550,6 +553,10 @@ template = '''
         .io-table th:nth-child(2), .io-table td:nth-child(2) { text-align: right; }
         .group-row td { background:#0f172a; color:#94a3b8; font-weight:700; padding-top:12px; }
         .value-cell { font-weight:800; text-align: right; }
+        .value-cell.on { color:#16a34a; }
+        .value-cell.off { color:#dc2626; }
+        .value-cell.nonneg { color:#16a34a; }
+        .value-cell.neg { color:#ef4444; }
         .value-cell.offline { color:#f59e0b; }
         .value-cell.error { color:#ef4444; }
         .subchips { margin-top:4px; color:#94a3b8; font-size:11px; }
@@ -770,18 +777,19 @@ template = '''
             <p>Monitor PLC system status and generate intelligent operator reports using Gemma3 1B AI</p>
         </div>
         
-        <div class="section-card panel" style="grid-column: 1 / -1;">
+        <div class="section-card panel" id="dashboardPanel" style="grid-column: 1 / -1;">
         <div class="panel-header">
             <div>
                 <span class="panel-title">Dashboard</span>
                 <span class="panel-subtitle">Live view of PLC status and insights</span>
             </div>
             <div class="quick-actions">
+                <button class="collapse-btn" onclick="toggleSection('metricsSection', this)">Hide</button>
                 <input class="search-input" id="filterInput" placeholder="Filter IO (e.g., A1, Red, PWM)" oninput="applyFilter()">
                 <button class="btn" onclick="refreshIOStatus()">Refresh All</button>
             </div>
         </div>
-        <div class="panel-body">
+        <div class="panel-body" id="metricsSection">
         <div class="metrics">
             <div class="metric">
                 <h3>{{ data_points }}</h3>
@@ -799,15 +807,16 @@ template = '''
         </div>
         </div>
         
-        <div class="section-card panel" style="grid-column: 1 / -1;">
+        <div class="section-card panel" id="liveIoPanel" style="grid-column: 1 / -1;">
         <div class="panel-header">
             <div class="panel-title">Live IO Status</div>
             <div class="quick-actions">
+                <button class="collapse-btn" onclick="toggleSection('liveIoSection', this)">Hide</button>
                 <button class="btn" onclick="refreshIOStatus()" style="background-color: #28a745;">Refresh</button>
                 <span id="lastUpdate" class="panel-subtitle">Last update: Never</span>
             </div>
         </div>
-        <div class="panel-body io-status-container">
+        <div class="panel-body io-status-container" id="liveIoSection">
             <div id="ioGroupsContainer">
                 <!-- Grouped IO status will be inserted here -->
             </div>
@@ -831,8 +840,11 @@ template = '''
             <div class="panel-header">
                 <div class="panel-title">AI Analysis with Gemma3 1B</div>
                 <div class="panel-subtitle">Ask questions about the PLC system status</div>
+                <div class="quick-actions">
+                    <button class="collapse-btn" onclick="toggleSection('aiSectionBody', this)">Hide</button>
+                </div>
             </div>
-            <div class="panel-body">
+            <div class="panel-body" id="aiSectionBody">
             
             <div>
                 <strong>Example Questions:</strong><br>
@@ -857,6 +869,14 @@ template = '''
     </div>
     
     <script>
+        // Simple collapsible sections
+        function toggleSection(bodyId, btn){
+            const el = document.getElementById(bodyId);
+            if(!el) return;
+            const isHidden = el.style.display === 'none';
+            el.style.display = isHidden ? '' : 'none';
+            if(btn){ btn.textContent = isHidden ? 'Hide' : 'Show'; }
+        }
         function setQuestion(question) {
             document.getElementById('questionInput').value = question;
         }
@@ -1138,9 +1158,8 @@ template = '''
                 const table = document.createElement('table');
                 table.className = 'io-table';
                 table.innerHTML = `<thead><tr>
-                    <th style=\"width:60%\">Description</th>
-                    <th style=\"width:20%\">Value</th>
-                    <th style=\"width:20%\"></th>
+                    <th style=\"width:70%\">Description</th>
+                    <th style=\"width:30%\">Value</th>
                 </tr></thead>`;
                 const tbody = document.createElement('tbody');
 
@@ -1160,7 +1179,11 @@ template = '''
                         if (filter && !(mainName.toLowerCase().includes(filter) || desc.toLowerCase().includes(filter))) return;
                         const tr = document.createElement('tr');
                         const valueDisplay = formatIoValue(info);
-                        const valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
+                        let valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
+                        if (info.type !== 'bit') {
+                            const num = parseFloat(valueDisplay);
+                            if (!isNaN(num)) valueClass += (num >= 0 ? ' nonneg' : ' neg');
+                        }
                         const statusDot = `<span class=\"status-dot-mini ${info.status==='error'?'error':(info.type==='bit'?(info.value?'on':'off'):'')}\"></span>`;
                         // Subchips
                         const rawInfo = ioData[rawName]; if (rawInfo) used.add(rawName);
@@ -1183,7 +1206,6 @@ template = '''
                                 ${sub}
                             </td>
                             <td class=\"value-cell ${valueClass} ${valueStateClass}\">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
-                            <td></td>
                         `;
                         // Details row
                         const dtr = document.createElement('tr');
@@ -1217,7 +1239,11 @@ template = '''
                         if (filter && !(stateName.toLowerCase().includes(filter) || desc.toLowerCase().includes(filter))) return;
                         const tr = document.createElement('tr');
                         const valueDisplay = formatIoValue(info);
-                        const valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
+                        let valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
+                        if (info.type !== 'bit') {
+                            const num = parseFloat(valueDisplay);
+                            if (!isNaN(num)) valueClass += (num >= 0 ? ' nonneg' : ' neg');
+                        }
                         const statusDot = `<span class=\"status-dot-mini ${info.status==='error'?'error':(info.type==='bit'?(info.value?'on':'off'):'')}\"></span>`;
                         const forcedState = ioData[`${base}_ForcedState`]; if (forcedState) used.add(`${base}_ForcedState`);
                         const forcedStatus = ioData[`${base}_ForcedStatus`]; if (forcedStatus) used.add(`${base}_ForcedStatus`);
@@ -1237,7 +1263,6 @@ template = '''
                                 ${sub}
                             </td>
                             <td class=\"value-cell ${valueClass} ${valueStateClass2}\">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
-                            <td></td>
                         `;
                         const dtr = document.createElement('tr');
                         dtr.className = 'details-row';
@@ -1263,7 +1288,11 @@ template = '''
                         if (filter && !(name.toLowerCase().includes(filter) || desc.toLowerCase().includes(filter))) return;
                         const tr = document.createElement('tr');
                         const valueDisplay = formatIoValue(info);
-                        const valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
+                        let valueClass = info.type === 'bit' ? (info.value ? 'on':'off') : 'number';
+                        if (info.type !== 'bit') {
+                            const num = parseFloat(valueDisplay);
+                            if (!isNaN(num)) valueClass += (num >= 0 ? ' nonneg' : ' neg');
+                        }
                         const statusDot = `<span class=\"status-dot-mini ${info.status==='error'?'error':(info.type==='bit'?(info.value?'on':'off'):'')}\"></span>`;
                         const valueStateClass3 = info.status==='error'?'error':(info.value===null?'offline':'');
                         const detailsId3 = `details_${name.replace(/[^a-zA-Z0-9_]/g,'_')}`;
@@ -1275,7 +1304,6 @@ template = '''
                                 </div>
                             </td>
                             <td class=\"value-cell ${valueClass} ${valueStateClass3}\">${info.status==='error'?'error':(info.value===null?'offline':valueDisplay)}</td>
-                            <td></td>
                         `;
                         const dtr = document.createElement('tr');
                         dtr.className = 'details-row';
@@ -1770,9 +1798,10 @@ def get_event_log():
 def clear_event_log():
     """Clear all event log entries"""
     try:
-        # Clear the events by writing an empty array to the file
+        # Clear the events by writing an empty array to the actual log file in data/
         import json
-        with open('io_events.json', 'w') as f:
+        from event_logger import event_logger as _ev
+        with open(_ev.log_file, 'w') as f:
             json.dump([], f)
         
         return jsonify({'status': 'success', 'message': 'Event log cleared successfully'})

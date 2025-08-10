@@ -1,6 +1,7 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, date
+import glob
 from typing import Dict, Any, List
 
 class EventLogger:
@@ -12,11 +13,26 @@ class EventLogger:
             data_dir = os.path.join(base_dir, 'data')
             os.makedirs(data_dir, exist_ok=True)
             log_file = os.path.join(data_dir, 'io_events.json')
-        self.log_file = log_file
+        # Use daily log rotation: io_events_YYYY-MM-DD.json (fallback to single file path if given)
+        self.base_dir = os.path.dirname(__file__)
+        self.data_dir = os.path.join(self.base_dir, 'data')
+        os.makedirs(self.data_dir, exist_ok=True)
+        # If a custom file was passed, keep it; otherwise default to daily file
+        self.log_file = log_file if log_file else self._today_log_path()
         self.previous_states = {}
-        self.max_events = 1000  # Maximum number of events to keep
+        self.max_events = 5000  # Per-file cap to avoid huge daily files
         self.plc_communication_status = None  # Track overall PLC communication
         self.initial_snapshot_logged = False  # Track whether we've logged a system snapshot
+
+    def _today_log_path(self) -> str:
+        today_str = date.today().isoformat()
+        return os.path.join(self.data_dir, f'io_events_{today_str}.json')
+
+    def _list_log_files(self):
+        pattern = os.path.join(self.data_dir, 'io_events_*.json')
+        files = glob.glob(pattern)
+        files.sort(reverse=True)
+        return files
         
     def log_event(self, io_name: str, old_value: Any, new_value: Any, io_config: Dict):
         """Log an IO state change event"""
@@ -161,7 +177,9 @@ class EventLogger:
         """Save event to JSON log file"""
         try:
             # Load existing events
-            events = self._load_events()
+            # Always write to today's file
+            self.log_file = self._today_log_path()
+            events = self._load_events()  # today's events
             
             # Add new event at the beginning
             events.insert(0, event)
@@ -171,7 +189,7 @@ class EventLogger:
                 events = events[:self.max_events]
             
             # Save back to file
-            with open(self.log_file, 'w') as f:
+             with open(self.log_file, 'w') as f:
                 json.dump(events, f, indent=2)
                 
         except Exception as e:
@@ -180,6 +198,8 @@ class EventLogger:
     def _load_events(self) -> List[Dict]:
         """Load events from JSON log file"""
         try:
+            # Load today's file; if missing, return empty
+            self.log_file = self._today_log_path()
             if os.path.exists(self.log_file):
                 with open(self.log_file, 'r') as f:
                     return json.load(f)
@@ -201,21 +221,22 @@ class EventLogger:
     
     def get_event_statistics(self) -> Dict:
         """Get statistics about logged events"""
-        events = self._load_events()
-        
-        total_events = len(events)
-        critical_events = len([e for e in events if e.get('priority') == 'critical'])
-        high_events = len([e for e in events if e.get('priority') == 'high'])
-        
-        # Get events from today
-        today = datetime.now().date()
-        today_events = []
-        for event in events:
+        # Today's events from today's file
+        today_events = self._load_events()
+
+        # Aggregate totals across all daily files
+        total_events = 0
+        critical_events = 0
+        high_events = 0
+        files = self._list_log_files()
+        for fp in files:
             try:
-                event_date = datetime.fromisoformat(event['timestamp']).date()
-                if event_date == today:
-                    today_events.append(event)
-            except:
+                with open(fp, 'r') as f:
+                    evs = json.load(f)
+                    total_events += len(evs)
+                    critical_events += len([e for e in evs if e.get('priority') == 'critical'])
+                    high_events += len([e for e in evs if e.get('priority') == 'high'])
+            except Exception:
                 continue
         
         return {
@@ -223,7 +244,7 @@ class EventLogger:
             'critical_events': critical_events,
             'high_priority_events': high_events,
             'events_today': len(today_events),
-            'latest_event': events[0] if events else None
+            'latest_event': today_events[0] if today_events else None
         }
     
     def format_event_for_display(self, event: Dict) -> Dict:
