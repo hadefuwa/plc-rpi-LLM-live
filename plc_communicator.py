@@ -37,9 +37,26 @@ class PLCCommunicator:
         self.connection_time = None
         self.last_read_time = None
         
+        # Connection retry settings
+        self.max_retries = 3
+        self.retry_delay = 1.0  # seconds
+        self.last_connection_attempt = 0
+        self.connection_attempt_interval = 5.0  # seconds between connection attempts
+        
     def connect(self):
-        """Connect to PLC using settings from config"""
+        """Connect to PLC using settings from config with retry logic"""
         try:
+            # Don't attempt connection too frequently
+            current_time = time.time()
+            if (current_time - self.last_connection_attempt) < self.connection_attempt_interval:
+                return self.connected
+            
+            self.last_connection_attempt = current_time
+            
+            # If already connected, verify connection is still good
+            if self.connected and self.client.get_connected():
+                return True
+            
             settings = get_plc_settings()
             ip = settings.get('ip', '192.168.1.100')
             rack = settings.get('rack', 0)
@@ -47,22 +64,38 @@ class PLCCommunicator:
             
             print(f"Connecting to PLC at {ip}, rack {rack}, slot {slot}")
             
-            # Connect to PLC
-            self.client.connect(ip, rack, slot)
+            # Try to connect with retries
+            for attempt in range(self.max_retries):
+                try:
+                    # Connect to PLC
+                    self.client.connect(ip, rack, slot)
+                    
+                    if self.client.get_connected():
+                        self.connected = True
+                        self.last_error = ""
+                        self.connection_time = current_time
+                        print("✅ Successfully connected to PLC")
+                        return True
+                    else:
+                        self.last_error = "Failed to connect to PLC"
+                        print(f"❌ {self.last_error} (attempt {attempt + 1}/{self.max_retries})")
+                        
+                except Exception as e:
+                    self.last_error = f"Connection error: {str(e)}"
+                    print(f"❌ {self.last_error} (attempt {attempt + 1}/{self.max_retries})")
+                
+                # Wait before retry (except on last attempt)
+                if attempt < self.max_retries - 1:
+                    time.sleep(self.retry_delay)
             
-            if self.client.get_connected():
-                self.connected = True
-                self.last_error = ""
-                print("✅ Successfully connected to PLC")
-                return True
-            else:
-                self.last_error = "Failed to connect to PLC"
-                print(f"❌ {self.last_error}")
-                return False
+            # All attempts failed
+            self.connected = False
+            return False
                 
         except Exception as e:
             self.last_error = f"Connection error: {str(e)}"
             print(f"❌ {self.last_error}")
+            self.connected = False
             return False
     
     def disconnect(self):
@@ -246,80 +279,124 @@ class PLCCommunicator:
     
     def read_all_io(self):
         """Read all configured IO points using a single bulk DB read per DB number.
-        Currently assumes most tags are in DB1; supports multiple DBs if present.
+        Handles DB size limits and falls back gracefully to individual reads.
         """
         try:
+            if not self.is_connected():
+                return {}
+                
             io_mapping = get_io_mapping()
+            if not io_mapping:
+                return {}
+            
             # Group addresses by DB
             db_to_offsets: Dict[int, int] = {}
             parsed: Dict[str, Dict[str, int]] = {}
+            
             for name, cfg in io_mapping.items():
-                info = self.parse_address(cfg['address'])
-                parsed[name] = info
-                end_offset = info['byte_offset'] + (1 if cfg['type']=='bit' else (4 if cfg['type'] in ('dword','real') else 2))
-                db_to_offsets[info['db_number']] = max(db_to_offsets.get(info['db_number'], 0), end_offset)
+                try:
+                    info = self.parse_address(cfg['address'])
+                    parsed[name] = info
+                    
+                    # Calculate end offset based on data type
+                    if cfg['type'] == 'bit':
+                        end_offset = info['byte_offset'] + 1
+                    elif cfg['type'] in ('dword', 'real'):
+                        end_offset = info['byte_offset'] + 4
+                    elif cfg['type'] == 'word':
+                        end_offset = info['byte_offset'] + 2
+                    else:  # byte
+                        end_offset = info['byte_offset'] + 1
+                        
+                    db_to_offsets[info['db_number']] = max(
+                        db_to_offsets.get(info['db_number'], 0), 
+                        end_offset
+                    )
+                except Exception as e:
+                    print(f"Error parsing address for {name}: {e}")
+                    continue
 
-            # Read buffers per DB
+            # Read buffers per DB with conservative approach
             db_buffers: Dict[int, bytes] = {}
             for db_num, size in db_to_offsets.items():
                 if size <= 0:
                     continue
-                # add small safety margin
-                read_size = size + 2
-                try:
-                    db_buffers[db_num] = self.client.db_read(db_num, 0, read_size)
-                except Exception:
-                    # Leave buffer missing for this DB; we'll fallback to per-tag reads
+                    
+                # Conservative read size - don't add extra margin
+                read_size = size
+                
+                # Try smaller chunks if the full read fails
+                chunk_sizes = [read_size, read_size // 2, read_size // 4, 64, 32, 16]
+                
+                for chunk_size in chunk_sizes:
+                    if chunk_size <= 0:
+                        continue
+                        
+                    try:
+                        print(f"Trying to read DB{db_num} from offset 0, size {chunk_size}")
+                        db_buffers[db_num] = self.client.db_read(db_num, 0, chunk_size)
+                        if db_buffers[db_num] is not None:
+                            print(f"Successfully read DB{db_num} with size {chunk_size}")
+                            break
+                    except Exception as e:
+                        print(f"Failed to read DB{db_num} with size {chunk_size}: {e}")
+                        continue
+                else:
+                    # All chunk sizes failed
+                    print(f"All read attempts failed for DB{db_num}")
                     db_buffers[db_num] = None
 
             # Decode values from buffers
             results: Dict[str, Any] = {}
             for name, cfg in io_mapping.items():
+                if name not in parsed:
+                    results[name] = None
+                    continue
+                    
                 info = parsed[name]
                 buf = db_buffers.get(info['db_number'])
+                
                 if not buf:
                     results[name] = None
                     continue
-                try:
-                    if buf is not None:
-                        if cfg['type'] == 'bit':
-                            results[name] = get_bool(buf, info['byte_offset'], info['bit_offset'])
-                        elif cfg['type'] == 'byte':
-                            results[name] = buf[info['byte_offset']]
-                        elif cfg['type'] == 'word':
-                            results[name] = get_int(bytearray(buf[info['byte_offset']:info['byte_offset']+2]), 0)
-                        elif cfg['type'] == 'dword':
-                            results[name] = get_dword(bytearray(buf[info['byte_offset']:info['byte_offset']+4]), 0)
-                        elif cfg['type'] == 'real':
-                            results[name] = get_real(bytearray(buf[info['byte_offset']:info['byte_offset']+4]), 0)
-                        else:
-                            results[name] = None
-                        continue
-                except Exception:
-                    # fall through to per-tag read
-                    pass
-
-                # Fallback: per-tag read if buffer missing/failed
+                    
+                # Check if we have enough data in the buffer
+                required_size = info['byte_offset']
+                if cfg['type'] in ('dword', 'real'):
+                    required_size += 4
+                elif cfg['type'] == 'word':
+                    required_size += 2
+                else:  # bit or byte
+                    required_size += 1
+                    
+                if len(buf) < required_size:
+                    print(f"Buffer too small for {name}: need {required_size}, have {len(buf)}")
+                    results[name] = None
+                    continue
+                    
                 try:
                     if cfg['type'] == 'bit':
-                        results[name] = self.read_bit(info['db_number'], info['byte_offset'], info['bit_offset'])
+                        results[name] = get_bool(buf, info['byte_offset'], info['bit_offset'])
                     elif cfg['type'] == 'byte':
-                        results[name] = self.read_byte(info['db_number'], info['byte_offset'])
+                        results[name] = buf[info['byte_offset']]
                     elif cfg['type'] == 'word':
-                        results[name] = self.read_word(info['db_number'], info['byte_offset'])
+                        results[name] = get_int(bytearray(buf[info['byte_offset']:info['byte_offset']+2]), 0)
                     elif cfg['type'] == 'dword':
-                        results[name] = self.read_dword(info['db_number'], info['byte_offset'])
+                        results[name] = get_dword(bytearray(buf[info['byte_offset']:info['byte_offset']+4]), 0)
                     elif cfg['type'] == 'real':
-                        results[name] = self.read_real(info['db_number'], info['byte_offset'])
+                        results[name] = get_real(bytearray(buf[info['byte_offset']:info['byte_offset']+4]), 0)
                     else:
                         results[name] = None
-                except Exception:
+                        
+                except Exception as e:
+                    print(f"Error decoding {name} from buffer: {e}")
                     results[name] = None
 
             return results
 
         except Exception as e:
             self.last_error = f"Error reading all IO (bulk): {str(e)}"
+            print(f"Bulk read failed: {e}")
             return {}
     
     def test_connection(self):

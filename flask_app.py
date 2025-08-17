@@ -27,12 +27,22 @@ atexit.register(plc.disconnect)
 # Background polling state
 latest_snapshot = None
 snapshot_lock = threading.Lock()
-USE_BULK_READ = False  # temporarily disable bulk reads to restore functionality
+USE_BULK_READ = False  # Temporarily disable bulk reads until DB size issue is resolved
+PERSISTENT_CONNECTION = True  # Keep connection alive
+POLL_INTERVAL_FAST = 0.05  # 50ms for fast polling (button presses)
+POLL_INTERVAL_NORMAL = 0.2  # 200ms for normal polling
+FAST_POLL_DURATION = 2.0  # Use fast polling for 2 seconds after any change
+
+# Track last change time for adaptive polling
+last_change_time = 0
+current_poll_interval = POLL_INTERVAL_NORMAL
 
 def _build_io_snapshot() -> dict:
     """Build a full IO snapshot and perform change logging.
-    Runs in the background poller.
+    Runs in the background poller with improved efficiency.
     """
+    global last_change_time, current_poll_interval
+    
     io_mapping = get_io_mapping()
     io_groups = get_io_groups()
     io_data = {}
@@ -45,19 +55,29 @@ def _build_io_snapshot() -> dict:
         plc_connected = True
 
     if plc_connected:
-        # Choose read strategy
+        # Use bulk read for efficiency
         values = None
         if USE_BULK_READ:
             try:
                 values = plc.read_all_io()
-            except Exception:
+                # Check if bulk read was successful
+                if not values or len(values) == 0:
+                    print("Bulk read returned no data, falling back to individual reads")
+                    values = None
+                else:
+                    print(f"Bulk read successful: {len(values)} values read")
+            except Exception as e:
+                print(f"Bulk read failed, falling back to individual reads: {e}")
                 values = None
+        
         if values is None or not isinstance(values, dict) or not values:
             # Per-tag reads (safe fallback)
+            print("Using individual reads...")
             for io_name, io_config in io_mapping.items():
                 try:
                     value = plc.read_io(io_name)
-                except Exception:
+                except Exception as e:
+                    print(f"Error reading {io_name}: {e}")
                     value = None
                 io_data[io_name] = {
                     'value': value,
@@ -67,6 +87,8 @@ def _build_io_snapshot() -> dict:
                     'status': 'online' if value is not None else 'error'
                 }
         else:
+            # Use bulk read results
+            print("Using bulk read results...")
             for io_name, io_config in io_mapping.items():
                 value = values.get(io_name)
                 io_data[io_name] = {
@@ -91,11 +113,18 @@ def _build_io_snapshot() -> dict:
     if plc_connected and not event_logger.initial_snapshot_logged:
         event_logger.log_system_snapshot(io_data)
 
-    # Check for changes and log IO events (only for valid state changes)
+    # Check for changes and log IO events with improved change detection
     try:
-        event_logger.check_and_log_changes(io_data, io_mapping)
-    except Exception:
-        pass
+        changes = event_logger.check_and_log_changes(io_data, io_mapping)
+        
+        # If we detected changes, switch to fast polling
+        if changes:
+            last_change_time = time.time()
+            current_poll_interval = POLL_INTERVAL_FAST
+            print(f"Change detected, switching to fast polling ({len(changes)} changes)")
+            
+    except Exception as e:
+        print(f"Error in change detection: {e}")
 
     return {
         'timestamp': datetime.now().isoformat(),
@@ -104,21 +133,35 @@ def _build_io_snapshot() -> dict:
         'connected': plc_connected,
     }
 
-def _poller_loop(poll_interval_sec: float = 0.2):
-    """Continuously poll the PLC and update a shared snapshot."""
-    global latest_snapshot
+def _poller_loop():
+    """Continuously poll the PLC with adaptive polling intervals."""
+    global latest_snapshot, current_poll_interval, last_change_time
+    
+    print("Starting PLC poller with adaptive polling...")
+    
     while True:
         try:
+            # Check if we should switch back to normal polling
+            if current_poll_interval == POLL_INTERVAL_FAST:
+                time_since_change = time.time() - last_change_time
+                if time_since_change > FAST_POLL_DURATION:
+                    current_poll_interval = POLL_INTERVAL_NORMAL
+                    print("Switching back to normal polling")
+            
+            # Build snapshot
             snap = _build_io_snapshot()
             with snapshot_lock:
                 latest_snapshot = snap
-        except Exception:
+                
+        except Exception as e:
+            print(f"Error in poller loop: {e}")
             # Keep looping even if a cycle fails
-            pass
-        time.sleep(poll_interval_sec)
+            
+        # Sleep with current interval
+        time.sleep(current_poll_interval)
 
 # Start the background poller thread (daemon so it won't block shutdown)
-_t = threading.Thread(target=_poller_loop, kwargs={'poll_interval_sec': 0.2}, daemon=True)
+_t = threading.Thread(target=_poller_loop, daemon=True)
 _t.start()
 
 def query_ollama(prompt, data_summary):

@@ -4,6 +4,7 @@ from datetime import datetime, date
 import glob
 from typing import Dict, Any, List
 import re
+import time
 
 class EventLogger:
     """Event logging system for tracking IO state changes"""
@@ -24,7 +25,11 @@ class EventLogger:
         self.max_events = 5000  # Per-file cap to avoid huge daily files
         self.plc_communication_status = None  # Track overall PLC communication
         self.initial_snapshot_logged = False  # Track whether we've logged a system snapshot
-        # Debounce removed to capture all fast IO edges
+        
+        # Improved change tracking to prevent duplicates
+        self.last_logged_states = {}  # Track last logged state to prevent duplicates
+        self.change_debounce = {}  # Track debounce times for each IO point
+        self.debounce_time = 0.1  # 100ms debounce to prevent rapid duplicate logging
 
     def _is_fault_tag(self, io_name: str, io_cfg: Dict) -> bool:
         # Only treat explicit fault array items and fault_count as fault-like
@@ -169,8 +174,9 @@ class EventLogger:
             return []
     
     def check_and_log_changes(self, current_io_data: Dict, io_mapping: Dict):
-        """Check for changes in IO data and log events"""
+        """Check for changes in IO data and log events with improved duplicate prevention"""
         events = []
+        current_time = time.time()
         
         for io_name, current_info in current_io_data.items():
             current_value = current_info.get('value')
@@ -186,11 +192,26 @@ class EventLogger:
             
             # Check if value has actually changed
             if previous_value != current_value:
+                # Check debounce - don't log if we recently logged the same state
+                last_logged = self.last_logged_states.get(io_name)
+                last_logged_time = self.change_debounce.get(io_name, 0)
+                
+                # Skip if this is a duplicate of what we just logged
+                if (last_logged == current_value and 
+                    (current_time - last_logged_time) < self.debounce_time):
+                    # Update previous state but don't log
+                    self.previous_states[io_name] = current_value
+                    continue
+                
                 # Log change when current value is known (even if previous was unknown)
                 if current_value is not None:
                     io_cfg = io_mapping.get(io_name, {})
                     event = self.log_event(io_name, previous_value, current_value, io_cfg)
                     events.append(event)
+                    
+                    # Update tracking
+                    self.last_logged_states[io_name] = current_value
+                    self.change_debounce[io_name] = current_time
                 
                 # Always update previous state regardless
                 self.previous_states[io_name] = current_value
