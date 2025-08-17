@@ -1,866 +1,6 @@
 [
   {
-    "timestamp": "2025-08-17T15:24:31.850431",
-    "io_name": "A7_State",
-    "description": "A[7] - State",
-    "address": "DB1.DBX14.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.830190",
-    "io_name": "A6_ForcedStatus",
-    "description": "A[6] - ForcedStatus",
-    "address": "DB1.DBX12.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.808044",
-    "io_name": "A6_ForcedState",
-    "description": "A[6] - ForcedState",
-    "address": "DB1.DBX12.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.784022",
-    "io_name": "A6_State",
-    "description": "A[6] - State",
-    "address": "DB1.DBX12.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.762495",
-    "io_name": "A5_ForcedStatus",
-    "description": "A[5] - ForcedStatus",
-    "address": "DB1.DBX10.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.741969",
-    "io_name": "A5_ForcedState",
-    "description": "A[5] - ForcedState",
-    "address": "DB1.DBX10.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.723025",
-    "io_name": "A5_State",
-    "description": "A[5] - State",
-    "address": "DB1.DBX10.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.702246",
-    "io_name": "A4_ForcedStatus",
-    "description": "Red Button - ForcedStatus",
-    "address": "DB1.DBX8.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.682226",
-    "io_name": "A4_ForcedState",
-    "description": "Red Button - ForcedState",
-    "address": "DB1.DBX8.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.661207",
-    "io_name": "A4_State",
-    "description": "Red Button - State",
-    "address": "DB1.DBX8.0",
-    "old_value": null,
-    "new_value": true,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.640776",
-    "io_name": "A3_ForcedStatus",
-    "description": "Green Button - ForcedStatus",
-    "address": "DB1.DBX6.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.619755",
-    "io_name": "A3_ForcedState",
-    "description": "Green Button - ForcedState",
-    "address": "DB1.DBX6.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.599737",
-    "io_name": "A3_State",
-    "description": "Green Button - State",
-    "address": "DB1.DBX6.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.575710",
-    "io_name": "A2_ForcedStatus",
-    "description": "Switch Right - ForcedStatus",
-    "address": "DB1.DBX4.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.555692",
-    "io_name": "A2_ForcedState",
-    "description": "Switch Right - ForcedState",
-    "address": "DB1.DBX4.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.536676",
-    "io_name": "A2_State",
-    "description": "Switch Right - State",
-    "address": "DB1.DBX4.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.514090",
-    "io_name": "A1_ForcedStatus",
-    "description": "Switch Left - ForcedStatus",
-    "address": "DB1.DBX2.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.496075",
-    "io_name": "A1_ForcedState",
-    "description": "Switch Left - ForcedState",
-    "address": "DB1.DBX2.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.478053",
-    "io_name": "A1_State",
-    "description": "Switch Left - State",
-    "address": "DB1.DBX2.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.460037",
-    "io_name": "A0_ForcedStatus",
-    "description": "Safety Relay EStop - ForcedStatus",
-    "address": "DB1.DBX0.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.438017",
-    "io_name": "A0_ForcedState",
-    "description": "Safety Relay EStop - ForcedState",
-    "address": "DB1.DBX0.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:31.419998",
-    "io_name": "A0_State",
-    "description": "Safety Relay EStop - State",
-    "address": "DB1.DBX0.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.370036",
-    "io_name": "Faults[10]",
-    "description": "Faults[10]",
-    "address": "DB1.DBX95.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.351011",
-    "io_name": "Faults[9]",
-    "description": "Faults[9]",
-    "address": "DB1.DBX95.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.325989",
-    "io_name": "Faults[8]",
-    "description": "Faults[8]",
-    "address": "DB1.DBX95.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.304972",
-    "io_name": "HMI_ClearForcing",
-    "description": "HMI Button - Clear Forcing",
-    "address": "DB1.DBX76.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.220883",
-    "io_name": "Out_B1_ForcedStatus",
-    "description": "Output B[1] - ForcedStatus",
-    "address": "DB1.DBX74.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.200864",
-    "io_name": "Out_B1_ForcedState",
-    "description": "Output B[1] - ForcedState",
-    "address": "DB1.DBX74.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.181847",
-    "io_name": "Out_B1_State",
-    "description": "Output B[1] - State",
-    "address": "DB1.DBX74.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.149819",
-    "io_name": "Out_B0_ForcedStatus",
-    "description": "Output B[0] - ForcedStatus",
-    "address": "DB1.DBX72.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.128798",
-    "io_name": "Out_B0_ForcedState",
-    "description": "Output B[0] - ForcedState",
-    "address": "DB1.DBX72.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.109781",
-    "io_name": "Out_B0_State",
-    "description": "Output B[0] - State",
-    "address": "DB1.DBX72.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.090763",
-    "io_name": "Out_A7_ForcedStatus",
-    "description": "Output A[7] - ForcedStatus",
-    "address": "DB1.DBX70.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.072747",
-    "io_name": "Out_A7_ForcedState",
-    "description": "Output A[7] - ForcedState",
-    "address": "DB1.DBX70.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.054726",
-    "io_name": "Out_A7_State",
-    "description": "Output A[7] - State",
-    "address": "DB1.DBX70.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.035709",
-    "io_name": "Out_A6_ForcedStatus",
-    "description": "Output A[6] - ForcedStatus",
-    "address": "DB1.DBX68.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:29.016692",
-    "io_name": "Out_A6_ForcedState",
-    "description": "Output A[6] - ForcedState",
-    "address": "DB1.DBX68.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.988667",
-    "io_name": "Out_A6_State",
-    "description": "Output A[6] - State",
-    "address": "DB1.DBX68.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.968648",
-    "io_name": "Out_A5_ForcedStatus",
-    "description": "Output A[5] - ForcedStatus",
-    "address": "DB1.DBX66.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.950631",
-    "io_name": "Out_A5_ForcedState",
-    "description": "Output A[5] - ForcedState",
-    "address": "DB1.DBX66.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.933616",
-    "io_name": "Out_A5_State",
-    "description": "Output A[5] - State",
-    "address": "DB1.DBX66.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.915600",
-    "io_name": "Out_A4_ForcedStatus",
-    "description": "Output A[4] - ForcedStatus",
-    "address": "DB1.DBX64.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.897583",
-    "io_name": "Out_A4_ForcedState",
-    "description": "Output A[4] - ForcedState",
-    "address": "DB1.DBX64.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.880568",
-    "io_name": "Out_A4_State",
-    "description": "Output A[4] - State",
-    "address": "DB1.DBX64.0",
-    "old_value": null,
-    "new_value": true,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.862547",
-    "io_name": "Out_A3_ForcedStatus",
-    "description": "Output A[3] - ForcedStatus",
-    "address": "DB1.DBX62.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.844530",
-    "io_name": "Out_A3_ForcedState",
-    "description": "Output A[3] - ForcedState",
-    "address": "DB1.DBX62.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.825032",
-    "io_name": "Out_A3_State",
-    "description": "Output A[3] - State",
-    "address": "DB1.DBX62.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.805692",
-    "io_name": "Out_A2_ForcedStatus",
-    "description": "Output E-Stop LED - ForcedStatus",
-    "address": "DB1.DBX60.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.786675",
-    "io_name": "Out_A2_ForcedState",
-    "description": "Output E-Stop LED - ForcedState",
-    "address": "DB1.DBX60.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.767666",
-    "io_name": "Out_A2_State",
-    "description": "Output E-Stop LED - State",
-    "address": "DB1.DBX60.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.748635",
-    "io_name": "Out_A1_ForcedStatus",
-    "description": "Output Green LED - ForcedStatus",
-    "address": "DB1.DBX58.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.729619",
-    "io_name": "Out_A1_ForcedState",
-    "description": "Output Green LED - ForcedState",
-    "address": "DB1.DBX58.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.711598",
-    "io_name": "Out_A1_State",
-    "description": "Output Green LED - State",
-    "address": "DB1.DBX58.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.693582",
-    "io_name": "Out_A0_ForcedStatus",
-    "description": "Output Red LED - ForcedStatus",
-    "address": "DB1.DBX56.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.677563",
-    "io_name": "Out_A0_ForcedState",
-    "description": "Output Red LED - ForcedState",
-    "address": "DB1.DBX56.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.660547",
-    "io_name": "Out_A0_State",
-    "description": "Output Red LED - State",
-    "address": "DB1.DBX56.0",
-    "old_value": null,
-    "new_value": true,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.643532",
-    "io_name": "AI1_Scalar",
-    "description": "AI1 Scalar (Real)",
-    "address": "DB1.DBD52",
-    "old_value": null,
-    "new_value": 10.0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.626041",
-    "io_name": "AI1_Offset",
-    "description": "AI1 Offset (Real)",
-    "address": "DB1.DBD48",
-    "old_value": null,
-    "new_value": 1.2000000476837158,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.609025",
-    "io_name": "AI1_Scaled",
-    "description": "AI1",
-    "address": "DB1.DBD44",
-    "old_value": null,
-    "new_value": 1.2000000476837158,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.592006",
-    "io_name": "AI0_Scalar",
-    "description": "AI0 Scalar (Real)",
-    "address": "DB1.DBD38",
-    "old_value": null,
-    "new_value": 10.0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.573989",
-    "io_name": "AI0_Offset",
-    "description": "AI0 Offset (Real)",
-    "address": "DB1.DBD34",
-    "old_value": null,
-    "new_value": 2.0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.556451",
-    "io_name": "AI0_Scaled",
-    "description": "AI0",
-    "address": "DB1.DBD30",
-    "old_value": null,
-    "new_value": 2.0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.539435",
-    "io_name": "AI0_Raw",
-    "description": "AI0 Raw (Int)",
-    "address": "DB1.DBW28",
-    "old_value": null,
-    "new_value": 0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.521915",
-    "io_name": "B5_ForcedStatus",
-    "description": "B[5] - ForcedStatus",
-    "address": "DB1.DBX26.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.504899",
-    "io_name": "B5_ForcedState",
-    "description": "B[5] - ForcedState",
-    "address": "DB1.DBX26.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.486879",
-    "io_name": "B5_State",
-    "description": "B[5] - State",
-    "address": "DB1.DBX26.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.467862",
-    "io_name": "B4_ForcedStatus",
-    "description": "B[4] - ForcedStatus",
-    "address": "DB1.DBX24.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.451327",
-    "io_name": "B4_ForcedState",
-    "description": "B[4] - ForcedState",
-    "address": "DB1.DBX24.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.420788",
-    "io_name": "B4_State",
-    "description": "B[4] - State",
-    "address": "DB1.DBX24.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.393759",
-    "io_name": "B3_ForcedStatus",
-    "description": "B[3] - ForcedStatus",
-    "address": "DB1.DBX22.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.370738",
-    "io_name": "B3_ForcedState",
-    "description": "B[3] - ForcedState",
-    "address": "DB1.DBX22.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.355217",
-    "io_name": "B3_State",
-    "description": "B[3] - State",
-    "address": "DB1.DBX22.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.339202",
-    "io_name": "B2_ForcedStatus",
-    "description": "B[2] - ForcedStatus",
-    "address": "DB1.DBX20.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.322678",
-    "io_name": "B2_ForcedState",
-    "description": "B[2] - ForcedState",
-    "address": "DB1.DBX20.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.306663",
-    "io_name": "B2_State",
-    "description": "B[2] - State",
-    "address": "DB1.DBX20.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.291134",
-    "io_name": "B1_ForcedStatus",
-    "description": "B[1] - ForcedStatus",
-    "address": "DB1.DBX18.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.273117",
-    "io_name": "B1_ForcedState",
-    "description": "B[1] - ForcedState",
-    "address": "DB1.DBX18.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.257090",
-    "io_name": "B1_State",
-    "description": "B[1] - State",
-    "address": "DB1.DBX18.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.241076",
-    "io_name": "B0_ForcedStatus",
-    "description": "B[0] - ForcedStatus",
-    "address": "DB1.DBX16.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.225053",
-    "io_name": "B0_ForcedState",
-    "description": "B[0] - ForcedState",
-    "address": "DB1.DBX16.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.209038",
-    "io_name": "B0_State",
-    "description": "B[0] - State",
-    "address": "DB1.DBX16.0",
-    "old_value": null,
-    "new_value": true,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.193024",
-    "io_name": "A7_ForcedStatus",
-    "description": "A[7] - ForcedStatus",
-    "address": "DB1.DBX14.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:28.178012",
-    "io_name": "A7_ForcedState",
-    "description": "A[7] - ForcedState",
-    "address": "DB1.DBX14.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.941336",
-    "io_name": "Faults[7]",
-    "description": "Faults[7]",
-    "address": "DB1.DBX94.7",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.911303",
-    "io_name": "Faults[6]",
-    "description": "Faults[6]",
-    "address": "DB1.DBX94.6",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.893825",
-    "io_name": "Faults[5]",
-    "description": "Faults[5]",
-    "address": "DB1.DBX94.5",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.877811",
+    "timestamp": "2025-08-17T15:26:24.977356",
     "io_name": "Faults[4]",
     "description": "Faults[4]",
     "address": "DB1.DBX94.4",
@@ -870,177 +10,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.861795",
-    "io_name": "Faults[3]",
-    "description": "Faults[3]",
-    "address": "DB1.DBX94.3",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.844781",
-    "io_name": "Faults[2]",
-    "description": "Faults[2]",
-    "address": "DB1.DBX94.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.828259",
-    "io_name": "Faults[1]",
-    "description": "Faults[1]",
-    "address": "DB1.DBX94.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.812245",
-    "io_name": "Faults[0]",
-    "description": "Faults[0]",
-    "address": "DB1.DBX94.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.796963",
-    "io_name": "fault_count",
-    "description": "Active Faults Count",
-    "address": "DB1.DBW96",
-    "old_value": null,
-    "new_value": 0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.780948",
-    "io_name": "PWM1_Low_Duty",
-    "description": "PWM[1] Low Duty (Int)",
-    "address": "DB1.DBW92",
-    "old_value": null,
-    "new_value": 0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.766018",
-    "io_name": "PWM1_High_Duty",
-    "description": "PWM[1] High Duty (Int)",
-    "address": "DB1.DBW90",
-    "old_value": null,
-    "new_value": 0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.750463",
-    "io_name": "PWM1_Duty_Cycle",
-    "description": "PWM[1] Duty Cycle (Int)",
-    "address": "DB1.DBW88",
-    "old_value": null,
-    "new_value": 0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.735449",
-    "io_name": "PWM0_Low_Duty",
-    "description": "PWM[0] Low Duty (Int)",
-    "address": "DB1.DBW86",
-    "old_value": null,
-    "new_value": 20,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.720805",
-    "io_name": "PWM0_High_Duty",
-    "description": "PWM[0] High Duty (Int)",
-    "address": "DB1.DBW84",
-    "old_value": null,
-    "new_value": 0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.705121",
-    "io_name": "PWM0_Duty_Cycle",
-    "description": "PWM[0] Duty Cycle (Int)",
-    "address": "DB1.DBW82",
-    "old_value": null,
-    "new_value": 0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.691101",
-    "io_name": "Stats_ForcedCount",
-    "description": "Forced Count (Int)",
-    "address": "DB1.DBW80",
-    "old_value": null,
-    "new_value": 0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.674084",
-    "io_name": "Stats_ForcingActive",
-    "description": "Forcing Active",
-    "address": "DB1.DBX78.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.659792",
-    "io_name": "HMI_FaultReset",
-    "description": "HMI Button - Fault Reset",
-    "address": "DB1.DBX76.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.643778",
-    "io_name": "AI1_Raw",
-    "description": "AI1 Raw (Int)",
-    "address": "DB1.DBW42",
-    "old_value": null,
-    "new_value": 0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.564867",
-    "io_name": "Out_A6_ForcedStatus",
-    "description": "Output A[6] - ForcedStatus",
-    "address": "DB1.DBX68.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.550855",
-    "io_name": "A6_ForcedState",
-    "description": "A[6] - ForcedState",
-    "address": "DB1.DBX12.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:26.536842",
+    "timestamp": "2025-08-17T15:26:24.967352",
     "io_name": "A6_State",
     "description": "A[6] - State",
     "address": "DB1.DBX12.0",
@@ -1050,7 +20,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.522825",
+    "timestamp": "2025-08-17T15:26:24.956998",
     "io_name": "A5_ForcedStatus",
     "description": "A[5] - ForcedStatus",
     "address": "DB1.DBX10.2",
@@ -1060,7 +30,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.507812",
+    "timestamp": "2025-08-17T15:26:24.946986",
     "io_name": "A5_ForcedState",
     "description": "A[5] - ForcedState",
     "address": "DB1.DBX10.1",
@@ -1070,7 +40,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.494796",
+    "timestamp": "2025-08-17T15:26:24.935976",
     "io_name": "A5_State",
     "description": "A[5] - State",
     "address": "DB1.DBX10.0",
@@ -1080,7 +50,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.479783",
+    "timestamp": "2025-08-17T15:26:24.925923",
     "io_name": "A4_ForcedStatus",
     "description": "Red Button - ForcedStatus",
     "address": "DB1.DBX8.2",
@@ -1090,7 +60,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.457746",
+    "timestamp": "2025-08-17T15:26:24.912902",
     "io_name": "A4_ForcedState",
     "description": "Red Button - ForcedState",
     "address": "DB1.DBX8.1",
@@ -1100,7 +70,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.444148",
+    "timestamp": "2025-08-17T15:26:24.901888",
     "io_name": "A4_State",
     "description": "Red Button - State",
     "address": "DB1.DBX8.0",
@@ -1110,7 +80,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.430629",
+    "timestamp": "2025-08-17T15:26:24.889875",
     "io_name": "A3_ForcedStatus",
     "description": "Green Button - ForcedStatus",
     "address": "DB1.DBX6.2",
@@ -1120,7 +90,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.415094",
+    "timestamp": "2025-08-17T15:26:24.878353",
     "io_name": "A3_ForcedState",
     "description": "Green Button - ForcedState",
     "address": "DB1.DBX6.1",
@@ -1130,7 +100,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.386957",
+    "timestamp": "2025-08-17T15:26:24.868337",
     "io_name": "A3_State",
     "description": "Green Button - State",
     "address": "DB1.DBX6.0",
@@ -1140,7 +110,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.372943",
+    "timestamp": "2025-08-17T15:26:24.858328",
     "io_name": "A2_ForcedStatus",
     "description": "Switch Right - ForcedStatus",
     "address": "DB1.DBX4.2",
@@ -1150,7 +120,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.355922",
+    "timestamp": "2025-08-17T15:26:24.848316",
     "io_name": "A2_ForcedState",
     "description": "Switch Right - ForcedState",
     "address": "DB1.DBX4.1",
@@ -1160,7 +130,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.342911",
+    "timestamp": "2025-08-17T15:26:24.838307",
     "io_name": "A2_State",
     "description": "Switch Right - State",
     "address": "DB1.DBX4.0",
@@ -1170,7 +140,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.328898",
+    "timestamp": "2025-08-17T15:26:24.829298",
     "io_name": "A1_ForcedStatus",
     "description": "Switch Left - ForcedStatus",
     "address": "DB1.DBX2.2",
@@ -1180,7 +150,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.315886",
+    "timestamp": "2025-08-17T15:26:24.820290",
     "io_name": "A1_ForcedState",
     "description": "Switch Left - ForcedState",
     "address": "DB1.DBX2.1",
@@ -1190,7 +160,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.301873",
+    "timestamp": "2025-08-17T15:26:24.811283",
     "io_name": "A1_State",
     "description": "Switch Left - State",
     "address": "DB1.DBX2.0",
@@ -1200,7 +170,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.288854",
+    "timestamp": "2025-08-17T15:26:24.802274",
     "io_name": "A0_ForcedStatus",
     "description": "Safety Relay EStop - ForcedStatus",
     "address": "DB1.DBX0.2",
@@ -1210,7 +180,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.273840",
+    "timestamp": "2025-08-17T15:26:24.793266",
     "io_name": "A0_ForcedState",
     "description": "Safety Relay EStop - ForcedState",
     "address": "DB1.DBX0.1",
@@ -1220,7 +190,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.252820",
+    "timestamp": "2025-08-17T15:26:24.784255",
     "io_name": "A0_State",
     "description": "Safety Relay EStop - State",
     "address": "DB1.DBX0.0",
@@ -1230,543 +200,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:26.246814",
-    "io_name": "SYSTEM",
-    "description": "System startup snapshot",
-    "address": "",
-    "old_value": null,
-    "new_value": null,
-    "event_type": "system_snapshot",
-    "priority": "normal",
-    "snapshot_counts": {
-      "total": 102,
-      "online": 21,
-      "errors": 81,
-      "faults_active": 0
-    }
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.191000",
-    "io_name": "Out_B1_ForcedStatus",
-    "description": "Output B[1] - ForcedStatus",
-    "address": "DB1.DBX74.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.174911",
-    "io_name": "Out_B1_ForcedState",
-    "description": "Output B[1] - ForcedState",
-    "address": "DB1.DBX74.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.160899",
-    "io_name": "Out_B1_State",
-    "description": "Output B[1] - State",
-    "address": "DB1.DBX74.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.147885",
-    "io_name": "Out_B0_ForcedStatus",
-    "description": "Output B[0] - ForcedStatus",
-    "address": "DB1.DBX72.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.133871",
-    "io_name": "Out_B0_ForcedState",
-    "description": "Output B[0] - ForcedState",
-    "address": "DB1.DBX72.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.119858",
-    "io_name": "Out_B0_State",
-    "description": "Output B[0] - State",
-    "address": "DB1.DBX72.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.106847",
-    "io_name": "Out_A7_ForcedStatus",
-    "description": "Output A[7] - ForcedStatus",
-    "address": "DB1.DBX70.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.093835",
-    "io_name": "Out_A7_ForcedState",
-    "description": "Output A[7] - ForcedState",
-    "address": "DB1.DBX70.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.080819",
-    "io_name": "Out_A6_ForcedState",
-    "description": "Output A[6] - ForcedState",
-    "address": "DB1.DBX68.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.067808",
-    "io_name": "Out_A6_State",
-    "description": "Output A[6] - State",
-    "address": "DB1.DBX68.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.054714",
-    "io_name": "Out_A5_ForcedStatus",
-    "description": "Output A[5] - ForcedStatus",
-    "address": "DB1.DBX66.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.040702",
-    "io_name": "Out_A5_ForcedState",
-    "description": "Output A[5] - ForcedState",
-    "address": "DB1.DBX66.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.025688",
-    "io_name": "Out_A5_State",
-    "description": "Output A[5] - State",
-    "address": "DB1.DBX66.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.013230",
-    "io_name": "Out_A4_ForcedStatus",
-    "description": "Output A[4] - ForcedStatus",
-    "address": "DB1.DBX64.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:20.000217",
-    "io_name": "Out_A4_ForcedState",
-    "description": "Output A[4] - ForcedState",
-    "address": "DB1.DBX64.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.987202",
-    "io_name": "Out_A4_State",
-    "description": "Output A[4] - State",
-    "address": "DB1.DBX64.0",
-    "old_value": null,
-    "new_value": true,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.973191",
-    "io_name": "Out_A3_ForcedStatus",
-    "description": "Output A[3] - ForcedStatus",
-    "address": "DB1.DBX62.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.961179",
-    "io_name": "Out_A3_ForcedState",
-    "description": "Output A[3] - ForcedState",
-    "address": "DB1.DBX62.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.949163",
-    "io_name": "Out_A3_State",
-    "description": "Output A[3] - State",
-    "address": "DB1.DBX62.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.936151",
-    "io_name": "Out_A2_ForcedStatus",
-    "description": "Output E-Stop LED - ForcedStatus",
-    "address": "DB1.DBX60.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.924141",
-    "io_name": "Out_A2_ForcedState",
-    "description": "Output E-Stop LED - ForcedState",
-    "address": "DB1.DBX60.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.910128",
-    "io_name": "Out_A2_State",
-    "description": "Output E-Stop LED - State",
-    "address": "DB1.DBX60.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.898117",
-    "io_name": "B2_State",
-    "description": "B[2] - State",
-    "address": "DB1.DBX20.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.885099",
-    "io_name": "B1_ForcedStatus",
-    "description": "B[1] - ForcedStatus",
-    "address": "DB1.DBX18.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.872087",
-    "io_name": "B1_ForcedState",
-    "description": "B[1] - ForcedState",
-    "address": "DB1.DBX18.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.859076",
-    "io_name": "B1_State",
-    "description": "B[1] - State",
-    "address": "DB1.DBX18.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.847065",
-    "io_name": "B0_ForcedStatus",
-    "description": "B[0] - ForcedStatus",
-    "address": "DB1.DBX16.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.835054",
-    "io_name": "B0_ForcedState",
-    "description": "B[0] - ForcedState",
-    "address": "DB1.DBX16.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.822755",
-    "io_name": "B0_State",
-    "description": "B[0] - State",
-    "address": "DB1.DBX16.0",
-    "old_value": null,
-    "new_value": true,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.810744",
-    "io_name": "A7_ForcedStatus",
-    "description": "A[7] - ForcedStatus",
-    "address": "DB1.DBX14.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.798733",
-    "io_name": "A7_ForcedState",
-    "description": "A[7] - ForcedState",
-    "address": "DB1.DBX14.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.785721",
-    "io_name": "A7_State",
-    "description": "A[7] - State",
-    "address": "DB1.DBX14.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.773710",
-    "io_name": "A6_ForcedStatus",
-    "description": "A[6] - ForcedStatus",
-    "address": "DB1.DBX12.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.761699",
-    "io_name": "A6_ForcedState",
-    "description": "A[6] - ForcedState",
-    "address": "DB1.DBX12.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.749682",
-    "io_name": "A6_State",
-    "description": "A[6] - State",
-    "address": "DB1.DBX12.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.736670",
-    "io_name": "A5_ForcedStatus",
-    "description": "A[5] - ForcedStatus",
-    "address": "DB1.DBX10.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.725661",
-    "io_name": "A5_ForcedState",
-    "description": "A[5] - ForcedState",
-    "address": "DB1.DBX10.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.713640",
-    "io_name": "A5_State",
-    "description": "A[5] - State",
-    "address": "DB1.DBX10.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.701629",
-    "io_name": "A4_ForcedStatus",
-    "description": "Red Button - ForcedStatus",
-    "address": "DB1.DBX8.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.689618",
-    "io_name": "A4_ForcedState",
-    "description": "Red Button - ForcedState",
-    "address": "DB1.DBX8.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.677607",
-    "io_name": "A4_State",
-    "description": "Red Button - State",
-    "address": "DB1.DBX8.0",
-    "old_value": null,
-    "new_value": true,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.665596",
-    "io_name": "A3_ForcedStatus",
-    "description": "Green Button - ForcedStatus",
-    "address": "DB1.DBX6.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.652584",
-    "io_name": "A3_ForcedState",
-    "description": "Green Button - ForcedState",
-    "address": "DB1.DBX6.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.640573",
-    "io_name": "A3_State",
-    "description": "Green Button - State",
-    "address": "DB1.DBX6.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.628562",
-    "io_name": "A2_ForcedStatus",
-    "description": "Switch Right - ForcedStatus",
-    "address": "DB1.DBX4.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.617552",
-    "io_name": "A2_ForcedState",
-    "description": "Switch Right - ForcedState",
-    "address": "DB1.DBX4.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.605542",
-    "io_name": "A2_State",
-    "description": "Switch Right - State",
-    "address": "DB1.DBX4.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.594532",
-    "io_name": "A1_ForcedState",
-    "description": "Switch Left - ForcedState",
-    "address": "DB1.DBX2.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.582521",
-    "io_name": "A1_State",
-    "description": "Switch Left - State",
-    "address": "DB1.DBX2.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.570509",
-    "io_name": "A0_ForcedStatus",
-    "description": "Safety Relay EStop - ForcedStatus",
-    "address": "DB1.DBX0.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.559499",
-    "io_name": "A0_ForcedState",
-    "description": "Safety Relay EStop - ForcedState",
-    "address": "DB1.DBX0.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:19.548490",
-    "io_name": "A0_State",
-    "description": "Safety Relay EStop - State",
-    "address": "DB1.DBX0.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.678551",
+    "timestamp": "2025-08-17T15:26:22.890196",
     "io_name": "Faults[10]",
     "description": "Faults[10]",
     "address": "DB1.DBX95.2",
@@ -1776,7 +210,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.667540",
+    "timestamp": "2025-08-17T15:26:22.880188",
     "io_name": "Faults[9]",
     "description": "Faults[9]",
     "address": "DB1.DBX95.1",
@@ -1786,7 +220,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.656527",
+    "timestamp": "2025-08-17T15:26:22.871179",
     "io_name": "Faults[8]",
     "description": "Faults[8]",
     "address": "DB1.DBX95.0",
@@ -1796,7 +230,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.644516",
+    "timestamp": "2025-08-17T15:26:22.861167",
     "io_name": "Faults[7]",
     "description": "Faults[7]",
     "address": "DB1.DBX94.7",
@@ -1806,7 +240,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.633506",
+    "timestamp": "2025-08-17T15:26:22.852158",
     "io_name": "Faults[6]",
     "description": "Faults[6]",
     "address": "DB1.DBX94.6",
@@ -1816,7 +250,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.621495",
+    "timestamp": "2025-08-17T15:26:22.842149",
     "io_name": "Faults[5]",
     "description": "Faults[5]",
     "address": "DB1.DBX94.5",
@@ -1826,7 +260,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.611485",
+    "timestamp": "2025-08-17T15:26:22.840147",
     "io_name": "Faults[4]",
     "description": "Faults[4]",
     "address": "DB1.DBX94.4",
@@ -1836,7 +270,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.599475",
+    "timestamp": "2025-08-17T15:26:22.839147",
     "io_name": "Faults[3]",
     "description": "Faults[3]",
     "address": "DB1.DBX94.3",
@@ -1846,7 +280,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.589466",
+    "timestamp": "2025-08-17T15:26:22.837144",
     "io_name": "Faults[2]",
     "description": "Faults[2]",
     "address": "DB1.DBX94.2",
@@ -1856,7 +290,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.578455",
+    "timestamp": "2025-08-17T15:26:22.836143",
     "io_name": "Faults[1]",
     "description": "Faults[1]",
     "address": "DB1.DBX94.1",
@@ -1866,7 +300,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.567445",
+    "timestamp": "2025-08-17T15:26:22.835143",
     "io_name": "Faults[0]",
     "description": "Faults[0]",
     "address": "DB1.DBX94.0",
@@ -1876,7 +310,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.556440",
+    "timestamp": "2025-08-17T15:26:22.835143",
     "io_name": "fault_count",
     "description": "Active Faults Count",
     "address": "DB1.DBW96",
@@ -1886,7 +320,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.546424",
+    "timestamp": "2025-08-17T15:26:22.834148",
     "io_name": "PWM1_Low_Duty",
     "description": "PWM[1] Low Duty (Int)",
     "address": "DB1.DBW92",
@@ -1896,7 +330,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.535413",
+    "timestamp": "2025-08-17T15:26:22.833138",
     "io_name": "PWM1_High_Duty",
     "description": "PWM[1] High Duty (Int)",
     "address": "DB1.DBW90",
@@ -1906,7 +340,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.524400",
+    "timestamp": "2025-08-17T15:26:22.832137",
     "io_name": "PWM1_Duty_Cycle",
     "description": "PWM[1] Duty Cycle (Int)",
     "address": "DB1.DBW88",
@@ -1916,7 +350,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.512388",
+    "timestamp": "2025-08-17T15:26:22.831135",
     "io_name": "PWM0_Low_Duty",
     "description": "PWM[0] Low Duty (Int)",
     "address": "DB1.DBW86",
@@ -1926,7 +360,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.501379",
+    "timestamp": "2025-08-17T15:26:22.830134",
     "io_name": "PWM0_High_Duty",
     "description": "PWM[0] High Duty (Int)",
     "address": "DB1.DBW84",
@@ -1936,7 +370,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.490366",
+    "timestamp": "2025-08-17T15:26:22.829134",
     "io_name": "PWM0_Duty_Cycle",
     "description": "PWM[0] Duty Cycle (Int)",
     "address": "DB1.DBW82",
@@ -1946,7 +380,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.478354",
+    "timestamp": "2025-08-17T15:26:22.829134",
     "io_name": "Stats_ForcedCount",
     "description": "Forced Count (Int)",
     "address": "DB1.DBW80",
@@ -1956,7 +390,7 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.467344",
+    "timestamp": "2025-08-17T15:26:22.828133",
     "io_name": "Stats_ForcingActive",
     "description": "Forcing Active",
     "address": "DB1.DBX78.0",
@@ -1966,230 +400,10 @@
     "priority": "normal"
   },
   {
-    "timestamp": "2025-08-17T15:24:17.457330",
+    "timestamp": "2025-08-17T15:26:22.811117",
     "io_name": "HMI_FaultReset",
     "description": "HMI Button - Fault Reset",
     "address": "DB1.DBX76.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.447321",
-    "io_name": "HMI_ClearForcing",
-    "description": "HMI Button - Clear Forcing",
-    "address": "DB1.DBX76.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.443317",
-    "io_name": "Out_B1_ForcedStatus",
-    "description": "Output B[1] - ForcedStatus",
-    "address": "DB1.DBX74.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.442316",
-    "io_name": "Out_A1_ForcedState",
-    "description": "Output Green LED - ForcedState",
-    "address": "DB1.DBX58.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.440316",
-    "io_name": "Out_B1_ForcedState",
-    "description": "Output B[1] - ForcedState",
-    "address": "DB1.DBX74.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.438316",
-    "io_name": "Out_A1_State",
-    "description": "Output Green LED - State",
-    "address": "DB1.DBX58.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.436307",
-    "io_name": "Out_B1_State",
-    "description": "Output B[1] - State",
-    "address": "DB1.DBX74.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.435111",
-    "io_name": "Out_A0_ForcedStatus",
-    "description": "Output Red LED - ForcedStatus",
-    "address": "DB1.DBX56.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.434109",
-    "io_name": "Out_B0_ForcedStatus",
-    "description": "Output B[0] - ForcedStatus",
-    "address": "DB1.DBX72.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.432110",
-    "io_name": "Out_A0_ForcedState",
-    "description": "Output Red LED - ForcedState",
-    "address": "DB1.DBX56.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.431108",
-    "io_name": "Out_B0_ForcedState",
-    "description": "Output B[0] - ForcedState",
-    "address": "DB1.DBX72.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.430107",
-    "io_name": "Out_A0_State",
-    "description": "Output Red LED - State",
-    "address": "DB1.DBX56.0",
-    "old_value": null,
-    "new_value": true,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.429107",
-    "io_name": "Out_B0_State",
-    "description": "Output B[0] - State",
-    "address": "DB1.DBX72.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.427104",
-    "io_name": "AI1_Scalar",
-    "description": "AI1 Scalar (Real)",
-    "address": "DB1.DBD52",
-    "old_value": null,
-    "new_value": 10.0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.426103",
-    "io_name": "Out_A7_ForcedStatus",
-    "description": "Output A[7] - ForcedStatus",
-    "address": "DB1.DBX70.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.425102",
-    "io_name": "AI1_Offset",
-    "description": "AI1 Offset (Real)",
-    "address": "DB1.DBD48",
-    "old_value": null,
-    "new_value": 1.2000000476837158,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.424102",
-    "io_name": "Out_A7_ForcedState",
-    "description": "Output A[7] - ForcedState",
-    "address": "DB1.DBX70.1",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.423100",
-    "io_name": "AI1_Scaled",
-    "description": "AI1",
-    "address": "DB1.DBD44",
-    "old_value": null,
-    "new_value": 1.2000000476837158,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.422099",
-    "io_name": "Out_A7_State",
-    "description": "Output A[7] - State",
-    "address": "DB1.DBX70.0",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.414091",
-    "io_name": "AI0_Scalar",
-    "description": "AI0 Scalar (Real)",
-    "address": "DB1.DBD38",
-    "old_value": null,
-    "new_value": 10.0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.413090",
-    "io_name": "Out_A6_ForcedStatus",
-    "description": "Output A[6] - ForcedStatus",
-    "address": "DB1.DBX68.2",
-    "old_value": null,
-    "new_value": false,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.412089",
-    "io_name": "AI0_Offset",
-    "description": "AI0 Offset (Real)",
-    "address": "DB1.DBD34",
-    "old_value": null,
-    "new_value": 2.0,
-    "event_type": "initialization",
-    "priority": "normal"
-  },
-  {
-    "timestamp": "2025-08-17T15:24:17.394901",
-    "io_name": "Out_A6_ForcedState",
-    "description": "Output A[6] - ForcedState",
-    "address": "DB1.DBX68.1",
     "old_value": null,
     "new_value": false,
     "event_type": "initialization",
