@@ -1,0 +1,17 @@
+# Commands to run on the Pi after SSH connection:
+
+# Clone the repository
+git clone https://github.com/hadefuwa/plc-rpi-LLM-live
+cd plc-rpi-LLM-live
+
+# Make the install script executable
+chmod +x install_on_pi.sh
+
+# Run the installation
+./install_on_pi.sh
+
+# Start the service
+sudo systemctl start plc-estop.service
+
+# Check if it's running
+sudo systemctl status plc-estop.service
