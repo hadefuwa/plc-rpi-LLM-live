@@ -2231,4 +2231,4 @@ def clear_event_log():
 if __name__ == '__main__':
     # Ensure folders exist for static assets
     os.makedirs(os.path.join(os.path.dirname(__file__), 'static'), exist_ok=True)
-    app.run(host='127.0.0.1', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
