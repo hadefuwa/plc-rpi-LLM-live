@@ -14,6 +14,15 @@ echo "📋 Reinstalling systemd service with correct paths..."
 # Stop the service if it's running
 sudo systemctl stop plc-estop.service 2>/dev/null
 
+# Make sure scripts are executable
+chmod +x scripts/*.sh
+
+# Verify the start script exists
+if [ ! -f "scripts/start_plc_app.sh" ]; then
+    echo "❌ Error: scripts/start_plc_app.sh not found!"
+    exit 1
+fi
+
 # Reinstall the service file
 sudo cp deploy/plc-estop.service /etc/systemd/system/
 
