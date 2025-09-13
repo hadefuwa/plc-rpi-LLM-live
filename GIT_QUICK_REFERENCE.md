@@ -15,7 +15,7 @@ git fetch origin
 git reset --hard origin/main
 git clean -fd
 chmod +x scripts/*.sh
-./scripts/start_app.sh
+./scripts/start_plc_app.sh
 ```
 
 
