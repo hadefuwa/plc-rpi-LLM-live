@@ -6,185 +6,126 @@
   },
   "io_mapping": {
     // === SAFETY SYSTEM ===
-    "EStop_State":        { "type": "bit",  "address": "DB1.DBX0.0",  "description": "Emergency Stop Button - State" },
-    "EStop_ForcedState":  { "type": "bit",  "address": "DB1.DBX0.1",  "description": "Emergency Stop Button - ForcedState" },
-    "EStop_ForcedStatus": { "type": "bit",  "address": "DB1.DBX0.2",  "description": "Emergency Stop Button - ForcedStatus" },
+    "EStop_State":        { "type": "bit",  "address": "DB1.DBX2.0",  "description": "Emergency Stop Button - State" },
 
     // === CONTROL BUTTONS ===
-    "GreenButton_State":        { "type": "bit",  "address": "DB1.DBX6.0",  "description": "Green Start Button - State" },
-    "GreenButton_ForcedState":  { "type": "bit",  "address": "DB1.DBX6.1",  "description": "Green Start Button - ForcedState" },
-    "GreenButton_ForcedStatus": { "type": "bit",  "address": "DB1.DBX6.2",  "description": "Green Start Button - ForcedStatus" },
+    "GreenButton_State":        { "type": "bit",  "address": "DB1.DBX4.0",  "description": "Green Start Button - State" },
+
     
-    "RedButton_State":        { "type": "bit",  "address": "DB1.DBX8.0",  "description": "Red Stop Button - State" },
-    "RedButton_ForcedState":  { "type": "bit",  "address": "DB1.DBX8.1",  "description": "Red Stop Button - ForcedState" },
-    "RedButton_ForcedStatus": { "type": "bit",  "address": "DB1.DBX8.2",  "description": "Red Stop Button - ForcedStatus" },
+    "RedButton_State":        { "type": "bit",  "address": "DB1.DBX6.0",  "description": "Red Stop Button - State" },
+
 
     // === SELECTOR SWITCHES ===
-    "LeftSwitch_State":        { "type": "bit",  "address": "DB1.DBX2.0",  "description": "Left Selector Switch - State" },
-    "LeftSwitch_ForcedState":  { "type": "bit",  "address": "DB1.DBX2.1",  "description": "Left Selector Switch - ForcedState" },
-    "LeftSwitch_ForcedStatus": { "type": "bit",  "address": "DB1.DBX2.2",  "description": "Left Selector Switch - ForcedStatus" },
+    "LeftSwitch_State":        { "type": "bit",  "address": "DB1.DBX8.0",  "description": "Left Selector Switch - State" },
+
     
-    "RightSwitch_State":        { "type": "bit",  "address": "DB1.DBX4.0",  "description": "Right Selector Switch - State" },
-    "RightSwitch_ForcedState":  { "type": "bit",  "address": "DB1.DBX4.1",  "description": "Right Selector Switch - ForcedState" },
-    "RightSwitch_ForcedStatus": { "type": "bit",  "address": "DB1.DBX4.2",  "description": "Right Selector Switch - ForcedStatus" },
+    "RightSwitch_State":        { "type": "bit",  "address": "DB1.DBX10.0",  "description": "Right Selector Switch - State" },
+
 
     // === SPARE DIGITAL INPUTS ===
-    "SpareInput_A5_State":        { "type": "bit",  "address": "DB1.DBX10.0", "description": "Spare Digital Input A5 - State" },
-    "SpareInput_A5_ForcedState":  { "type": "bit",  "address": "DB1.DBX10.1", "description": "Spare Digital Input A5 - ForcedState" },
-    "SpareInput_A5_ForcedStatus": { "type": "bit",  "address": "DB1.DBX10.2", "description": "Spare Digital Input A5 - ForcedStatus" },
+    "SpareInput_A5_State":        { "type": "bit",  "address": "DB1.DBX12.0", "description": "Spare Digital Input A5 - State" },
+
     
-    "SpareInput_A6_State":        { "type": "bit",  "address": "DB1.DBX12.0", "description": "Spare Digital Input A6 - State" },
-    "SpareInput_A6_ForcedState":  { "type": "bit",  "address": "DB1.DBX12.1", "description": "Spare Digital Input A6 - ForcedState" },
-    "SpareInput_A6_ForcedStatus": { "type": "bit",  "address": "DB1.DBX12.2", "description": "Spare Digital Input A6 - ForcedStatus" },
+    "SpareInput_A6_State":        { "type": "bit",  "address": "DB1.DBX14.0", "description": "Spare Digital Input A6 - State" },
+
     
-    "SpareInput_A7_State":        { "type": "bit",  "address": "DB1.DBX14.0", "description": "Spare Digital Input A7 - State" },
-    "SpareInput_A7_ForcedState":  { "type": "bit",  "address": "DB1.DBX14.1", "description": "Spare Digital Input A7 - ForcedState" },
-    "SpareInput_A7_ForcedStatus": { "type": "bit",  "address": "DB1.DBX14.2", "description": "Spare Digital Input A7 - ForcedStatus" },
+    "SpareInput_A7_State":        { "type": "bit",  "address": "DB1.DBX16.0", "description": "Spare Digital Input A7 - State" },
+
 
     // === ADDITIONAL INPUTS (B SERIES) ===
-    "Input_B0_State":        { "type": "bit",  "address": "DB1.DBX16.0", "description": "Digital Input B0 - State" },
-    "Input_B0_ForcedState":  { "type": "bit",  "address": "DB1.DBX16.1", "description": "Digital Input B0 - ForcedState" },
-    "Input_B0_ForcedStatus": { "type": "bit",  "address": "DB1.DBX16.2", "description": "Digital Input B0 - ForcedStatus" },
-    
-    "Input_B1_State":        { "type": "bit",  "address": "DB1.DBX18.0", "description": "Digital Input B1 - State" },
-    "Input_B1_ForcedState":  { "type": "bit",  "address": "DB1.DBX18.1", "description": "Digital Input B1 - ForcedState" },
-    "Input_B1_ForcedStatus": { "type": "bit",  "address": "DB1.DBX18.2", "description": "Digital Input B1 - ForcedStatus" },
-    
-    "Input_B2_State":        { "type": "bit",  "address": "DB1.DBX20.0", "description": "Digital Input B2 - State" },
-    "Input_B2_ForcedState":  { "type": "bit",  "address": "DB1.DBX20.1", "description": "Digital Input B2 - ForcedState" },
-    "Input_B2_ForcedStatus": { "type": "bit",  "address": "DB1.DBX20.2", "description": "Digital Input B2 - ForcedStatus" },
-    
-    "Input_B3_State":        { "type": "bit",  "address": "DB1.DBX22.0", "description": "Digital Input B3 - State" },
-    "Input_B3_ForcedState":  { "type": "bit",  "address": "DB1.DBX22.1", "description": "Digital Input B3 - ForcedState" },
-    "Input_B3_ForcedStatus": { "type": "bit",  "address": "DB1.DBX22.2", "description": "Digital Input B3 - ForcedStatus" },
-    
-    "Input_B4_State":        { "type": "bit",  "address": "DB1.DBX24.0", "description": "Digital Input B4 - State" },
-    "Input_B4_ForcedState":  { "type": "bit",  "address": "DB1.DBX24.1", "description": "Digital Input B4 - ForcedState" },
-    "Input_B4_ForcedStatus": { "type": "bit",  "address": "DB1.DBX24.2", "description": "Digital Input B4 - ForcedStatus" },
-    
-    "Input_B5_State":        { "type": "bit",  "address": "DB1.DBX26.0", "description": "Digital Input B5 - State" },
-    "Input_B5_ForcedState":  { "type": "bit",  "address": "DB1.DBX26.1", "description": "Digital Input B5 - ForcedState" },
-    "Input_B5_ForcedStatus": { "type": "bit",  "address": "DB1.DBX26.2", "description": "Digital Input B5 - ForcedStatus" },
+    "Input_B0_State":        { "type": "bit",  "address": "DB1.DBX18.0", "description": "Digital Input B0 - State" },
+    "Input_B1_State":        { "type": "bit",  "address": "DB1.DBX20.0", "description": "Digital Input B1 - State" },
+    "Input_B2_State":        { "type": "bit",  "address": "DB1.DBX22.0", "description": "Digital Input B2 - State" },
+    "Input_B3_State":        { "type": "bit",  "address": "DB1.DBX24.0", "description": "Digital Input B3 - State" },
+    "Input_B4_State":        { "type": "bit",  "address": "DB1.DBX26.0", "description": "Digital Input B4 - State" },
+
 
     // === ANALOG INPUTS ===
-    "AI0_Raw":         { "type": "word", "address": "DB1.DBW28",   "description": "Analog Input 0 - Raw Value (Int)" },
-    "AI0_Scaled":      { "type": "real", "address": "DB1.DBD30",  "description": "Analog Input 0 - Scaled Value (Real)" },
+    "AI0_Raw":         { "type": "word", "address": "DB1.DBW30",   "description": "Analog Input 0 - Raw Value (Int)" },
+    "AI0_Scaled":      { "type": "real", "address": "DB1.DBD32",  "description": "Analog Input 0 - Scaled Value (Real)" },
     "AI0_Offset":      { "type": "real", "address": "DB1.DBD34",  "description": "Analog Input 0 - Offset (Real)" },
-    "AI0_Scalar":      { "type": "real", "address": "DB1.DBD38",  "description": "Analog Input 0 - Scale Factor (Real)" },
+    "AI0_Scalar":      { "type": "real", "address": "DB1.DBD36",  "description": "Analog Input 0 - Scale Factor (Real)" },
     
-    "AI1_Raw":         { "type": "word", "address": "DB1.DBW42",   "description": "Analog Input 1 - Raw Value (Int)" },
+    "AI1_Raw":         { "type": "word", "address": "DB1.DBW44",   "description": "Analog Input 1 - Raw Value (Int)" },
     "AI1_Scaled":      { "type": "real", "address": "DB1.DBD44",  "description": "Analog Input 1 - Scaled Value (Real)" },
-    "AI1_Offset":      { "type": "real", "address": "DB1.DBD48",  "description": "Analog Input 1 - Offset (Real)" },
-    "AI1_Scalar":      { "type": "real", "address": "DB1.DBD52",  "description": "Analog Input 1 - Scale Factor (Real)" },
+    "AI1_Offset":      { "type": "real", "address": "DB1.DBD46",  "description": "Analog Input 1 - Offset (Real)" },
+    "AI1_Scalar":      { "type": "real", "address": "DB1.DBD48",  "description": "Analog Input 1 - Scale Factor (Real)" },
 
     // === STATUS LEDS (OUTPUTS) ===
-    "RedLED_State":    { "type": "bit",  "address": "DB1.DBX56.0", "description": "Red Status LED - State" },
-    "RedLED_ForcedState": { "type": "bit",  "address": "DB1.DBX56.1", "description": "Red Status LED - ForcedState" },
-    "RedLED_ForcedStatus": { "type": "bit",  "address": "DB1.DBX56.2", "description": "Red Status LED - ForcedStatus" },
+    "Green_Status_LED":    { "type": "bit",  "address": "DB1.DBX58.0", "description": "Red Status LED - State" },
     
-    "GreenLED_State":    { "type": "bit",  "address": "DB1.DBX58.0", "description": "Green Status LED - State" },
-    "GreenLED_ForcedState": { "type": "bit",  "address": "DB1.DBX58.1", "description": "Green Status LED - ForcedState" },
-    "GreenLED_ForcedStatus": { "type": "bit",  "address": "DB1.DBX58.2", "description": "Green Status LED - ForcedStatus" },
+    "Yellow_Status_LED":    { "type": "bit",  "address": "DB1.DBX60.0", "description": "Green Status LED - State" },
     
-    "EStopLED_State":    { "type": "bit",  "address": "DB1.DBX60.0", "description": "E-Stop Indicator LED - State" },
-    "EStopLED_ForcedState": { "type": "bit",  "address": "DB1.DBX60.1", "description": "E-Stop Indicator LED - ForcedState" },
-    "EStopLED_ForcedStatus": { "type": "bit",  "address": "DB1.DBX60.2", "description": "E-Stop Indicator LED - ForcedStatus" },
+    "Red_Status_LED":    { "type": "bit",  "address": "DB1.DBX62.0", "description": "E-Stop Indicator LED - State" },
 
     // === SPARE DIGITAL OUTPUTS ===
-    "SpareOutput_A3_State":    { "type": "bit",  "address": "DB1.DBX62.0", "description": "Spare Digital Output A3 - State" },
-    "SpareOutput_A3_ForcedState": { "type": "bit",  "address": "DB1.DBX62.1", "description": "Spare Digital Output A3 - ForcedState" },
-    "SpareOutput_A3_ForcedStatus": { "type": "bit",  "address": "DB1.DBX62.2", "description": "Spare Digital Output A3 - ForcedStatus" },
+    "SpareOutput_A3_State":    { "type": "bit",  "address": "DB1.DBX64.0", "description": "Spare Digital Output A3 - State" },
     
-    "SpareOutput_A4_State":    { "type": "bit",  "address": "DB1.DBX64.0", "description": "Spare Digital Output A4 - State" },
-    "SpareOutput_A4_ForcedState": { "type": "bit",  "address": "DB1.DBX64.1", "description": "Spare Digital Output A4 - ForcedState" },
-    "SpareOutput_A4_ForcedStatus": { "type": "bit",  "address": "DB1.DBX64.2", "description": "Spare Digital Output A4 - ForcedStatus" },
+    "SpareOutput_A4_State":    { "type": "bit",  "address": "DB1.DBX66.0", "description": "Spare Digital Output A4 - State" },
     
-    "SpareOutput_A5_State":    { "type": "bit",  "address": "DB1.DBX66.0", "description": "Spare Digital Output A5 - State" },
-    "SpareOutput_A5_ForcedState": { "type": "bit",  "address": "DB1.DBX66.1", "description": "Spare Digital Output A5 - ForcedState" },
-    "SpareOutput_A5_ForcedStatus": { "type": "bit",  "address": "DB1.DBX66.2", "description": "Spare Digital Output A5 - ForcedStatus" },
+    "SpareOutput_A5_State":    { "type": "bit",  "address": "DB1.DBX68.0", "description": "Spare Digital Output A5 - State" },
     
-    "SpareOutput_A6_State":    { "type": "bit",  "address": "DB1.DBX68.0", "description": "Spare Digital Output A6 - State" },
-    "SpareOutput_A6_ForcedState": { "type": "bit",  "address": "DB1.DBX68.1", "description": "Spare Digital Output A6 - ForcedState" },
-    "SpareOutput_A6_ForcedStatus": { "type": "bit",  "address": "DB1.DBX68.2", "description": "Spare Digital Output A6 - ForcedStatus" },
+    "SpareOutput_A6_State":    { "type": "bit",  "address": "DB1.DBX70.0", "description": "Spare Digital Output A6 - State" },
     
-    "SpareOutput_A7_State":    { "type": "bit",  "address": "DB1.DBX70.0", "description": "Spare Digital Output A7 - State" },
-    "SpareOutput_A7_ForcedState": { "type": "bit",  "address": "DB1.DBX70.1", "description": "Spare Digital Output A7 - ForcedState" },
-    "SpareOutput_A7_ForcedStatus": { "type": "bit",  "address": "DB1.DBX70.2", "description": "Spare Digital Output A7 - ForcedStatus" },
+    "SpareOutput_A7_State":    { "type": "bit",  "address": "DB1.DBX72.0", "description": "Spare Digital Output A7 - State" },
 
     // === ADDITIONAL OUTPUTS (B SERIES) ===
-    "Output_B0_State":    { "type": "bit",  "address": "DB1.DBX72.0", "description": "Digital Output B0 - State" },
-    "Output_B0_ForcedState": { "type": "bit",  "address": "DB1.DBX72.1", "description": "Digital Output B0 - ForcedState" },
-    "Output_B0_ForcedStatus": { "type": "bit",  "address": "DB1.DBX72.2", "description": "Digital Output B0 - ForcedStatus" },
+    "Output_B0_State":    { "type": "bit",  "address": "DB1.DBX74.0", "description": "Digital Output B0 - State" },
     
-    "Output_B1_State":    { "type": "bit",  "address": "DB1.DBX74.0", "description": "Digital Output B1 - State" },
-    "Output_B1_ForcedState": { "type": "bit",  "address": "DB1.DBX74.1", "description": "Digital Output B1 - ForcedState" },
-    "Output_B1_ForcedStatus": { "type": "bit",  "address": "DB1.DBX74.2", "description": "Digital Output B1 - ForcedStatus" },
+    "Output_B1_State":    { "type": "bit",  "address": "DB1.DBX76.0", "description": "Digital Output B1 - State" },
 
     // === HMI CONTROLS ===
-    "HMI_ClearForcing":{ "type": "bit",  "address": "DB1.DBX76.0", "description": "HMI Clear Forcing Button" },
-    "HMI_FaultReset":  { "type": "bit",  "address": "DB1.DBX76.1", "description": "HMI Fault Reset Button" },
+    "HMI_ClearForcing":{ "type": "bit",  "address": "DB1.DBX0.0", "description": "HMI Clear Forcing Button" },
+    "HMI_FaultReset":  { "type": "bit",  "address": "DB1.DBX0.1", "description": "HMI Fault Reset Button" },
 
     // === SYSTEM STATUS ===
     "Stats_ForcingActive": { "type": "bit",  "address": "DB1.DBX78.0", "description": "System Forcing Active Status" },
-    "Stats_ForcedCount":   { "type": "word", "address": "DB1.DBW80",   "description": "Number of Forced Tags" },
-
-    // === PWM OUTPUTS ===
-    "PWM0_DutyCycle": { "type": "word", "address": "DB1.DBW82",   "description": "PWM Channel 0 - Duty Cycle %" },
-    "PWM0_HighDuty":  { "type": "word", "address": "DB1.DBW84",   "description": "PWM Channel 0 - High Time (ms)" },
-    "PWM0_LowDuty":   { "type": "word", "address": "DB1.DBW86",   "description": "PWM Channel 0 - Low Time (ms)" },
-    
-    "PWM1_DutyCycle": { "type": "word", "address": "DB1.DBW88",   "description": "PWM Channel 1 - Duty Cycle %" },
-    "PWM1_HighDuty":  { "type": "word", "address": "DB1.DBW90",   "description": "PWM Channel 1 - High Time (ms)" },
-    "PWM1_LowDuty":   { "type": "word", "address": "DB1.DBW92",   "description": "PWM Channel 1 - Low Time (ms)" }
+    "Stats_ForcedCount":   { "type": "word", "address": "DB1.DBW80",   "description": "Number of Forced Tags" }
   },
   "io_groups": {
     "Safety System": [
-      "EStop_State", "EStop_ForcedState", "EStop_ForcedStatus"
+      "EStop_State"
     ],
     "Control Buttons": [
-      "GreenButton_State", "GreenButton_ForcedState", "GreenButton_ForcedStatus",
-      "RedButton_State", "RedButton_ForcedState", "RedButton_ForcedStatus"
+      "GreenButton_State",
+      "RedButton_State"
     ],
     "Selector Switches": [
-      "LeftSwitch_State", "LeftSwitch_ForcedState", "LeftSwitch_ForcedStatus",
-      "RightSwitch_State", "RightSwitch_ForcedState", "RightSwitch_ForcedStatus"
+      "LeftSwitch_State",
+      "RightSwitch_State"
     ],
     "Status LEDs": [
-      "RedLED_State", "RedLED_ForcedState", "RedLED_ForcedStatus",
-      "GreenLED_State", "GreenLED_ForcedState", "GreenLED_ForcedStatus",
-      "EStopLED_State", "EStopLED_ForcedState", "EStopLED_ForcedStatus"
+      "RedLED_State",
+      "GreenLED_State",
+      "EStopLED_State"
     ],
     "Analog Inputs": [
       "AI0_Raw", "AI0_Scaled", "AI0_Offset", "AI0_Scalar",
       "AI1_Raw", "AI1_Scaled", "AI1_Offset", "AI1_Scalar"
     ],
     "Spare Digital Inputs": [
-      "SpareInput_A5_State", "SpareInput_A5_ForcedState", "SpareInput_A5_ForcedStatus",
-      "SpareInput_A6_State", "SpareInput_A6_ForcedState", "SpareInput_A6_ForcedStatus",
-      "SpareInput_A7_State", "SpareInput_A7_ForcedState", "SpareInput_A7_ForcedStatus"
+      "SpareInput_A5_State",
+      "SpareInput_A6_State",
+      "SpareInput_A7_State"
     ],
     "Additional Digital Inputs (B Series)": [
-      "Input_B0_State", "Input_B0_ForcedState", "Input_B0_ForcedStatus",
-      "Input_B1_State", "Input_B1_ForcedState", "Input_B1_ForcedStatus",
-      "Input_B2_State", "Input_B2_ForcedState", "Input_B2_ForcedStatus",
-      "Input_B3_State", "Input_B3_ForcedState", "Input_B3_ForcedStatus",
-      "Input_B4_State", "Input_B4_ForcedState", "Input_B4_ForcedStatus",
-      "Input_B5_State", "Input_B5_ForcedState", "Input_B5_ForcedStatus"
+      "Input_B0_State",
+      "Input_B1_State",
+      "Input_B2_State",
+      "Input_B3_State",
+      "Input_B4_State",
+      "Input_B5_State"
     ],
     "Spare Digital Outputs": [
-      "SpareOutput_A3_State", "SpareOutput_A3_ForcedState", "SpareOutput_A3_ForcedStatus",
-      "SpareOutput_A4_State", "SpareOutput_A4_ForcedState", "SpareOutput_A4_ForcedStatus",
-      "SpareOutput_A5_State", "SpareOutput_A5_ForcedState", "SpareOutput_A5_ForcedStatus",
-      "SpareOutput_A6_State", "SpareOutput_A6_ForcedState", "SpareOutput_A6_ForcedStatus",
-      "SpareOutput_A7_State", "SpareOutput_A7_ForcedState", "SpareOutput_A7_ForcedStatus"
+      "SpareOutput_A3_State",
+      "SpareOutput_A4_State",
+      "SpareOutput_A5_State",
+      "SpareOutput_A6_State",
+      "SpareOutput_A7_State"
     ],
     "Additional Digital Outputs (B Series)": [
-      "Output_B0_State", "Output_B0_ForcedState", "Output_B0_ForcedStatus",
-      "Output_B1_State", "Output_B1_ForcedState", "Output_B1_ForcedStatus"
-    ],
-    "PWM Outputs": [
-      "PWM0_DutyCycle", "PWM0_HighDuty", "PWM0_LowDuty",
-      "PWM1_DutyCycle", "PWM1_HighDuty", "PWM1_LowDuty"
+      "Output_B0_State",
+      "Output_B1_State"
     ],
     "HMI Controls": [
       "HMI_ClearForcing", "HMI_FaultReset"

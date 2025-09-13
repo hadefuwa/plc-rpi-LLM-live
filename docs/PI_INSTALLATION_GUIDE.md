@@ -168,7 +168,7 @@ If you need to start/stop the app manually:
 ```bash
 # Start the app manually
 cd ~/plc-rpi-LLM-live
-./start_plc_app.sh
+./scripts/start_plc_app.sh
 
 # Stop the service
 sudo systemctl stop plc-estop.service

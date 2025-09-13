@@ -4,7 +4,7 @@
 ```bash
 cd ~/plc-rpi-LLM-live
 git add .
-git commit -m "changed install script"
+git commit -m "updated IO in JSON"
 git push origin main
 ```
 
