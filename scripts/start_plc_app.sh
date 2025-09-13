@@ -16,22 +16,9 @@ if [ -d "venv" ]; then
     echo "Activating virtual environment..."
     source venv/bin/activate
     
-    # Check if critical packages are installed, install if missing
-    echo "Checking Python dependencies..."
-    if ! python -c "import schedule" 2>/dev/null; then
-        echo "Installing missing schedule module..."
-        pip install schedule
-    fi
-    if ! python -c "import flask" 2>/dev/null; then
-        echo "Installing missing flask module..."
-        pip install flask
-    fi
-    if ! python -c "import snap7" 2>/dev/null; then
-        echo "Installing missing snap7 module..."
-        pip install python-snap7
-    fi
-    
-    echo "All dependencies verified."
+    # Install/update dependencies
+    echo "Installing Python dependencies..."
+    pip install -r requirements.txt
 else
     echo "Warning: Virtual environment not found. Using system Python."
     echo "Consider running ./scripts/install_on_pi.sh to set up properly."
