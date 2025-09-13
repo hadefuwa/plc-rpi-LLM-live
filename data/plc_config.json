@@ -18,14 +18,8 @@
     "Input_B2_State": { "type": "bit", "address": "DB1.DBX22.0", "description": "Digital Input B2 - State" },
     "Input_B3_State": { "type": "bit", "address": "DB1.DBX24.0", "description": "Digital Input B3 - State" },
     "Input_B4_State": { "type": "bit", "address": "DB1.DBX26.0", "description": "Digital Input B4 - State" },
-    "AI0_Raw": { "type": "word", "address": "DB1.DBW30", "description": "Analog Input 0 - Raw Value (Int)" },
     "AI0_Scaled": { "type": "real", "address": "DB1.DBD32", "description": "Analog Input 0 - Scaled Value (Real)" },
-    "AI0_Offset": { "type": "real", "address": "DB1.DBD34", "description": "Analog Input 0 - Offset (Real)" },
-    "AI0_Scalar": { "type": "real", "address": "DB1.DBD36", "description": "Analog Input 0 - Scale Factor (Real)" },
-    "AI1_Raw": { "type": "word", "address": "DB1.DBW44", "description": "Analog Input 1 - Raw Value (Int)" },
     "AI1_Scaled": { "type": "real", "address": "DB1.DBD44", "description": "Analog Input 1 - Scaled Value (Real)" },
-    "AI1_Offset": { "type": "real", "address": "DB1.DBD46", "description": "Analog Input 1 - Offset (Real)" },
-    "AI1_Scalar": { "type": "real", "address": "DB1.DBD48", "description": "Analog Input 1 - Scale Factor (Real)" },
     "Green_Status_LED": { "type": "bit", "address": "DB1.DBX58.0", "description": "Green Status LED - State" },
     "Yellow_Status_LED": { "type": "bit", "address": "DB1.DBX60.0", "description": "Yellow Status LED - State" },
     "Red_Status_LED": { "type": "bit", "address": "DB1.DBX62.0", "description": "Red Status LED - State" },
@@ -59,8 +53,7 @@
       "Red_Status_LED"
     ],
     "Analog Inputs": [
-      "AI0_Raw", "AI0_Scaled", "AI0_Offset", "AI0_Scalar",
-      "AI1_Raw", "AI1_Scaled", "AI1_Offset", "AI1_Scalar"
+      "AI0_Scaled", "AI1_Scaled"
     ],
     "Spare Digital Inputs": [
       "SpareInput_A5_State",

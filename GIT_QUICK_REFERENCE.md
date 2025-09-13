@@ -4,7 +4,7 @@
 ```bash
 cd ~/plc-rpi-LLM-live
 git add .
-git commit -m "fixed ip addresses"
+git commit -m "analogues shortened"
 git push origin main
 ```
 
