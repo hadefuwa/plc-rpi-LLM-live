@@ -258,6 +258,27 @@ class EventLogger:
         events = self._load_events()
         return events[:limit]
     
+    def get_events_in_last_minutes(self, minutes: int = 15, limit: int = 100) -> List[Dict]:
+        """Get events from the last N minutes"""
+        from datetime import datetime, timedelta
+        
+        cutoff_time = datetime.now() - timedelta(minutes=minutes)
+        events = self._load_events()
+        
+        # Filter events by time
+        recent_events = []
+        for event in events:
+            try:
+                event_time = datetime.fromisoformat(event['timestamp'])
+                if event_time >= cutoff_time:
+                    recent_events.append(event)
+                if len(recent_events) >= limit:  # Limit results for performance
+                    break
+            except (ValueError, KeyError):
+                continue  # Skip events with invalid timestamps
+        
+        return recent_events
+    
     def get_events_by_priority(self, priority: str, limit: int = 10) -> List[Dict]:
         """Get events filtered by priority"""
         events = self._load_events()

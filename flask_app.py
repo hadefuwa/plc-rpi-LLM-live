@@ -61,8 +61,8 @@ def generate_automated_ai_report():
                 except Exception as e:
                     io_data[name] = {'value': None, 'error': str(e)}
         
-        # Get recent events for context
-        recent_events = event_logger.get_recent_events(100)  # Last 100 events
+        # Get events from the last 15 minutes specifically
+        recent_events = event_logger.get_events_in_last_minutes(minutes=15, limit=100)
         
         # Build comprehensive data payload
         payload = build_report_payload(io_data)
@@ -80,8 +80,8 @@ SYSTEM CONTEXT:
 CURRENT IO DATA:
 {data_context}
 
-RECENT EVENTS (Last 15 minutes):
-{chr(10).join([f"[{event.get('timestamp', 'Unknown')}] {event.get('message', '')}" for event in recent_events[-20:]])}
+RECENT EVENTS (Last 15 minutes - {len(recent_events)} total):
+{chr(10).join([f"[{event.get('timestamp', 'Unknown')}] {event.get('message', '')}" for event in recent_events])}
 
 ANALYSIS REQUIREMENTS:
 1. SAFETY STATUS: Report on emergency stop status and any safety-related events
