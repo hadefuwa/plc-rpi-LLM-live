@@ -16,6 +16,8 @@ import pathlib
 from datetime import datetime
 import threading
 import time
+import schedule
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this-in-production'
@@ -37,6 +39,116 @@ PERSISTENT_CONNECTION = True  # Keep connection alive
 POLL_INTERVAL_FAST = 0.05  # 50ms for fast polling (button presses)
 POLL_INTERVAL_NORMAL = 0.2  # 200ms for normal polling
 FAST_POLL_DURATION = 2.0  # Use fast polling for 2 seconds after any change
+
+# ============================================================
+# AUTOMATED AI REPORTING SYSTEM (Every 15 minutes)
+# ============================================================
+
+def generate_automated_ai_report():
+    """Generate an automated AI report with industrial automation context"""
+    try:
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Generating automated AI report...")
+        
+        # Build current IO snapshot
+        io_mapping = get_io_mapping()
+        io_data = {}
+        
+        if plc.connect():
+            for name in io_mapping.keys():
+                try:
+                    value = plc.read_io(name)
+                    io_data[name] = {'value': value, 'error': None}
+                except Exception as e:
+                    io_data[name] = {'value': None, 'error': str(e)}
+        
+        # Get recent events for context
+        recent_events = event_logger.get_recent_events(100)  # Last 100 events
+        
+        # Build comprehensive data payload
+        payload = build_report_payload(io_data)
+        data_context = generate_report_text(payload)
+        
+        # Enhanced industrial automation AI prompt
+        ai_prompt = f"""You are an industrial automation AI assistant tasked with producing a comprehensive report on what has occurred on this PLC test machine during the last 15 minutes.
+
+SYSTEM CONTEXT:
+- This is a Siemens S7-1200 PLC controlling a test rig with safety systems
+- Emergency stop functionality is present and critical for safety
+- System includes: buttons, switches, LEDs, analog inputs, and spare I/O
+- Forced values indicate manual overrides that may mask true process states
+
+CURRENT IO DATA:
+{data_context}
+
+RECENT EVENTS (Last 15 minutes):
+{chr(10).join([f"[{event.get('timestamp', 'Unknown')}] {event.get('message', '')}" for event in recent_events[-20:]])}
+
+ANALYSIS REQUIREMENTS:
+1. SAFETY STATUS: Report on emergency stop status and any safety-related events
+2. OPERATIONAL CHANGES: Identify what operations or tests were performed
+3. SYSTEM HEALTH: Note any errors, forced values, or unusual conditions
+4. TREND ANALYSIS: Describe patterns in the recent activity
+5. RECOMMENDATIONS: Suggest any actions needed (maintenance, investigation, etc.)
+
+Please provide a clear, professional operator report focusing on:
+- What actually happened during this period
+- Current system status and safety condition
+- Any anomalies or items requiring attention
+- Operational insights for the test rig
+
+Keep the report concise but comprehensive (5-8 sentences). Focus on actionable insights."""
+
+        # Query the AI
+        ai_summary = query_ollama(ai_prompt, data_context)
+        
+        if not ai_summary or ai_summary.startswith('Error:'):
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] AI report generation failed: {ai_summary}")
+            return
+        
+        # Save the report
+        json_path, md_path = write_report_files(payload, ai_summary)
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Automated AI report saved: {md_path}")
+        
+        # Log the report generation
+        event_logger.log_event(
+            io_name="SYSTEM",
+            old_value="Report Generated",
+            new_value="Automated AI Report",
+            description=f"AI report generated automatically: {ai_summary[:100]}..."
+        )
+        
+    except Exception as e:
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Error generating automated AI report: {e}")
+        event_logger.log_event(
+            io_name="SYSTEM",
+            old_value="Report Error",
+            new_value=str(e),
+            description="Failed to generate automated AI report"
+        )
+
+def schedule_ai_reports():
+    """Schedule automated AI reports every 15 minutes"""
+    schedule.every(15).minutes.do(generate_automated_ai_report)
+    
+    # Run immediately on startup for testing
+    threading.Timer(30.0, generate_automated_ai_report).start()  # Wait 30 seconds after startup
+    
+    # Background thread to run scheduled tasks
+    def run_scheduler():
+        while True:
+            try:
+                schedule.run_pending()
+                time.sleep(60)  # Check every minute
+            except Exception as e:
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] Scheduler error: {e}")
+                time.sleep(60)
+    
+    scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
+    scheduler_thread.start()
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Automated AI reporting system started (every 15 minutes)")
+
+# Start the automated AI reporting system
+schedule_ai_reports()
 
 # Track last change time for adaptive polling
 last_change_time = 0
@@ -1054,8 +1166,17 @@ template = '''
             
             <div class="loading" id="loading">AI is analyzing your data...</div>
             <div id="response" class="response" style="display: none;"></div>
-            <div style="margin-top:12px; display:flex; justify-content:flex-end;">
-                <button class="btn" id="generateReportBtn" onclick="generateReport()" title="Generate an AI operator report">Generate Report Now</button>
+            
+            <div style="margin-top:12px; border-top: 1px solid var(--border-color); padding-top: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="color: var(--text-secondary); font-size: 12px;">🤖 Automated Reports (Every 15 min)</span>
+                    <span id="aiReportStatus" style="color: var(--text-muted); font-size: 11px;">Waiting...</span>
+                </div>
+                <div style="display:flex; gap: 8px; justify-content:flex-end;">
+                    <button class="btn" onclick="triggerAiReport()" title="Manually trigger an automated AI report" style="background-color: #0ea5e9;">Trigger AI Report</button>
+                    <button class="btn" onclick="showLatestAiReport()" title="View the latest automated AI report" style="background-color: #059669;">View Latest</button>
+                    <button class="btn" id="generateReportBtn" onclick="generateReport()" title="Generate a manual AI operator report">Manual Report</button>
+                </div>
             </div>
             </div>
         </div>
@@ -1841,6 +1962,89 @@ def reports():
         </div>
         <script>
         function generateReport(){ fetch('/generate_report', {method:'POST'}).then(r=>r.json()).then(d=>{alert(d.message||'Done'); location.reload();}).catch(e=>alert('Error: '+e)); }
+        
+        // Automated AI Report Functions
+        function triggerAiReport() {
+            const statusElement = document.getElementById('aiReportStatus');
+            statusElement.textContent = 'Generating...';
+            statusElement.style.color = '#f59e0b';
+            
+            fetch('/trigger_ai_report', {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    statusElement.textContent = 'Generated ✓';
+                    statusElement.style.color = '#10b981';
+                    alert('Automated AI report generated successfully!');
+                } else {
+                    statusElement.textContent = 'Error';
+                    statusElement.style.color = '#ef4444';
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                statusElement.textContent = 'Error';
+                statusElement.style.color = '#ef4444';
+                alert('Error: ' + error);
+            });
+        }
+        
+        function showLatestAiReport() {
+            fetch('/get_latest_ai_report')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const reportWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
+                    const timestamp = new Date(data.timestamp).toLocaleString();
+                    reportWindow.document.write(`
+                        <html>
+                        <head><title>Latest AI Report - ${timestamp}</title></head>
+                        <body style="font-family: monospace; padding: 20px; background: #0b1220; color: #e5e7eb;">
+                            <h2 style="color: #60a5fa;">🤖 Automated AI Report</h2>
+                            <p><strong>Generated:</strong> ${timestamp}</p>
+                            <hr style="border-color: #374151;">
+                            <pre style="white-space: pre-wrap; line-height: 1.5;">${data.content}</pre>
+                        </body>
+                        </html>
+                    `);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => alert('Error: ' + error));
+        }
+        
+        // Update AI report status periodically
+        function updateAiReportStatus() {
+            fetch('/get_latest_ai_report')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const timestamp = new Date(data.timestamp);
+                    const now = new Date();
+                    const diffMinutes = Math.floor((now - timestamp) / (1000 * 60));
+                    const statusElement = document.getElementById('aiReportStatus');
+                    
+                    if (diffMinutes < 1) {
+                        statusElement.textContent = 'Just generated ✓';
+                        statusElement.style.color = '#10b981';
+                    } else if (diffMinutes < 15) {
+                        statusElement.textContent = `Last: ${diffMinutes}m ago`;
+                        statusElement.style.color = '#94a3b8';
+                    } else {
+                        statusElement.textContent = `Last: ${diffMinutes}m ago (due)`;
+                        statusElement.style.color = '#f59e0b';
+                    }
+                }
+            })
+            .catch(error => {
+                console.log('No AI reports found yet');
+            });
+        }
+        
+        // Update AI report status every 30 seconds
+        setInterval(updateAiReportStatus, 30000);
+        updateAiReportStatus(); // Initial call
         </script>
     </body>
     </html>
@@ -2070,6 +2274,49 @@ def generate_report():
 
         json_path, md_path = write_report_files(payload, ai_summary)
         return jsonify({'status': 'success', 'message': 'Report generated', 'json': json_path, 'md': md_path, 'ai_summary': ai_summary})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/trigger_ai_report', methods=['POST'])
+def trigger_ai_report():
+    """Manually trigger an automated AI report"""
+    try:
+        generate_automated_ai_report()
+        return jsonify({'status': 'success', 'message': 'Automated AI report generated successfully'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/get_latest_ai_report')
+def get_latest_ai_report():
+    """Get the latest automated AI report"""
+    try:
+        reports_root = os.path.join(os.path.dirname(__file__), 'data', 'reports')
+        if not os.path.exists(reports_root):
+            return jsonify({'status': 'error', 'message': 'No reports directory found'}), 404
+        
+        # Find the most recent markdown report file
+        md_files = []
+        for root, dirs, files in os.walk(reports_root):
+            for file in files:
+                if file.endswith('.md'):
+                    full_path = os.path.join(root, file)
+                    md_files.append((full_path, os.path.getmtime(full_path)))
+        
+        if not md_files:
+            return jsonify({'status': 'error', 'message': 'No AI reports found'}), 404
+        
+        # Get the most recent file
+        latest_file = max(md_files, key=lambda x: x[1])[0]
+        
+        with open(latest_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        return jsonify({
+            'status': 'success',
+            'report_path': latest_file,
+            'content': content,
+            'timestamp': datetime.fromtimestamp(os.path.getmtime(latest_file)).isoformat()
+        })
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
