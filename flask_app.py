@@ -20,6 +20,9 @@ import time
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this-in-production'
 
+# Register template functions
+app.jinja_env.globals['get_current_theme'] = get_current_theme
+
 # No longer loading CSV data - using live PLC data instead
 
 # Create a single PLC communicator instance and clean up on exit
