@@ -4,7 +4,7 @@
 ```bash
 cd ~/plc-rpi-LLM-live
 git add .
-git commit -m "Update message here"
+git commit -m "changed install script"
 git push origin main
 ```
 
@@ -14,9 +14,8 @@ cd ~/plc-rpi-LLM-live
 git fetch origin
 git reset --hard origin/main
 git clean -fd
-npm install
 chmod +x scripts/*.sh
-npm run kiosk
+./scripts/start_app.sh
 ```
 
 
