@@ -28,7 +28,10 @@ NAV_TEMPLATE = '''
                 Reports
             </a>
         </div>
-        <div class="nav-status">
+        <div class="nav-actions">
+            <button id="themeToggle" class="theme-toggle" title="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
             <span id="connectionStatus" class="status-indicator">
                 <span class="status-dot"></span>
                 Checking...
@@ -40,14 +43,14 @@ NAV_TEMPLATE = '''
 
 NAV_STYLES = '''
 .top-nav {
-    background: #0b1220;
-    color: #e5e7eb;
+    background: var(--nav-bg);
+    color: var(--text-primary);
     padding: 0;
-    box-shadow: 0 1px 2px rgba(2,6,23,.5);
+    box-shadow: 0 1px 2px rgba(0,0,0,.1);
     position: sticky;
     top: 0;
     z-index: 1000;
-    border-bottom: 1px solid #1f2937;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .nav-container {
@@ -59,24 +62,47 @@ NAV_STYLES = '''
     padding: 0 20px;
 }
 
-.nav-brand h1 { margin: 0; font-size: 20px; font-weight: 700; color: #e5e7eb; }
+.nav-brand h1 { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); }
 
 .nav-menu {
     display: flex;
     gap: 20px;
 }
 
-.nav-link { display: flex; align-items: center; gap: 8px; color: #cbd5e1; text-decoration: none; padding: 12px 16px; border-radius: 6px; transition: background .2s ease; font-weight: 500; }
-.nav-link:hover { background: #111827; color: #e5e7eb; }
-.nav-link.active { background: #111827; color: #e5e7eb; box-shadow: inset 0 -2px 0 #2563eb; }
+.nav-link { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); text-decoration: none; padding: 12px 16px; border-radius: 6px; transition: background .2s ease; font-weight: 500; }
+.nav-link:hover { background: var(--nav-hover); color: var(--text-primary); }
+.nav-link.active { background: var(--nav-hover); color: var(--text-primary); box-shadow: inset 0 -2px 0 var(--btn-primary); }
 
 .nav-icon {
     font-size: 16px;
 }
 
-.nav-status {
+.nav-actions {
     display: flex;
     align-items: center;
+    gap: 16px;
+}
+
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all .2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle:hover {
+    background: var(--nav-hover);
+    border-color: var(--btn-primary);
+}
+
+.theme-icon {
+    font-size: 16px;
 }
 
 .status-indicator {
@@ -87,15 +113,15 @@ NAV_STYLES = '''
     font-weight: 500;
 }
 
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; animation: pulse 2s infinite; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--status-warning); animation: pulse 2s infinite; }
 
 .status-dot.connected {
-    background: #28a745;
+    background: var(--status-ok);
     animation: none;
 }
 
 .status-dot.disconnected {
-    background: #dc3545;
+    background: var(--status-error);
     animation: none;
 }
 

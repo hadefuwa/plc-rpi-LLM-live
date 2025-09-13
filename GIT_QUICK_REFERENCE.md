@@ -4,7 +4,7 @@
 ```bash
 cd ~/plc-rpi-LLM-live
 git add .
-git commit -m "groups fixed"
+git commit -m "logs simplified"
 git push origin main
 ```
 

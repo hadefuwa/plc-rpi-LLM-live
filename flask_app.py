@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, request, jsonify
+from flask import Flask, render_template_string, request, jsonify, session
 import pandas as pd
 import json
 import requests
@@ -9,6 +9,7 @@ from config import (
 )
 from plc_communicator import PLCCommunicator
 from nav_template import NAV_TEMPLATE, NAV_STYLES
+from theme_config import get_theme_styles, get_current_theme, set_theme
 from event_logger import event_logger
 import os
 import pathlib
@@ -17,6 +18,7 @@ import threading
 import time
 
 app = Flask(__name__)
+app.secret_key = 'your-secret-key-change-this-in-production'
 
 # No longer loading CSV data - using live PLC data instead
 
@@ -216,25 +218,28 @@ config_template = '''
     <title>PLC Configuration - E-Stop AI Status Reporter</title>
     <link rel="icon" href="/static/favicon.ico">
     <style>
+        /* Theme Variables */
+        {{ theme_styles|safe }}
+
         /* Navigation Styles */
         {{ nav_styles|safe }}
-        
-        /* Main Content Styles - Dark Theme */
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 0; 
+
+        /* Main Content Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
             padding: 20px;
-            background-color: #0b1220; /* deep slate */
-            color: #e5e7eb; /* light text */
+            background-color: var(--body-bg);
+            color: var(--text-primary);
         }
-        .container { 
-            max-width: 900px; 
-            margin: 0 auto; 
-            background-color: #0f172a; /* card surface */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: var(--panel-bg);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(2,6,23,.5);
-            border: 1px solid #1f2937;
+            box-shadow: 0 1px 3px rgba(0,0,0,.1);
+            border: 1px solid var(--panel-border);
         }
         .section {
             margin: 20px 0;
@@ -618,25 +623,28 @@ template = '''
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f2937'/%3E%3Cpath d='M14 3l-3 10h5l-2 8 7-11h-5l3-7z' fill='%23ffffff'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="/static/vendor/tablesort.css">
     <style>
+        /* Theme Variables */
+        {{ theme_styles|safe }}
+
         /* Navigation Styles */
         {{ nav_styles|safe }}
-        
-        /* Main Content Styles - Dark Theme */
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 0; 
+
+        /* Main Content Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
             padding: 0;
-            background-color: #0b1220;
-            color: #e5e7eb;
+            background-color: var(--body-bg);
+            color: var(--body-color);
         }
-        .container { 
-            max-width: 100%; 
-            margin: 0; 
-            background-color: #0f172a;
+        .container {
+            max-width: 100%;
+            margin: 0;
+            background-color: var(--panel-bg);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(2,6,23,.5);
-            border: 1px solid #1f2937;
+            box-shadow: 0 1px 3px rgba(0,0,0,.1);
+            border: 1px solid var(--panel-border);
         }
         /* Page grid layout */
         .page-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
@@ -647,9 +655,9 @@ template = '''
         }
 
         /* Generic panel/card styling with colorful glows */
-        .panel { position:relative; background: #0f172a; border: 1px solid #1f2937; border-radius: 12px; box-shadow: 0 6px 16px rgba(2,6,23,.6); }
-        .panel::before { content:""; position:absolute; inset:0; border-radius:12px; pointer-events:none; box-shadow: 0 0 0 1px #26324a inset, 0 0 22px rgba(37,99,235,.18); }
-        .panel-header { display:flex; align-items:center; justify-content:space-between; padding: 12px 16px; border-bottom:1px solid #1f2937; background:#0b1220; border-top-left-radius:12px; border-top-right-radius:12px; }
+        .panel { position:relative; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.1); }
+        .panel::before { content:""; position:absolute; inset:0; border-radius:12px; pointer-events:none; box-shadow: 0 0 0 1px var(--border-color) inset, 0 0 22px rgba(37,99,235,.18); }
+        .panel-header { display:flex; align-items:center; justify-content:space-between; padding: 12px 16px; border-bottom:1px solid var(--panel-border); background:var(--body-bg); border-top-left-radius:12px; border-top-right-radius:12px; }
         
         /* Section-specific glow colors */
         .section { position: relative; margin: 20px 0; }
@@ -684,15 +692,15 @@ template = '''
         
         /* Others - Default blue glow */
         .section[data-group*="Others"]::before { background: linear-gradient(45deg, #1e40af, #3b82f6, #60a5fa); box-shadow: 0 0 20px rgba(30, 64, 175, 0.3), 0 0 40px rgba(30, 64, 175, 0.1); }
-        .panel-title { font-weight: 800; font-size: 16px; color:#e5e7eb; }
-        .panel-subtitle { color:#94a3b8; font-size:12px; margin-left:8px; }
+        .panel-title { font-weight: 800; font-size: 16px; color:var(--text-primary); }
+        .panel-subtitle { color:var(--text-secondary); font-size:12px; margin-left:8px; }
         .panel-body { padding: 12px 16px; }
         .quick-actions { display:flex; gap:10px; align-items:center; }
-        .collapse-icon { background:none; border:none; color:#e5e7eb; font-size:16px; cursor:pointer; padding:4px 6px; }
-        .collapse-icon:hover { color:#93c5fd; }
+        .collapse-icon { background:none; border:none; color:var(--text-primary); font-size:16px; cursor:pointer; padding:4px 6px; }
+        .collapse-icon:hover { color:var(--link-color); }
         .panel.collapsed .panel-body { display:none; }
-        .search-input { width: 260px; max-width: 100%; background:#111827; color:#e5e7eb; border:1px solid #253049; border-radius:8px; padding:8px 10px; }
-        .search-input:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 2px rgba(37,99,235,.25); }
+        .search-input { width: 260px; max-width: 100%; background:var(--input-bg); color:var(--text-primary); border:1px solid var(--input-border); border-radius:8px; padding:8px 10px; }
+        .search-input:focus { outline:none; border-color:var(--btn-primary); box-shadow:0 0 0 2px rgba(37,99,235,.25); }
         .plot { 
             margin: 20px 0; 
             border: 1px solid #ddd;
@@ -708,8 +716,8 @@ template = '''
             box-shadow: 0 1px 3px rgba(2,6,23,.5), 0 0 20px rgba(37, 99, 235, 0.1);
         }
         .chat-input { width: 100%; padding: 10px; border: 1px solid #253049; border-radius: 8px; margin: 10px 0; font-size: 16px; background: #111827; color: #e5e7eb; }
-        .btn { background-color: #2563eb; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
-        .btn:hover { background-color: #1d4ed8; }
+        .btn { background-color: var(--btn-primary); color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background-color: var(--btn-primary-hover); }
         .example-btn { background-color: #374151; color: #e5e7eb; padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; margin: 5px; font-size: 12px; }
         .example-btn:hover { background-color: #4b5563; }
         .response { background-color: #0b1220; padding: 15px; border-radius: 10px; margin: 10px 0; border: 1px solid #1f2937; white-space: pre-wrap; color: #e5e7eb; }
@@ -1698,6 +1706,37 @@ template = '''
                     if (e.key === 'Enter') sendQuestion();
                 });
             }
+
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.querySelector('.theme-icon');
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    fetch('/toggle_theme', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update theme icon
+                            themeIcon.textContent = data.theme === 'dark' ? '🌙' : '☀️';
+                            // Reload page to apply new theme
+                            window.location.reload();
+                        }
+                    })
+                    .catch(error => console.error('Error toggling theme:', error));
+                });
+            }
+
+            // Set initial theme icon based on current theme
+            if (themeIcon) {
+                const currentTheme = '{{ get_current_theme() }}';
+                themeIcon.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
+            }
         });
     </script>
     <script src="/static/vendor/tablesort.min.js"></script>
@@ -1744,9 +1783,11 @@ def home():
         emergency_stops = 0
         data_points = 0
     
+    theme_styles = get_theme_styles(get_current_theme())
     return render_template_string(template,
         nav_html=NAV_TEMPLATE,
         nav_styles=NAV_STYLES,
+        theme_styles=theme_styles,
         data_points=data_points,
         emergency_stops=emergency_stops,
         system_status=system_status
@@ -1771,7 +1812,7 @@ def reports():
     <html>
     <head>
         <title>Reports - E-Stop AI Status Reporter</title>
-        <style>{{ nav_styles|safe }} body{font-family:Arial,sans-serif;margin:0;padding:0;background:#0b1220;color:#e5e7eb} .container{max-width:1000px;margin:0 auto;padding:20px} .panel{background:#0f172a;border:1px solid #1f2937;border-radius:12px;box-shadow:0 1px 3px rgba(2,6,23,.5);} .panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #1f2937;} .panel-body{padding:12px 16px;} .btn{background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer} .btn:hover{background:#1d4ed8} .list{margin:0;padding:0;list-style:none} .list li{padding:8px;border-bottom:1px solid #1f2937} .list li a{color:#93c5fd;text-decoration:none} .list li a:hover{text-decoration:underline}
+        <style>{{ theme_styles|safe }} {{ nav_styles|safe }} body{font-family:Arial,sans-serif;margin:0;padding:0;background:var(--body-bg);color:var(--text-primary)} .container{max-width:1000px;margin:0 auto;padding:20px} .panel{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);} .panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--panel-border);} .panel-body{padding:12px 16px;} .btn{background:var(--btn-primary);color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer} .btn:hover{background:var(--btn-primary-hover)} .list{margin:0;padding:0;list-style:none} .list li{padding:8px;border-bottom:1px solid var(--border-color)} .list li a{color:var(--link-color);text-decoration:none} .list li a:hover{text-decoration:underline}
         </style>
     </head>
     <body>
@@ -1801,7 +1842,8 @@ def reports():
     </body>
     </html>
     '''
-    return render_template_string(page, nav_html=NAV_TEMPLATE, nav_styles=NAV_STYLES, items=items, today=today)
+    theme_styles = get_theme_styles(get_current_theme())
+    return render_template_string(page, nav_html=NAV_TEMPLATE, nav_styles=NAV_STYLES, theme_styles=theme_styles, items=items, today=today)
 
 @app.route('/test_ollama')
 def test_ollama():
@@ -1979,10 +2021,11 @@ def generate_report():
         # Add recent events context for the AI
         try:
             recent = event_logger.get_recent_events(limit=100)
+            io_mapping = get_io_mapping()
             recent_fmt = []
             for e in recent[::-1]:  # oldest to newest
                 try:
-                    fe = event_logger.format_event_for_display(e)
+                    fe = event_logger.format_event_for_display(e, io_mapping)
                     recent_fmt.append(f"{fe['formatted_time']} - {fe['io_name']}: {fe['change_description']}")
                 except Exception:
                     pass
@@ -2037,13 +2080,23 @@ def download_report(day, name):
     return send_file(path, as_attachment=True)
 
 # Configuration routes
+@app.route('/toggle_theme', methods=['POST'])
+def toggle_theme():
+    """Toggle between light and dark themes"""
+    current_theme = get_current_theme()
+    new_theme = 'light' if current_theme == 'dark' else 'dark'
+    set_theme(new_theme)
+    return jsonify({'success': True, 'theme': new_theme})
+
 @app.route('/config')
 def config():
     """Render the PLC configuration page"""
     config_summary = get_config_summary()
-    return render_template_string(config_template, 
+    theme_styles = get_theme_styles(get_current_theme())
+    return render_template_string(config_template,
         nav_html=NAV_TEMPLATE,
         nav_styles=NAV_STYLES,
+        theme_styles=theme_styles,
         config=config_summary
     )
 
@@ -2241,8 +2294,11 @@ def get_event_log():
         # Get recent events (larger window so scrolling makes sense)
         recent_events = event_logger.get_recent_events(limit=200)
         
+        # Get IO mapping for proper value formatting
+        io_mapping = get_io_mapping()
+        
         # Format events for display
-        formatted_events = [event_logger.format_event_for_display(event) for event in recent_events]
+        formatted_events = [event_logger.format_event_for_display(event, io_mapping) for event in recent_events]
         
         # Get event statistics
         stats = event_logger.get_event_statistics()

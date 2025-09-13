@@ -6,7 +6,8 @@
       "Bash(sudo apt install:*)",
       "Bash(git fetch:*)",
       "Bash(git add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

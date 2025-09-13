@@ -292,8 +292,8 @@ class EventLogger:
             'latest_event': today_events[0] if today_events else None
         }
     
-    def format_event_for_display(self, event: Dict) -> Dict:
-        """Format event for web display"""
+    def format_event_for_display(self, event: Dict, io_mapping: Dict = None) -> Dict:
+        """Format event for web display - simple and clear"""
         try:
             # Parse timestamp
             timestamp = datetime.fromisoformat(event['timestamp'])
@@ -301,52 +301,62 @@ class EventLogger:
             formatted_date = timestamp.strftime('%Y-%m-%d')
             time_ago = self._time_ago(timestamp)
             
-            # Format value display
-            old_display = self._format_value(event.get('old_value'), event.get('event_type'))
-            new_display = self._format_value(event.get('new_value'), event.get('event_type'))
+            # Get IO config for proper formatting
+            io_name = event.get('io_name', '')
+            io_config = {}
+            if io_mapping and io_name in io_mapping:
+                io_config = io_mapping[io_name]
             
-            # Create simple change description
-            change_desc = f"{old_display} → {new_display}"
-            if event.get('event_type') == 'initialization':
-                change_desc = f"Started: {new_display}"
-            elif event.get('event_type') == 'system_snapshot':
-                total = (event.get('snapshot_counts') or {}).get('total', 0)
-                change_desc = f"Initial startup IO values recorded ({total} points)"
-            elif event.get('event_type') == 'emergency_stop_pressed':
-                change_desc = "E-STOP PRESSED"
-            elif event.get('event_type') == 'emergency_stop_reset':
-                change_desc = "E-STOP RESET / HEALTHY"
-            elif event.get('event_type') == 'emergency_stop':
-                # Legacy fallback for old events
-                if event.get('new_value') == True or event.get('new_value') == 1:
-                    change_desc = "E-STOP RESET / HEALTHY"
-                else:
-                    change_desc = "E-STOP PRESSED"
-            elif event.get('event_type') == 'plc_connected':
-                change_desc = "PLC CONNECTED"
-            elif event.get('event_type') == 'plc_disconnected':
-                change_desc = "PLC DISCONNECTED"
-            elif event.get('event_type') == 'activated':
-                change_desc = "ON"
-            elif event.get('event_type') == 'deactivated':
-                change_desc = "OFF"
-            elif event.get('event_type') == 'error':
-                change_desc = "ERROR"
-            
-            # Clean up the description - remove redundant info
+            # Get clean description
             description = event.get('description', '')
+            if ' - State' in description:
+                description = description.replace(' - State', '')
             if '(0=OFF, 1=ON)' in description:
                 description = description.replace(' (0=OFF, 1=ON)', '')
+            
+            # Format the current value properly
+            current_value = event.get('new_value')
+            if current_value is None:
+                value_display = "ERROR"
+            else:
+                value_display = self._format_value(current_value, event.get('event_type'), io_config)
+            
+            # Create simple, clear change description
+            event_type = event.get('event_type', 'change')
+            
+            if event_type == 'initialization':
+                change_desc = value_display
+            elif event_type == 'system_snapshot':
+                total = (event.get('snapshot_counts') or {}).get('total', 0)
+                change_desc = f"System startup ({total} IO points)"
+            elif event_type == 'emergency_stop_pressed':
+                change_desc = "E-STOP PRESSED"
+            elif event_type == 'emergency_stop_reset':
+                change_desc = "E-STOP RESET"
+            elif event_type == 'activated':
+                change_desc = "ON"
+            elif event_type == 'deactivated':
+                change_desc = "OFF"
+            elif event_type == 'error':
+                change_desc = "ERROR"
+            else:
+                # For regular changes, show old → new
+                old_value = event.get('old_value')
+                if old_value is not None:
+                    old_display = self._format_value(old_value, event_type, io_config)
+                    change_desc = f"{old_display} → {value_display}"
+                else:
+                    change_desc = value_display
             
             return {
                 'timestamp': event['timestamp'],
                 'formatted_time': formatted_time,
                 'formatted_date': formatted_date,
                 'time_ago': time_ago,
-                'io_name': event.get('io_name', ''),
+                'io_name': io_name,
                 'description': description,
                 'change_description': change_desc,
-                'event_type': event.get('event_type', 'change'),
+                'event_type': event_type,
                 'priority': event.get('priority', 'normal'),
                 'address': event.get('address', '')
             }
@@ -354,12 +364,29 @@ class EventLogger:
             print(f"Error formatting event: {e}")
             return event
     
-    def _format_value(self, value, event_type=None):
-        """Format a value for display"""
+    def _format_value(self, value, event_type=None, io_config=None):
+        """Format a value for display based on its data type"""
         if value is None:
             return "NULL"
-        elif isinstance(value, bool) or (isinstance(value, int) and value in [0, 1]):
+        
+        # Get the data type from IO config if available
+        data_type = io_config.get('type', 'unknown') if io_config else 'unknown'
+        
+        if isinstance(value, bool):
             return "ON" if value else "OFF"
+        elif isinstance(value, int):
+            # For integers, check the data type to determine formatting
+            if data_type == 'bit' or (data_type == 'unknown' and value in [0, 1]):
+                return "ON" if value else "OFF"
+            else:
+                # For word, dword, byte types, show the actual number
+                return str(value)
+        elif isinstance(value, float):
+            # For real/float values, show with appropriate precision
+            if data_type == 'real':
+                return f"{value:.2f}" if value != int(value) else str(int(value))
+            else:
+                return str(value)
         else:
             return str(value)
     

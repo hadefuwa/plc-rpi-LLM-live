@@ -1,5 +1,585 @@
 [
   {
+    "timestamp": "2025-09-13T16:13:12.751773",
+    "io_name": "Stats_ForcedCount",
+    "description": "Number of Forced Tags",
+    "address": "DB1.DBW80",
+    "old_value": null,
+    "new_value": 0,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.727829",
+    "io_name": "Stats_ForcingActive",
+    "description": "System Forcing Active Status",
+    "address": "DB1.DBX78.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.706039",
+    "io_name": "HMI_FaultReset",
+    "description": "HMI Fault Reset Button",
+    "address": "DB1.DBX0.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.680002",
+    "io_name": "HMI_ClearForcing",
+    "description": "HMI Clear Forcing Button",
+    "address": "DB1.DBX0.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.655644",
+    "io_name": "Output_B1_State",
+    "description": "Digital Output B1 - State",
+    "address": "DB1.DBX76.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.630828",
+    "io_name": "Output_B0_State",
+    "description": "Digital Output B0 - State",
+    "address": "DB1.DBX74.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.606531",
+    "io_name": "SpareOutput_A7_State",
+    "description": "Spare Digital Output A7 - State",
+    "address": "DB1.DBX72.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.585837",
+    "io_name": "SpareOutput_A6_State",
+    "description": "Spare Digital Output A6 - State",
+    "address": "DB1.DBX70.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.564704",
+    "io_name": "SpareOutput_A5_State",
+    "description": "Spare Digital Output A5 - State",
+    "address": "DB1.DBX68.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.543609",
+    "io_name": "SpareOutput_A4_State",
+    "description": "Spare Digital Output A4 - State",
+    "address": "DB1.DBX66.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.522494",
+    "io_name": "SpareOutput_A3_State",
+    "description": "Spare Digital Output A3 - State",
+    "address": "DB1.DBX64.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.501367",
+    "io_name": "Red_Status_LED",
+    "description": "Red Status LED - State",
+    "address": "DB1.DBX62.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.480159",
+    "io_name": "Yellow_Status_LED",
+    "description": "Yellow Status LED - State",
+    "address": "DB1.DBX60.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.460597",
+    "io_name": "Green_Status_LED",
+    "description": "Green Status LED - State",
+    "address": "DB1.DBX58.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.440528",
+    "io_name": "AI1_Scaled",
+    "description": "Analog Input 1 - Scaled Value (Real)",
+    "address": "DB1.DBD44",
+    "old_value": null,
+    "new_value": 2.2814540297672347e-41,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.420468",
+    "io_name": "AI0_Scaled",
+    "description": "Analog Input 0 - Scaled Value (Real)",
+    "address": "DB1.DBD32",
+    "old_value": null,
+    "new_value": 2.0,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.400920",
+    "io_name": "Input_B4_State",
+    "description": "Digital Input B4 - State",
+    "address": "DB1.DBX26.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.380323",
+    "io_name": "Input_B3_State",
+    "description": "Digital Input B3 - State",
+    "address": "DB1.DBX24.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.360224",
+    "io_name": "Input_B2_State",
+    "description": "Digital Input B2 - State",
+    "address": "DB1.DBX22.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.340126",
+    "io_name": "Input_B1_State",
+    "description": "Digital Input B1 - State",
+    "address": "DB1.DBX20.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.320550",
+    "io_name": "Input_B0_State",
+    "description": "Digital Input B0 - State",
+    "address": "DB1.DBX18.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.299927",
+    "io_name": "SpareInput_A7_State",
+    "description": "Spare Digital Input A7 - State",
+    "address": "DB1.DBX16.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.279805",
+    "io_name": "SpareInput_A6_State",
+    "description": "Spare Digital Input A6 - State",
+    "address": "DB1.DBX14.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.260766",
+    "io_name": "SpareInput_A5_State",
+    "description": "Spare Digital Input A5 - State",
+    "address": "DB1.DBX12.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.241217",
+    "io_name": "RightSwitch_State",
+    "description": "Right Selector Switch - State",
+    "address": "DB1.DBX10.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.222166",
+    "io_name": "LeftSwitch_State",
+    "description": "Left Selector Switch - State",
+    "address": "DB1.DBX8.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.202102",
+    "io_name": "RedButton_State",
+    "description": "Red Stop Button - State",
+    "address": "DB1.DBX6.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.179936",
+    "io_name": "GreenButton_State",
+    "description": "Green Start Button - State",
+    "address": "DB1.DBX4.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:12.170648",
+    "io_name": "EStop_State",
+    "description": "Emergency Stop Button - State",
+    "address": "DB1.DBX2.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "critical"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.336432",
+    "io_name": "Stats_ForcedCount",
+    "description": "Number of Forced Tags",
+    "address": "DB1.DBW80",
+    "old_value": null,
+    "new_value": 0,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.316857",
+    "io_name": "Stats_ForcingActive",
+    "description": "System Forcing Active Status",
+    "address": "DB1.DBX78.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.297812",
+    "io_name": "HMI_FaultReset",
+    "description": "HMI Fault Reset Button",
+    "address": "DB1.DBX0.1",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.277689",
+    "io_name": "HMI_ClearForcing",
+    "description": "HMI Clear Forcing Button",
+    "address": "DB1.DBX0.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.257056",
+    "io_name": "Output_B1_State",
+    "description": "Digital Output B1 - State",
+    "address": "DB1.DBX76.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.236957",
+    "io_name": "Output_B0_State",
+    "description": "Digital Output B0 - State",
+    "address": "DB1.DBX74.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.217912",
+    "io_name": "SpareOutput_A7_State",
+    "description": "Spare Digital Output A7 - State",
+    "address": "DB1.DBX72.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.197797",
+    "io_name": "SpareOutput_A6_State",
+    "description": "Spare Digital Output A6 - State",
+    "address": "DB1.DBX70.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.177682",
+    "io_name": "SpareOutput_A5_State",
+    "description": "Spare Digital Output A5 - State",
+    "address": "DB1.DBX68.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.158599",
+    "io_name": "SpareOutput_A4_State",
+    "description": "Spare Digital Output A4 - State",
+    "address": "DB1.DBX66.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.138511",
+    "io_name": "SpareOutput_A3_State",
+    "description": "Spare Digital Output A3 - State",
+    "address": "DB1.DBX64.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.119975",
+    "io_name": "Red_Status_LED",
+    "description": "Red Status LED - State",
+    "address": "DB1.DBX62.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.102469",
+    "io_name": "Yellow_Status_LED",
+    "description": "Yellow Status LED - State",
+    "address": "DB1.DBX60.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.083903",
+    "io_name": "Green_Status_LED",
+    "description": "Green Status LED - State",
+    "address": "DB1.DBX58.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.064789",
+    "io_name": "AI1_Scaled",
+    "description": "Analog Input 1 - Scaled Value (Real)",
+    "address": "DB1.DBD44",
+    "old_value": null,
+    "new_value": 2.2814540297672347e-41,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.045731",
+    "io_name": "AI0_Scaled",
+    "description": "Analog Input 0 - Scaled Value (Real)",
+    "address": "DB1.DBD32",
+    "old_value": null,
+    "new_value": 2.0,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.027716",
+    "io_name": "Input_B4_State",
+    "description": "Digital Input B4 - State",
+    "address": "DB1.DBX26.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:11.008665",
+    "io_name": "Input_B3_State",
+    "description": "Digital Input B3 - State",
+    "address": "DB1.DBX24.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:10.990131",
+    "io_name": "Input_B2_State",
+    "description": "Digital Input B2 - State",
+    "address": "DB1.DBX22.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:10.971553",
+    "io_name": "Input_B1_State",
+    "description": "Digital Input B1 - State",
+    "address": "DB1.DBX20.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:10.953002",
+    "io_name": "Input_B0_State",
+    "description": "Digital Input B0 - State",
+    "address": "DB1.DBX18.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:10.934488",
+    "io_name": "SpareInput_A7_State",
+    "description": "Spare Digital Input A7 - State",
+    "address": "DB1.DBX16.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:10.916462",
+    "io_name": "SpareInput_A6_State",
+    "description": "Spare Digital Input A6 - State",
+    "address": "DB1.DBX14.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:10.898385",
+    "io_name": "SpareInput_A5_State",
+    "description": "Spare Digital Input A5 - State",
+    "address": "DB1.DBX12.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:10.880367",
+    "io_name": "RightSwitch_State",
+    "description": "Right Selector Switch - State",
+    "address": "DB1.DBX10.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:10.861823",
+    "io_name": "LeftSwitch_State",
+    "description": "Left Selector Switch - State",
+    "address": "DB1.DBX8.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:10.842774",
+    "io_name": "RedButton_State",
+    "description": "Red Stop Button - State",
+    "address": "DB1.DBX6.0",
+    "old_value": null,
+    "new_value": false,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:10.821632",
+    "io_name": "GreenButton_State",
+    "description": "Green Start Button - State",
+    "address": "DB1.DBX4.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "normal"
+  },
+  {
+    "timestamp": "2025-09-13T16:13:10.813407",
+    "io_name": "EStop_State",
+    "description": "Emergency Stop Button - State",
+    "address": "DB1.DBX2.0",
+    "old_value": null,
+    "new_value": true,
+    "event_type": "initialization",
+    "priority": "critical"
+  },
+  {
     "timestamp": "2025-09-13T00:05:50.508904",
     "io_name": "Stats_ForcedCount",
     "description": "Forced Count (Int)",
