@@ -24,22 +24,27 @@ APP_DIR="/home/pi/plc-rpi-LLM-live"
 mkdir -p "$APP_DIR"
 cd "$APP_DIR"
 
-# Copy application files (assuming they're already in the current directory)
-echo "📋 Copying application files..."
-# Note: You'll need to copy your files here manually or via git clone
-
 # Change to the application directory (go up one level from scripts folder)
 cd "$(dirname "$0")/.."
 
 # Create virtual environment
 echo "🐍 Creating Python virtual environment..."
 python3 -m venv venv
+
+# Activate virtual environment
+echo "🔧 Activating virtual environment..."
 source venv/bin/activate
 
 # Install Python dependencies
 echo "📦 Installing Python dependencies..."
 pip install --upgrade pip
 pip install -r requirements.txt
+
+# Verify critical packages are installed
+echo "✅ Verifying package installation..."
+python -c "import schedule; print('schedule module: OK')" || echo "❌ schedule module: FAILED"
+python -c "import flask; print('flask module: OK')" || echo "❌ flask module: FAILED"
+python -c "import snap7; print('snap7 module: OK')" || echo "❌ snap7 module: FAILED"
 
 # Make scripts executable
 echo "🔧 Making scripts executable..."
