@@ -646,10 +646,44 @@ template = '''
             #ai { grid-column: 8 / -1; }
         }
 
-        /* Generic panel/card styling */
+        /* Generic panel/card styling with colorful glows */
         .panel { position:relative; background: #0f172a; border: 1px solid #1f2937; border-radius: 12px; box-shadow: 0 6px 16px rgba(2,6,23,.6); }
         .panel::before { content:""; position:absolute; inset:0; border-radius:12px; pointer-events:none; box-shadow: 0 0 0 1px #26324a inset, 0 0 22px rgba(37,99,235,.18); }
         .panel-header { display:flex; align-items:center; justify-content:space-between; padding: 12px 16px; border-bottom:1px solid #1f2937; background:#0b1220; border-top-left-radius:12px; border-top-right-radius:12px; }
+        
+        /* Section-specific glow colors */
+        .section { position: relative; margin: 20px 0; }
+        .section::before { content: ""; position: absolute; inset: -2px; border-radius: 14px; pointer-events: none; z-index: -1; }
+        
+        /* Safety System - Red glow */
+        .section[data-group*="Safety"]::before { background: linear-gradient(45deg, #dc2626, #ef4444, #f87171); box-shadow: 0 0 20px rgba(220, 38, 38, 0.3), 0 0 40px rgba(220, 38, 38, 0.1); }
+        
+        /* Control Buttons - Green glow */
+        .section[data-group*="Control"]::before { background: linear-gradient(45deg, #16a34a, #22c55e, #4ade80); box-shadow: 0 0 20px rgba(22, 163, 74, 0.3), 0 0 40px rgba(22, 163, 74, 0.1); }
+        
+        /* Selector Switches - Blue glow */
+        .section[data-group*="Selector"]::before { background: linear-gradient(45deg, #2563eb, #3b82f6, #60a5fa); box-shadow: 0 0 20px rgba(37, 99, 235, 0.3), 0 0 40px rgba(37, 99, 235, 0.1); }
+        
+        /* Status LEDs - Yellow glow */
+        .section[data-group*="Status"]::before { background: linear-gradient(45deg, #eab308, #facc15, #fde047); box-shadow: 0 0 20px rgba(234, 179, 8, 0.3), 0 0 40px rgba(234, 179, 8, 0.1); }
+        
+        /* Analog Inputs - Purple glow */
+        .section[data-group*="Analog"]::before { background: linear-gradient(45deg, #7c3aed, #8b5cf6, #a78bfa); box-shadow: 0 0 20px rgba(124, 58, 237, 0.3), 0 0 40px rgba(124, 58, 237, 0.1); }
+        
+        /* Spare Digital - Orange glow */
+        .section[data-group*="Spare"]::before { background: linear-gradient(45deg, #ea580c, #f97316, #fb923c); box-shadow: 0 0 20px rgba(234, 88, 12, 0.3), 0 0 40px rgba(234, 88, 12, 0.1); }
+        
+        /* Additional Digital - Cyan glow */
+        .section[data-group*="Additional"]::before { background: linear-gradient(45deg, #0891b2, #06b6d4, #22d3ee); box-shadow: 0 0 20px rgba(8, 145, 178, 0.3), 0 0 40px rgba(8, 145, 178, 0.1); }
+        
+        /* HMI Controls - Pink glow */
+        .section[data-group*="HMI"]::before { background: linear-gradient(45deg, #db2777, #ec4899, #f472b6); box-shadow: 0 0 20px rgba(219, 39, 119, 0.3), 0 0 40px rgba(219, 39, 119, 0.1); }
+        
+        /* System Status - Teal glow */
+        .section[data-group*="System"]::before { background: linear-gradient(45deg, #0d9488, #14b8a6, #2dd4bf); box-shadow: 0 0 20px rgba(13, 148, 136, 0.3), 0 0 40px rgba(13, 148, 136, 0.1); }
+        
+        /* Others - Default blue glow */
+        .section[data-group*="Others"]::before { background: linear-gradient(45deg, #1e40af, #3b82f6, #60a5fa); box-shadow: 0 0 20px rgba(30, 64, 175, 0.3), 0 0 40px rgba(30, 64, 175, 0.1); }
         .panel-title { font-weight: 800; font-size: 16px; color:#e5e7eb; }
         .panel-subtitle { color:#94a3b8; font-size:12px; margin-left:8px; }
         .panel-body { padding: 12px 16px; }
@@ -666,12 +700,12 @@ template = '''
             padding: 10px;
         }
         .ai-section {
-            background-color: #0f172a;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             padding: 16px;
             border-radius: 12px;
             margin: 20px 0;
             border: 1px solid #1f2937;
-            box-shadow: 0 1px 3px rgba(2,6,23,.5);
+            box-shadow: 0 1px 3px rgba(2,6,23,.5), 0 0 20px rgba(37, 99, 235, 0.1);
         }
         .chat-input { width: 100%; padding: 10px; border: 1px solid #253049; border-radius: 8px; margin: 10px 0; font-size: 16px; background: #111827; color: #e5e7eb; }
         .btn { background-color: #2563eb; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
@@ -848,8 +882,8 @@ template = '''
             color: #94a3b8;
         }
         .refresh-info span { color: #94a3b8; font-size: 12px; }
-        .event-log-section { margin: 20px 0; border: 1px solid #1f2937; border-radius: 12px; background: #0f172a; box-shadow: 0 1px 3px rgba(2,6,23,.5); }
-        .event-log-header { background: #0b1220; padding: 10px 15px; border-bottom: 1px solid #1f2937; font-weight: 700; color: #e5e7eb; border-top-left-radius: 12px; border-top-right-radius: 12px; }
+        .event-log-section { margin: 20px 0; border: 1px solid #1f2937; border-radius: 12px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); box-shadow: 0 1px 3px rgba(2,6,23,.5), 0 0 20px rgba(139, 92, 246, 0.1); }
+        .event-log-header { background: linear-gradient(135deg, #0b1220 0%, #1f2937 100%); padding: 10px 15px; border-bottom: 1px solid #1f2937; font-weight: 700; color: #e5e7eb; border-top-left-radius: 12px; border-top-right-radius: 12px; }
         .event-log-content {
             max-height: min(40vh, 360px);
             overflow-y: auto;
@@ -1312,10 +1346,20 @@ template = '''
             const filter = (document.getElementById('filterInput')?.value || '').toLowerCase();
             const used = new Set();
 
+            // Process each group from ioGroups configuration
+            if (ioGroups && typeof ioGroups === 'object') {
+                Object.entries(ioGroups).forEach(([groupName, ioNames]) => {
+                    if (ioNames && Array.isArray(ioNames) && ioNames.length > 0) {
+                        buildTable(groupName, ioNames);
+                    }
+                });
+            }
+
             function buildTable(title, names) {
                 if (!names || names.length === 0) return;
                 const section = document.createElement('div');
                 section.className = 'section';
+                section.setAttribute('data-group', title); // Add data attribute for CSS targeting
                 const h3 = document.createElement('h3');
                 h3.textContent = title;
                 section.appendChild(h3);
