@@ -9,7 +9,7 @@ User=pi
 Group=pi
 WorkingDirectory=/home/pi/plc-rpi-LLM-live
 Environment=PATH=/home/pi/plc-rpi-LLM-live/venv/bin:/usr/local/bin:/usr/bin:/bin
-ExecStart=/home/pi/plc-rpi-LLM-live/start_plc_app.sh
+ExecStart=/home/pi/plc-rpi-LLM-live/scripts/start_plc_app.sh
 Restart=always
 RestartSec=10
 StandardOutput=journal

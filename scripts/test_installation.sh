@@ -4,6 +4,9 @@
 echo "🧪 Testing PLC E-Stop AI Status Reporter Installation"
 echo "====================================================="
 
+# Change to the application directory (go up one level from scripts folder)
+cd "$(dirname "$0")/.."
+
 # Check if we're in the right directory
 if [ ! -f "flask_app.py" ]; then
     echo "❌ Error: flask_app.py not found. Are you in the correct directory?"

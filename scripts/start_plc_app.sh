@@ -8,8 +8,8 @@ echo "Current directory: $(pwd)"
 echo "Current user: $(whoami)"
 echo "Python version: $(python3 --version)"
 
-# Change to the application directory
-cd "$(dirname "$0")"
+# Change to the application directory (go up one level from scripts folder)
+cd "$(dirname "$0")/.."
 
 # Activate virtual environment if it exists
 if [ -d "venv" ]; then

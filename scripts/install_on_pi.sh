@@ -28,6 +28,9 @@ cd "$APP_DIR"
 echo "📋 Copying application files..."
 # Note: You'll need to copy your files here manually or via git clone
 
+# Change to the application directory (go up one level from scripts folder)
+cd "$(dirname "$0")/.."
+
 # Create virtual environment
 echo "🐍 Creating Python virtual environment..."
 python3 -m venv venv

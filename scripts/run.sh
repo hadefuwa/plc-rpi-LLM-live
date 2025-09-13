@@ -25,6 +25,9 @@ else
     echo "✅ Gemma3 1B model is available"
 fi
 
+# Change to the application directory (go up one level from scripts folder)
+cd "$(dirname "$0")/.."
+
 # Install Python dependencies if needed
 echo "Installing Python dependencies..."
 pip install -r requirements.txt
