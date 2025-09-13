@@ -1932,45 +1932,97 @@ def home():
 
 @app.route('/reports')
 def reports():
-    """Simple Reports page – lists today's reports if present and a button to generate one now."""
+    """Reports page showing the latest 3 AI reports with their full content"""
     reports_dir = os.path.join(os.path.dirname(__file__), 'data', 'reports')
-    today = datetime.now().date().isoformat()
-    today_dir = os.path.join(reports_dir, today)
-    os.makedirs(today_dir, exist_ok=True)
-
-    items = []
-    if os.path.exists(today_dir):
-        for p in sorted(os.listdir(today_dir)):
-            if p.endswith('.json') or p.endswith('.md'):
-                items.append(p)
+    
+    # Get all markdown reports from all dates
+    reports_data = []
+    if os.path.exists(reports_dir):
+        for root, dirs, files in os.walk(reports_dir):
+            for file in files:
+                if file.endswith('.md'):
+                    full_path = os.path.join(root, file)
+                    try:
+                        mtime = os.path.getmtime(full_path)
+                        with open(full_path, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                        
+                        # Extract date from path (YYYY-MM-DD format)
+                        path_parts = full_path.split(os.sep)
+                        date_part = None
+                        for part in path_parts:
+                            if len(part) == 10 and part.count('-') == 2:
+                                date_part = part
+                                break
+                        
+                        reports_data.append({
+                            'filename': file,
+                            'content': content,
+                            'timestamp': datetime.fromtimestamp(mtime),
+                            'date': date_part or 'unknown',
+                            'path': full_path
+                        })
+                    except Exception as e:
+                        print(f"Error reading report {full_path}: {e}")
+    
+    # Sort by timestamp (newest first) and take only the latest 3
+    reports_data.sort(key=lambda x: x['timestamp'], reverse=True)
+    latest_reports = reports_data[:3]
 
     page = '''
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Reports - E-Stop AI Status Reporter</title>
-        <style>{{ theme_styles|safe }} {{ nav_styles|safe }} body{font-family:Arial,sans-serif;margin:0;padding:0;background:var(--body-bg);color:var(--text-primary)} .container{max-width:1000px;margin:0 auto;padding:20px} .panel{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);} .panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--panel-border);} .panel-body{padding:12px 16px;} .btn{background:var(--btn-primary);color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer} .btn:hover{background:var(--btn-primary-hover)} .list{margin:0;padding:0;list-style:none} .list li{padding:8px;border-bottom:1px solid var(--border-color)} .list li a{color:var(--link-color);text-decoration:none} .list li a:hover{text-decoration:underline}
+        <title>AI Reports - E-Stop AI Status Reporter</title>
+        <style>{{ theme_styles|safe }} {{ nav_styles|safe }} 
+        body{font-family:Arial,sans-serif;margin:0;padding:0;background:var(--body-bg);color:var(--text-primary)} 
+        .container{max-width:1200px;margin:0 auto;padding:20px} 
+        .panel{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);margin-bottom:20px;} 
+        .panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--panel-border);} 
+        .panel-body{padding:16px;} 
+        .btn{background:var(--btn-primary);color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer} 
+        .btn:hover{background:var(--btn-primary-hover)} 
+        .report-content{background:var(--body-bg);border:1px solid var(--border-color);border-radius:8px;padding:16px;margin-top:12px;font-family:monospace;font-size:14px;line-height:1.6;white-space:pre-wrap;max-height:400px;overflow-y:auto;}
+        .report-meta{font-size:12px;color:var(--text-secondary);margin-bottom:8px;}
+        .no-reports{text-align:center;padding:40px;color:var(--text-secondary);}
+        .generate-btn{background:var(--btn-primary);color:#fff;border:none;border-radius:8px;padding:12px 24px;cursor:pointer;font-size:16px;margin:10px;}
+        .generate-btn:hover{background:var(--btn-primary-hover);}
+        .report-card{border:1px solid var(--border-color);border-radius:8px;margin-bottom:16px;overflow:hidden;}
+        .report-header{background:var(--nav-bg);padding:12px 16px;border-bottom:1px solid var(--border-color);}
+        .report-title{font-weight:600;color:var(--text-primary);margin:0 0 4px 0;}
+        .report-timestamp{font-size:12px;color:var(--text-secondary);}
         </style>
     </head>
     <body>
         {{ nav_html|safe }}
-        <div class="container panel">
-            <div class="panel-header">
-                <div>Reports (Today)</div>
-                <div>
-                    <button class="btn" onclick="generateReport()">Generate Report Now</button>
+        <div class="container">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>🤖 Latest AI Reports</div>
+                    <div>
+                        <button class="btn" onclick="triggerAiReport()">Generate AI Report Now</button>
+                        <button class="btn" onclick="generateReport()" style="margin-left:8px;">Generate Data Report</button>
+                    </div>
                 </div>
-            </div>
-            <div class="panel-body">
-                {% if items %}
-                <ul class="list">
-                    {% for it in items %}
-                    <li><a href="/download_report/{{ today }}/{{ it }}" target="_blank">{{ it }}</a></li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <div>No reports yet today.</div>
-                {% endif %}
+                <div class="panel-body">
+                    {% if latest_reports %}
+                        {% for report in latest_reports %}
+                        <div class="report-card">
+                            <div class="report-header">
+                                <div class="report-title">AI Report - {{ report.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+                                <div class="report-timestamp">Generated {{ report.timestamp.strftime('%A, %B %d at %I:%M %p') }}</div>
+                            </div>
+                            <div class="report-content">{{ report.content }}</div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="no-reports">
+                        <h3>📄 No AI Reports Yet</h3>
+                        <p>No automated AI reports have been generated yet.</p>
+                        <button class="generate-btn" onclick="triggerAiReport()">Generate Your First AI Report</button>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
         <script>
@@ -2082,7 +2134,7 @@ def reports():
     </html>
     '''
     theme_styles = get_theme_styles(get_current_theme())
-    return render_template_string(page, nav_html=NAV_TEMPLATE, nav_styles=NAV_STYLES, theme_styles=theme_styles, items=items, today=today)
+    return render_template_string(page, nav_html=NAV_TEMPLATE, nav_styles=NAV_STYLES, theme_styles=theme_styles, latest_reports=latest_reports)
 
 @app.route('/test_ollama')
 def test_ollama():
@@ -2584,15 +2636,17 @@ def ai_config_page():
     '''
     
     theme_styles = get_theme_styles(get_current_theme())
-    return render_template_string(page, 
-        nav_html=NAV_TEMPLATE, 
-        nav_styles=NAV_STYLES, 
-        theme_styles=theme_styles,
-        interval=ai_config["report_interval_minutes"],
-        startup_delay=ai_config["startup_delay_seconds"],
-        max_events=ai_config["max_events_for_analysis"],
-        system_prompt=ai_config["system_prompt"]
-    )
+    
+    # Replace template variables manually since we're using render_template_string
+    rendered_page = page.replace('{{ nav_html }}', NAV_TEMPLATE)
+    rendered_page = rendered_page.replace('{{ nav_styles }}', NAV_STYLES)
+    rendered_page = rendered_page.replace('{{ theme_styles }}', theme_styles)
+    rendered_page = rendered_page.replace('{{ interval }}', str(ai_config["report_interval_minutes"]))
+    rendered_page = rendered_page.replace('{{ startup_delay }}', str(ai_config["startup_delay_seconds"]))
+    rendered_page = rendered_page.replace('{{ max_events }}', str(ai_config["max_events_for_analysis"]))
+    rendered_page = rendered_page.replace('{{ system_prompt }}', ai_config["system_prompt"].replace('\n', '&#10;'))
+    
+    return rendered_page
 
 @app.route('/update_ai_schedule', methods=['POST'])
 def update_ai_schedule():
