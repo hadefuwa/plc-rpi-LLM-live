@@ -110,7 +110,7 @@
 ### Configuration Structure
 ```python
 PLC_CONFIG = {
-    'ip': '192.168.1.100',
+    'ip': '192.168.0.99',
     'rack': 0,
     'slot': 1,
     'io_mapping': {

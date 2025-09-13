@@ -9,7 +9,7 @@ import os
 # Default PLC configuration
 DEFAULT_CONFIG = {
     "plc": {
-        "ip": "192.168.1.100",
+        "ip": "192.168.0.99",
         "rack": 0,
         "slot": 1
     },

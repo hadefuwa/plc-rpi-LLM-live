@@ -58,7 +58,7 @@ class PLCCommunicator:
                 return True
             
             settings = get_plc_settings()
-            ip = settings.get('ip', '192.168.1.100')
+            ip = settings.get('ip', '192.168.0.99')
             rack = settings.get('rack', 0)
             slot = settings.get('slot', 1)
             

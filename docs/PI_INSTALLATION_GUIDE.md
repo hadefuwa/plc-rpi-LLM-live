@@ -94,7 +94,7 @@ sudo systemctl status plc-estop.service
 
 1. In the web interface, click **"PLC Configuration"**
 2. **Enter your PLC details**:
-   - IP Address: Your PLC's IP address (e.g., 192.168.1.100)
+   - IP Address: Your PLC's IP address (e.g., 192.168.0.99)
    - Rack Number: Usually 0
    - Slot Number: Usually 1
 3. **Click "Test Connection"** to verify

@@ -4,7 +4,7 @@
 ```bash
 cd ~/plc-rpi-LLM-live
 git add .
-git commit -m "fixed address error 3"
+git commit -m "fixed ip addresses"
 git push origin main
 ```
 
