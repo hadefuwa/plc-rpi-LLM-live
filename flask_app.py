@@ -5,7 +5,8 @@ import requests
 import atexit
 from config import (
     load_config, save_config, get_config_summary, update_plc_settings,
-    update_io_mapping, get_io_mapping, get_io_groups, update_io_group, remove_io_group
+    update_io_mapping, get_io_mapping, get_io_groups, update_io_group, remove_io_group,
+    get_ai_config, save_ai_config, update_ai_settings, update_ai_report_interval, update_ai_system_prompt
 )
 from plc_communicator import PLCCommunicator
 from nav_template import NAV_TEMPLATE, NAV_STYLES
@@ -45,9 +46,15 @@ FAST_POLL_DURATION = 2.0  # Use fast polling for 2 seconds after any change
 # ============================================================
 
 def generate_automated_ai_report():
-    """Generate an automated AI report with industrial automation context"""
+    """Generate an automated AI report with configurable settings"""
     try:
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] Generating automated AI report...")
+        # Get current AI configuration
+        ai_config = get_ai_config()
+        interval_minutes = ai_config["report_interval_minutes"]
+        max_events = ai_config["max_events_for_analysis"]
+        prompt_template = ai_config["system_prompt"]
+        
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Generating automated AI report (interval: {interval_minutes}min)...")
         
         # Build current IO snapshot
         io_mapping = get_io_mapping()
@@ -61,42 +68,20 @@ def generate_automated_ai_report():
                 except Exception as e:
                     io_data[name] = {'value': None, 'error': str(e)}
         
-        # Get events from the last 15 minutes specifically
-        recent_events = event_logger.get_events_in_last_minutes(minutes=15, limit=100)
+        # Get events from the configured time window
+        recent_events = event_logger.get_events_in_last_minutes(minutes=interval_minutes, limit=max_events)
         
         # Build comprehensive data payload
         payload = build_report_payload(io_data)
         data_context = generate_report_text(payload)
         
-        # Enhanced industrial automation AI prompt
-        ai_prompt = f"""You are an industrial automation AI assistant tasked with producing a comprehensive report on what has occurred on this PLC test machine during the last 15 minutes.
-
-SYSTEM CONTEXT:
-- This is a Siemens S7-1200 PLC controlling a test rig with safety systems
-- Emergency stop functionality is present and critical for safety
-- System includes: buttons, switches, LEDs, analog inputs, and spare I/O
-- Forced values indicate manual overrides that may mask true process states
-
-CURRENT IO DATA:
-{data_context}
-
-RECENT EVENTS (Last 15 minutes - {len(recent_events)} total):
-{chr(10).join([f"[{event.get('timestamp', 'Unknown')}] {event.get('message', '')}" for event in recent_events])}
-
-ANALYSIS REQUIREMENTS:
-1. SAFETY STATUS: Report on emergency stop status and any safety-related events
-2. OPERATIONAL CHANGES: Identify what operations or tests were performed
-3. SYSTEM HEALTH: Note any errors, forced values, or unusual conditions
-4. TREND ANALYSIS: Describe patterns in the recent activity
-5. RECOMMENDATIONS: Suggest any actions needed (maintenance, investigation, etc.)
-
-Please provide a clear, professional operator report focusing on:
-- What actually happened during this period
-- Current system status and safety condition
-- Any anomalies or items requiring attention
-- Operational insights for the test rig
-
-Keep the report concise but comprehensive (5-8 sentences). Focus on actionable insights."""
+        # Format the configurable AI prompt with current data
+        ai_prompt = prompt_template.format(
+            interval_minutes=interval_minutes,
+            data_context=data_context,
+            event_count=len(recent_events),
+            recent_events=chr(10).join([f"[{event.get('timestamp', 'Unknown')}] {event.get('message', '')}" for event in recent_events])
+        )
 
         # Query the AI
         ai_summary = query_ollama(ai_prompt, data_context)
@@ -127,11 +112,19 @@ Keep the report concise but comprehensive (5-8 sentences). Focus on actionable i
         )
 
 def schedule_ai_reports():
-    """Schedule automated AI reports every 15 minutes"""
-    schedule.every(15).minutes.do(generate_automated_ai_report)
+    """Schedule automated AI reports using configurable interval"""
+    ai_config = get_ai_config()
+    interval_minutes = ai_config["report_interval_minutes"]
+    startup_delay = ai_config["startup_delay_seconds"]
     
-    # Run immediately on startup for testing
-    threading.Timer(30.0, generate_automated_ai_report).start()  # Wait 30 seconds after startup
+    # Clear any existing scheduled jobs
+    schedule.clear('ai_report')
+    
+    # Schedule the job with configurable interval
+    schedule.every(interval_minutes).minutes.do(generate_automated_ai_report).tag('ai_report')
+    
+    # Run after startup delay for testing
+    threading.Timer(startup_delay, generate_automated_ai_report).start()
     
     # Background thread to run scheduled tasks
     def run_scheduler():
@@ -143,9 +136,26 @@ def schedule_ai_reports():
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] Scheduler error: {e}")
                 time.sleep(60)
     
-    scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
-    scheduler_thread.start()
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] Automated AI reporting system started (every 15 minutes)")
+    # Only start scheduler thread if not already running
+    if not hasattr(schedule_ai_reports, '_scheduler_started'):
+        scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
+        scheduler_thread.start()
+        schedule_ai_reports._scheduler_started = True
+    
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Automated AI reporting scheduled (every {interval_minutes} minutes, startup delay: {startup_delay}s)")
+
+def reschedule_ai_reports():
+    """Reschedule AI reports with updated configuration"""
+    ai_config = get_ai_config()
+    interval_minutes = ai_config["report_interval_minutes"]
+    
+    # Clear existing AI report jobs
+    schedule.clear('ai_report')
+    
+    # Reschedule with new interval
+    schedule.every(interval_minutes).minutes.do(generate_automated_ai_report).tag('ai_report')
+    
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] AI reporting rescheduled (every {interval_minutes} minutes)")
 
 # Start the automated AI reporting system
 schedule_ai_reports()
@@ -1169,8 +1179,11 @@ template = '''
             
             <div style="margin-top:12px; border-top: 1px solid var(--border-color); padding-top: 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="color: var(--text-secondary); font-size: 12px;">🤖 Automated Reports (Every 15 min)</span>
-                    <span id="aiReportStatus" style="color: var(--text-muted); font-size: 11px;">Waiting...</span>
+                    <span style="color: var(--text-secondary); font-size: 12px;">🤖 Automated Reports</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="aiReportStatus" style="color: var(--text-muted); font-size: 11px;">Waiting...</span>
+                        <a href="/ai_config" style="color: var(--link-color); font-size: 11px; text-decoration: none;" title="Configure AI settings">⚙️</a>
+                    </div>
                 </div>
                 <div style="display:flex; gap: 8px; justify-content:flex-end;">
                     <button class="btn" onclick="triggerAiReport()" title="Manually trigger an automated AI report" style="background-color: #0ea5e9;">Trigger AI Report</button>
@@ -2016,29 +2029,48 @@ def reports():
         
         // Update AI report status periodically
         function updateAiReportStatus() {
-            fetch('/get_latest_ai_report')
-            .then(response => response.json())
-            .then(data => {
+            // Get current AI configuration to check interval
+            Promise.all([
+                fetch('/get_latest_ai_report'),
+                fetch('/ai_config').then(r => r.text()).then(html => {
+                    const match = html.match(/value="(\d+)"/);
+                    return match ? parseInt(match[1]) : 15;
+                })
+            ])
+            .then(([reportResponse, interval]) => {
+                if (reportResponse.ok) {
+                    return reportResponse.json().then(data => ({data, interval}));
+                } else {
+                    return {data: {status: 'error'}, interval};
+                }
+            })
+            .then(({data, interval}) => {
+                const statusElement = document.getElementById('aiReportStatus');
+                
                 if (data.status === 'success') {
                     const timestamp = new Date(data.timestamp);
                     const now = new Date();
                     const diffMinutes = Math.floor((now - timestamp) / (1000 * 60));
-                    const statusElement = document.getElementById('aiReportStatus');
                     
                     if (diffMinutes < 1) {
-                        statusElement.textContent = 'Just generated ✓';
+                        statusElement.textContent = `Just generated ✓ (${interval}m)`;
                         statusElement.style.color = '#10b981';
-                    } else if (diffMinutes < 15) {
-                        statusElement.textContent = `Last: ${diffMinutes}m ago`;
+                    } else if (diffMinutes < interval) {
+                        statusElement.textContent = `Last: ${diffMinutes}m ago (${interval}m)`;
                         statusElement.style.color = '#94a3b8';
                     } else {
-                        statusElement.textContent = `Last: ${diffMinutes}m ago (due)`;
+                        statusElement.textContent = `Last: ${diffMinutes}m ago (due, ${interval}m)`;
                         statusElement.style.color = '#f59e0b';
                     }
+                } else {
+                    statusElement.textContent = `Every ${interval} minutes`;
+                    statusElement.style.color = '#6b7280';
                 }
             })
             .catch(error => {
-                console.log('No AI reports found yet');
+                const statusElement = document.getElementById('aiReportStatus');
+                statusElement.textContent = 'Every 15 minutes';
+                statusElement.style.color = '#6b7280';
             });
         }
         
@@ -2317,6 +2349,306 @@ def get_latest_ai_report():
             'content': content,
             'timestamp': datetime.fromtimestamp(os.path.getmtime(latest_file)).isoformat()
         })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/ai_config')
+def ai_config_page():
+    """AI configuration page"""
+    ai_config = get_ai_config()
+    
+    page = '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>AI Configuration - E-Stop AI Status Reporter</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+        {{ nav_styles }}
+        {{ theme_styles }}
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .config-section { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .section-title { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-weight: 500; margin-bottom: 5px; color: var(--text-secondary); }
+        .form-input { width: 100%; padding: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-primary); border-radius: 4px; }
+        .form-textarea { width: 100%; height: 300px; padding: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-primary); border-radius: 4px; font-family: monospace; font-size: 12px; resize: vertical; }
+        .btn { background: var(--btn-primary); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        .btn:hover { background: var(--btn-primary-hover); }
+        .btn-secondary { background: #6b7280; }
+        .btn-secondary:hover { background: #4b5563; }
+        .status-message { padding: 10px; border-radius: 4px; margin-top: 10px; display: none; }
+        .status-success { background: #065f46; color: #10b981; border: 1px solid #10b981; }
+        .status-error { background: #7f1d1d; color: #ef4444; border: 1px solid #ef4444; }
+        .help-text { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
+        .prompt-variables { background: var(--table-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; margin-top: 10px; }
+        .prompt-variables h4 { margin-top: 0; color: var(--text-secondary); }
+        .prompt-variables code { background: var(--input-bg); padding: 2px 4px; border-radius: 2px; color: var(--link-color); }
+        </style>
+    </head>
+    <body>
+        {{ nav_html }}
+        
+        <div class="container">
+            <h1>🤖 AI Configuration</h1>
+            <p>Configure automated AI reporting settings and customize the system prompt.</p>
+            
+            <div class="config-section">
+                <div class="section-title">⏰ Reporting Schedule</div>
+                
+                <form id="scheduleForm">
+                    <div class="form-group">
+                        <label class="form-label" for="reportInterval">Report Interval (minutes)</label>
+                        <input type="number" id="reportInterval" class="form-input" value="{{ interval }}" min="1" max="1440">
+                        <div class="help-text">How often to generate automated AI reports (1-1440 minutes)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="startupDelay">Startup Delay (seconds)</label>
+                        <input type="number" id="startupDelay" class="form-input" value="{{ startup_delay }}" min="5" max="300">
+                        <div class="help-text">Delay after app startup before first report (5-300 seconds)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="maxEvents">Max Events for Analysis</label>
+                        <input type="number" id="maxEvents" class="form-input" value="{{ max_events }}" min="10" max="1000">
+                        <div class="help-text">Maximum number of recent events to analyze (10-1000)</div>
+                    </div>
+                    
+                    <button type="submit" class="btn">Update Schedule Settings</button>
+                    <button type="button" class="btn btn-secondary" onclick="testReport()">Test Report Now</button>
+                </form>
+                
+                <div id="scheduleStatus" class="status-message"></div>
+            </div>
+            
+            <div class="config-section">
+                <div class="section-title">📝 AI System Prompt</div>
+                
+                <form id="promptForm">
+                    <div class="form-group">
+                        <label class="form-label" for="systemPrompt">System Prompt Template</label>
+                        <textarea id="systemPrompt" class="form-textarea">{{ system_prompt }}</textarea>
+                        <div class="help-text">Customize how the AI analyzes your PLC data. Use template variables below.</div>
+                        
+                        <div class="prompt-variables">
+                            <h4>Available Template Variables:</h4>
+                            <p><code>{interval_minutes}</code> - Report interval in minutes</p>
+                            <p><code>{data_context}</code> - Current IO data summary</p>
+                            <p><code>{event_count}</code> - Number of events in timeframe</p>
+                            <p><code>{recent_events}</code> - Formatted list of recent events</p>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">Update System Prompt</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetPrompt()">Reset to Default</button>
+                </form>
+                
+                <div id="promptStatus" class="status-message"></div>
+            </div>
+            
+            <div class="config-section">
+                <div class="section-title">🔄 Current Status</div>
+                <p><strong>Current Interval:</strong> <span id="currentInterval">{{ interval }}</span> minutes</p>
+                <p><strong>Next Report:</strong> <span id="nextReport">Loading...</span></p>
+                <p><strong>Reports Generated:</strong> <span id="reportCount">Loading...</span></p>
+                
+                <button class="btn" onclick="viewLatestReport()">View Latest Report</button>
+                <a href="/" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+        
+        <script>
+        // Update schedule settings
+        document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const data = {
+                report_interval_minutes: document.getElementById('reportInterval').value,
+                startup_delay_seconds: document.getElementById('startupDelay').value,
+                max_events_for_analysis: document.getElementById('maxEvents').value
+            };
+            
+            fetch('/update_ai_schedule', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                showStatus('scheduleStatus', result.status === 'success', result.message);
+                if (result.status === 'success') {
+                    document.getElementById('currentInterval').textContent = data.report_interval_minutes;
+                }
+            })
+            .catch(error => {
+                showStatus('scheduleStatus', false, 'Error: ' + error);
+            });
+        });
+        
+        // Update system prompt
+        document.getElementById('promptForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const prompt = document.getElementById('systemPrompt').value;
+            
+            fetch('/update_ai_prompt', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({system_prompt: prompt})
+            })
+            .then(response => response.json())
+            .then(result => {
+                showStatus('promptStatus', result.status === 'success', result.message);
+            })
+            .catch(error => {
+                showStatus('promptStatus', false, 'Error: ' + error);
+            });
+        });
+        
+        function showStatus(elementId, success, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = 'status-message ' + (success ? 'status-success' : 'status-error');
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+        
+        function testReport() {
+            fetch('/trigger_ai_report', {method: 'POST'})
+            .then(response => response.json())
+            .then(result => {
+                showStatus('scheduleStatus', result.status === 'success', 'Test report: ' + result.message);
+            })
+            .catch(error => {
+                showStatus('scheduleStatus', false, 'Test failed: ' + error);
+            });
+        }
+        
+        function resetPrompt() {
+            if (confirm('Reset system prompt to default? This will overwrite your current prompt.')) {
+                fetch('/reset_ai_prompt', {method: 'POST'})
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        document.getElementById('systemPrompt').value = result.default_prompt;
+                        showStatus('promptStatus', true, 'System prompt reset to default');
+                    } else {
+                        showStatus('promptStatus', false, result.message);
+                    }
+                })
+                .catch(error => {
+                    showStatus('promptStatus', false, 'Error: ' + error);
+                });
+            }
+        }
+        
+        function viewLatestReport() {
+            fetch('/get_latest_ai_report')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const reportWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
+                    const timestamp = new Date(data.timestamp).toLocaleString();
+                    reportWindow.document.write(`
+                        <html>
+                        <head><title>Latest AI Report - ${timestamp}</title></head>
+                        <body style="font-family: monospace; padding: 20px; background: #0b1220; color: #e5e7eb;">
+                            <h2 style="color: #60a5fa;">🤖 Latest AI Report</h2>
+                            <p><strong>Generated:</strong> ${timestamp}</p>
+                            <hr style="border-color: #374151;">
+                            <pre style="white-space: pre-wrap; line-height: 1.5;">${data.content}</pre>
+                        </body>
+                        </html>
+                    `);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => alert('Error: ' + error));
+        }
+        
+        // Load current status
+        setTimeout(() => {
+            // This could be enhanced to show actual next report time and count
+            document.getElementById('nextReport').textContent = 'Based on current schedule';
+            document.getElementById('reportCount').textContent = 'Available in reports section';
+        }, 100);
+        </script>
+    </body>
+    </html>
+    '''
+    
+    theme_styles = get_theme_styles(get_current_theme())
+    return render_template_string(page, 
+        nav_html=NAV_TEMPLATE, 
+        nav_styles=NAV_STYLES, 
+        theme_styles=theme_styles,
+        interval=ai_config["report_interval_minutes"],
+        startup_delay=ai_config["startup_delay_seconds"],
+        max_events=ai_config["max_events_for_analysis"],
+        system_prompt=ai_config["system_prompt"]
+    )
+
+@app.route('/update_ai_schedule', methods=['POST'])
+def update_ai_schedule():
+    """Update AI reporting schedule settings"""
+    try:
+        data = request.json
+        success = update_ai_settings(
+            report_interval_minutes=data.get('report_interval_minutes'),
+            startup_delay_seconds=data.get('startup_delay_seconds'),
+            max_events_for_analysis=data.get('max_events_for_analysis')
+        )
+        
+        if success:
+            # Reschedule the AI reports with new settings
+            reschedule_ai_reports()
+            return jsonify({'status': 'success', 'message': 'Schedule updated and reports rescheduled'})
+        else:
+            return jsonify({'status': 'error', 'message': 'Failed to save configuration'})
+            
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/update_ai_prompt', methods=['POST'])
+def update_ai_prompt():
+    """Update AI system prompt"""
+    try:
+        data = request.json
+        prompt = data.get('system_prompt', '').strip()
+        
+        if not prompt:
+            return jsonify({'status': 'error', 'message': 'System prompt cannot be empty'}), 400
+        
+        success = update_ai_system_prompt(prompt)
+        
+        if success:
+            return jsonify({'status': 'success', 'message': 'System prompt updated successfully'})
+        else:
+            return jsonify({'status': 'error', 'message': 'Failed to save system prompt'})
+            
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/reset_ai_prompt', methods=['POST'])
+def reset_ai_prompt():
+    """Reset AI system prompt to default"""
+    try:
+        from config import DEFAULT_AI_CONFIG
+        default_prompt = DEFAULT_AI_CONFIG["system_prompt"]
+        
+        success = update_ai_system_prompt(default_prompt)
+        
+        if success:
+            return jsonify({'status': 'success', 'message': 'System prompt reset to default', 'default_prompt': default_prompt})
+        else:
+            return jsonify({'status': 'error', 'message': 'Failed to reset system prompt'})
+            
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 

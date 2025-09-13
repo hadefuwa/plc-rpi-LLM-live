@@ -6,6 +6,41 @@ Contains PLC connection settings, IO mapping, and AI prompt templates
 import json
 import os
 
+# Default AI reporting configuration
+DEFAULT_AI_CONFIG = {
+    "report_interval_minutes": 15,
+    "startup_delay_seconds": 30,
+    "max_events_for_analysis": 100,
+    "system_prompt": """You are an industrial automation AI assistant tasked with producing a comprehensive report on what has occurred on this PLC test machine during the last {interval_minutes} minutes.
+
+SYSTEM CONTEXT:
+- This is a Siemens S7-1200 PLC controlling a test rig with safety systems
+- Emergency stop functionality is present and critical for safety
+- System includes: buttons, switches, LEDs, analog inputs, and spare I/O
+- Forced values indicate manual overrides that may mask true process states
+
+CURRENT IO DATA:
+{data_context}
+
+RECENT EVENTS (Last {interval_minutes} minutes - {event_count} total):
+{recent_events}
+
+ANALYSIS REQUIREMENTS:
+1. SAFETY STATUS: Report on emergency stop status and any safety-related events
+2. OPERATIONAL CHANGES: Identify what operations or tests were performed
+3. SYSTEM HEALTH: Note any errors, forced values, or unusual conditions
+4. TREND ANALYSIS: Describe patterns in the recent activity
+5. RECOMMENDATIONS: Suggest any actions needed (maintenance, investigation, etc.)
+
+Please provide a clear, professional operator report focusing on:
+- What actually happened during this period
+- Current system status and safety condition
+- Any anomalies or items requiring attention
+- Operational insights for the test rig
+
+Keep the report concise but comprehensive (5-8 sentences). Focus on actionable insights."""
+}
+
 # Default PLC configuration
 DEFAULT_CONFIG = {
     "plc": {
@@ -160,4 +195,64 @@ def get_config_summary():
         "plc_slot": plc.get("slot", 1),
         "io_count": io_count,
         "io_mapping": config.get("io_mapping", {})
-    } 
+    }
+
+# ============================================================
+# AI CONFIGURATION FUNCTIONS
+# ============================================================
+
+def get_ai_config():
+    """Get current AI reporting configuration"""
+    ai_config_file = os.path.join(os.path.dirname(__file__), 'ai_config.json')
+    try:
+        if os.path.exists(ai_config_file):
+            with open(ai_config_file, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                # Merge with defaults to ensure all keys exist
+                merged_config = DEFAULT_AI_CONFIG.copy()
+                merged_config.update(config)
+                return merged_config
+        else:
+            return DEFAULT_AI_CONFIG.copy()
+    except Exception as e:
+        print(f"Error loading AI config: {e}")
+        return DEFAULT_AI_CONFIG.copy()
+
+def save_ai_config(config):
+    """Save AI reporting configuration"""
+    ai_config_file = os.path.join(os.path.dirname(__file__), 'ai_config.json')
+    try:
+        with open(ai_config_file, 'w', encoding='utf-8') as f:
+            json.dump(config, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"Error saving AI config: {e}")
+        return False
+
+def update_ai_report_interval(minutes):
+    """Update AI report interval in minutes"""
+    config = get_ai_config()
+    config["report_interval_minutes"] = int(minutes)
+    return save_ai_config(config)
+
+def update_ai_system_prompt(prompt):
+    """Update AI system prompt template"""
+    config = get_ai_config()
+    config["system_prompt"] = prompt
+    return save_ai_config(config)
+
+def update_ai_settings(report_interval_minutes=None, startup_delay_seconds=None, 
+                      max_events_for_analysis=None, system_prompt=None):
+    """Update multiple AI settings at once"""
+    config = get_ai_config()
+    
+    if report_interval_minutes is not None:
+        config["report_interval_minutes"] = int(report_interval_minutes)
+    if startup_delay_seconds is not None:
+        config["startup_delay_seconds"] = int(startup_delay_seconds)
+    if max_events_for_analysis is not None:
+        config["max_events_for_analysis"] = int(max_events_for_analysis)
+    if system_prompt is not None:
+        config["system_prompt"] = system_prompt
+    
+    return save_ai_config(config) 

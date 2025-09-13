@@ -27,6 +27,10 @@ NAV_TEMPLATE = '''
                 <i class="nav-icon">📝</i>
                 Reports
             </a>
+            <a href="/ai_config" class="nav-link {% if request.endpoint == "ai_config_page" %}active{% endif %}">
+                <i class="nav-icon">🤖</i>
+                AI Config
+            </a>
         </div>
         <div class="nav-actions">
             <button id="themeToggle" class="theme-toggle" title="Toggle theme">
