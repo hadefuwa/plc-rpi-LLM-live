@@ -2419,6 +2419,13 @@ def ai_config_page():
         {{ nav_styles }}
         {{ theme_styles }}
         
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: var(--body-bg); 
+            color: var(--text-primary); 
+        }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .config-section { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
         .section-title { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 15px; }
