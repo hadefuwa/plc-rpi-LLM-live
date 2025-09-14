@@ -23,6 +23,10 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this-in-production'
 
+# Configure timeouts for AI processing (5 minutes)
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['PERMANENT_SESSION_LIFETIME'] = 600  # 10 minutes for sessions
+
 # Register template functions
 app.jinja_env.globals['get_current_theme'] = get_current_theme
 
@@ -315,7 +319,7 @@ Please provide a clear, CONCISE technical analysis based on this PLC data. Keep 
                     "temperature": 0.2   # slightly higher for readability
                 }
             },
-            timeout=300
+            timeout=300  # 5 minutes timeout for AI processing
         )
         
         if response.status_code == 200:
@@ -2158,7 +2162,8 @@ def test_ollama():
                 "model": "gemma3:1b",
                 "prompt": "Hello, respond with 'AI is working!'",
                 "stream": False
-            }
+            },
+            timeout=300  # 5 minutes timeout for AI processing
         )
         if response.status_code == 200:
             return jsonify({'status': 'success', 'response': response.json()["response"]})

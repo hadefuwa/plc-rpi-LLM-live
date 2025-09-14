@@ -11,6 +11,9 @@
       "Bash(git commit:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "additionalDirectories": [
+      "C:\\c\\Users\\Adefu\\OneDrive\\Documents"
+    ]
   }
 }

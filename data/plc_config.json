@@ -10,26 +10,26 @@
     "RedButton_State": { "type": "bit", "address": "DB1.DBX6.0", "description": "Red Stop Button" },
     "LeftSwitch_State": { "type": "bit", "address": "DB1.DBX8.0", "description": "Left Selector Switch" },
     "RightSwitch_State": { "type": "bit", "address": "DB1.DBX10.0", "description": "Right Selector Switch" },
-    "SpareInput_A5_State": { "type": "bit", "address": "DB1.DBX12.0", "description": "Spare Digital Input A5" },
-    "SpareInput_A6_State": { "type": "bit", "address": "DB1.DBX14.0", "description": "Spare Digital Input A6" },
-    "SpareInput_A7_State": { "type": "bit", "address": "DB1.DBX16.0", "description": "Spare Digital Input A7" },
-    "Input_B0_State": { "type": "bit", "address": "DB1.DBX18.0", "description": "Digital Input B0" },
-    "Input_B1_State": { "type": "bit", "address": "DB1.DBX20.0", "description": "Digital Input B1" },
-    "Input_B2_State": { "type": "bit", "address": "DB1.DBX22.0", "description": "Digital Input B2" },
-    "Input_B3_State": { "type": "bit", "address": "DB1.DBX24.0", "description": "Digital Input B3" },
-    "Input_B4_State": { "type": "bit", "address": "DB1.DBX26.0", "description": "Digital Input B4" },
+    "SpareInput_A5_State": { "type": "bit", "address": "DB1.DBX12.0", "description": "Spare DI A5" },
+    "SpareInput_A6_State": { "type": "bit", "address": "DB1.DBX14.0", "description": "Spare DI A6" },
+    "SpareInput_A7_State": { "type": "bit", "address": "DB1.DBX16.0", "description": "Spare DI A7" },
+    "Input_B0_State": { "type": "bit", "address": "DB1.DBX18.0", "description": "DI B0" },
+    "Input_B1_State": { "type": "bit", "address": "DB1.DBX20.0", "description": "DI B1" },
+    "Input_B2_State": { "type": "bit", "address": "DB1.DBX22.0", "description": "DI B2" },
+    "Input_B3_State": { "type": "bit", "address": "DB1.DBX24.0", "description": "DI B3" },
+    "Input_B4_State": { "type": "bit", "address": "DB1.DBX26.0", "description": "DI B4" },
     "AI0_Scaled": { "type": "real", "address": "DB1.DBD32", "description": "Analog Input 0" },
     "AI1_Scaled": { "type": "real", "address": "DB1.DBD44", "description": "Analog Input 1" },
     "Green_Status_LED": { "type": "bit", "address": "DB1.DBX58.0", "description": "Green Status LED" },
     "Yellow_Status_LED": { "type": "bit", "address": "DB1.DBX60.0", "description": "Yellow Status LED" },
     "Red_Status_LED": { "type": "bit", "address": "DB1.DBX62.0", "description": "Red Status LED" },
-    "SpareOutput_A3_State": { "type": "bit", "address": "DB1.DBX64.0", "description": "Spare Digital Output A3" },
-    "SpareOutput_A4_State": { "type": "bit", "address": "DB1.DBX66.0", "description": "Spare Digital Output A4" },
-    "SpareOutput_A5_State": { "type": "bit", "address": "DB1.DBX68.0", "description": "Spare Digital Output A5" },
-    "SpareOutput_A6_State": { "type": "bit", "address": "DB1.DBX70.0", "description": "Spare Digital Output A6" },
-    "SpareOutput_A7_State": { "type": "bit", "address": "DB1.DBX72.0", "description": "Spare Digital Output A7" },
-    "Output_B0_State": { "type": "bit", "address": "DB1.DBX74.0", "description": "Digital Output B0" },
-    "Output_B1_State": { "type": "bit", "address": "DB1.DBX76.0", "description": "Digital Output B1" },
+    "SpareOutput_A3_State": { "type": "bit", "address": "DB1.DBX64.0", "description": "Spare DQ A3" },
+    "SpareOutput_A4_State": { "type": "bit", "address": "DB1.DBX66.0", "description": "Spare DQ A4" },
+    "SpareOutput_A5_State": { "type": "bit", "address": "DB1.DBX68.0", "description": "Spare DQ A5" },
+    "SpareOutput_A6_State": { "type": "bit", "address": "DB1.DBX70.0", "description": "Spare DQ A6" },
+    "SpareOutput_A7_State": { "type": "bit", "address": "DB1.DBX72.0", "description": "Spare DQ A7" },
+    "SpareOutput_B0_State": { "type": "bit", "address": "DB1.DBX74.0", "description": "DQ B0" },
+    "Output_B1_State": { "type": "bit", "address": "DB1.DBX76.0", "description": "DQ K1 Relay" },
     "HMI_ClearForcing": { "type": "bit", "address": "DB1.DBX0.0", "description": "HMI Clear Forcing Button" },
     "HMI_FaultReset": { "type": "bit", "address": "DB1.DBX0.1", "description": "HMI Fault Reset Button" },
     "Stats_ForcingActive": { "type": "bit", "address": "DB1.DBX78.0", "description": "System Forcing Active" },
@@ -55,26 +55,26 @@
     "Analog Inputs": [
       "AI0_Scaled", "AI1_Scaled"
     ],
-    "Spare Digital Inputs": [
+    "Spare DIs": [
       "SpareInput_A5_State",
       "SpareInput_A6_State",
       "SpareInput_A7_State"
     ],
-    "Additional Digital Inputs (B Series)": [
+    "Additional DIs (B)": [
       "Input_B0_State",
       "Input_B1_State",
       "Input_B2_State",
       "Input_B3_State",
       "Input_B4_State"
     ],
-    "Spare Digital Outputs": [
+    "Spare DQs": [
       "SpareOutput_A3_State",
       "SpareOutput_A4_State",
       "SpareOutput_A5_State",
       "SpareOutput_A6_State",
       "SpareOutput_A7_State"
     ],
-    "Additional Digital Outputs (B Series)": [
+    "Additional DQs (B)": [
       "Output_B0_State",
       "Output_B1_State"
     ],
