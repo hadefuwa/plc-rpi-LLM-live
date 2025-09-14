@@ -851,6 +851,9 @@ template = '''
         .example-btn:hover { background-color: #4b5563; }
         .response { background-color: #0b1220; padding: 15px; border-radius: 10px; margin: 10px 0; border: 1px solid #1f2937; white-space: pre-wrap; color: #e5e7eb; }
         .loading { display: none; color: #60a5fa; font-style: italic; }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
         .table {
             width: 100%;
             border-collapse: collapse;
@@ -1178,7 +1181,15 @@ template = '''
             <button class="btn" onclick="sendQuestion()">Send test data to AI</button>
             <button class="btn" onclick="testOllama()" style="background-color: #28a745; margin-left: 10px;">Test AI Connection</button>
             
-            <div class="loading" id="loading">AI is analyzing your data...</div>
+            <div class="loading" id="loading">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="spinner" style="width: 16px; height: 16px; border: 2px solid var(--border-color); border-radius: 50%; border-top-color: var(--btn-primary); animation: spin 1s ease-in-out infinite;"></div>
+                    <span id="loadingText">AI is analyzing your data...</span>
+                </div>
+                <div id="processingDetails" style="font-size: 11px; color: var(--text-secondary); margin-top: 8px; display: none;">
+                    Processing with Ollama Gemma3 1B model...
+                </div>
+            </div>
             <div id="response" class="response" style="display: none;"></div>
             
             <div style="margin-top:12px; border-top: 1px solid var(--border-color); padding-top: 12px;">
@@ -1221,8 +1232,27 @@ template = '''
                 return;
             }
             
+            // Show loading with enhanced feedback
             document.getElementById('loading').style.display = 'block';
             document.getElementById('response').style.display = 'none';
+            document.getElementById('processingDetails').style.display = 'block';
+            document.getElementById('loadingText').textContent = 'AI is analyzing your data...';
+            
+            const startTime = Date.now();
+            
+            // Update loading text periodically
+            let loadingInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                if (elapsed < 10) {
+                    document.getElementById('loadingText').textContent = `AI is analyzing your data... (${elapsed}s)`;
+                } else if (elapsed < 30) {
+                    document.getElementById('loadingText').textContent = `Loading Gemma3 model... (${elapsed}s)`;
+                } else if (elapsed < 120) {
+                    document.getElementById('loadingText').textContent = `Model is starting up... (${elapsed}s)`;
+                } else {
+                    document.getElementById('loadingText').textContent = `This is taking longer than usual... (${elapsed}s)`;
+                }
+            }, 1000);
             
             fetch('/ask_ai', {
                 method: 'POST',
@@ -1231,14 +1261,41 @@ template = '''
             })
             .then(response => response.json())
             .then(data => {
+                clearInterval(loadingInterval);
+                const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+                
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('response').style.display = 'block';
-                document.getElementById('response').textContent = data.response;
+                
+                // Enhanced response display with timing and metadata
+                const responseDiv = document.getElementById('response');
+                const timestamp = new Date().toLocaleTimeString();
+                
+                responseDiv.innerHTML = `<div style="border-bottom: 1px solid var(--border-color); margin-bottom: 12px; padding-bottom: 8px;">
+                    <div style="font-size: 11px; color: var(--text-secondary);">
+                        📤 Question: "${question}"<br>
+                        ⏱️ Response time: ${duration}s | 🕒 ${timestamp} | 🤖 Gemma3 1B via Ollama
+                    </div>
+                </div>
+                <div style="white-space: pre-wrap;">${data.response}</div>`;
             })
             .catch(error => {
+                clearInterval(loadingInterval);
+                const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+                
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('response').style.display = 'block';
-                document.getElementById('response').textContent = 'Error: ' + error;
+                
+                const responseDiv = document.getElementById('response');
+                const timestamp = new Date().toLocaleTimeString();
+                
+                responseDiv.innerHTML = `<div style="border-bottom: 1px solid var(--border-color); margin-bottom: 12px; padding-bottom: 8px;">
+                    <div style="font-size: 11px; color: var(--text-secondary);">
+                        📤 Question: "${question}"<br>
+                        ❌ Failed after: ${duration}s | 🕒 ${timestamp}
+                    </div>
+                </div>
+                <div style="color: #ef4444;">Error: ${error}</div>`;
             });
         }
         
