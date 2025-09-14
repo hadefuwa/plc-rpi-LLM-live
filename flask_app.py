@@ -1965,9 +1965,9 @@ def reports():
                     except Exception as e:
                         print(f"Error reading report {full_path}: {e}")
     
-    # Sort by timestamp (newest first) and take only the latest 3
+    # Sort by timestamp (newest first) and take only the latest 10
     reports_data.sort(key=lambda x: x['timestamp'], reverse=True)
-    latest_reports = reports_data[:3]
+    latest_reports = reports_data[:10]
 
     page = '''
     <!DOCTYPE html>
@@ -1998,7 +1998,7 @@ def reports():
         <div class="container">
             <div class="panel">
                 <div class="panel-header">
-                    <div>🤖 Latest AI Reports</div>
+                    <div>🤖 Latest AI Reports (10 most recent)</div>
                     <div>
                         <button class="btn" onclick="triggerAiReport()">Generate AI Report Now</button>
                         <button class="btn" onclick="generateReport()" style="margin-left:8px;">Generate Data Report</button>

@@ -1,18 +1,59 @@
 # E-Stop AI Status Reporter
 
-A Flask-based web application for monitoring PLC systems and generating intelligent operator reports using AI. The system can read live data from Siemens S7 PLCs and provide real-time analysis and alerts.
+A comprehensive industrial automation monitoring and reporting system for Siemens S7-1200 PLC test rigs. This Flask-based web application combines real-time PLC monitoring with AI-powered analysis to provide intelligent operational insights and safety monitoring.
 
-## Features
+## 🎯 Core Purpose
 
-- **Live PLC Communication**: Connect to Siemens S7 PLCs using python-snap7
-- **Configurable IO Mapping**: Easy web interface to configure PLC addresses and data types
-- **Real-time Monitoring**: Live status updates and system health monitoring
-- **Scheduled Reports (Planned)**: Automatic 30‑minute status reports with local AI summary
-- **AI-Powered Analysis**: Intelligent operator reports using local AI (Gemma3 1B)
-- **Interactive Visualizations**: Real-time charts and system status displays
-- **Emergency Stop Detection**: Automatic detection and reporting of E-Stop events
-- **Event Logging**: Comprehensive event tracking and logging system
- - **Real Values Support**: Reads 32-bit Real (float) values from PLC (e.g., scaled analogs)
+Monitors a PLC-controlled test machine with safety systems (emergency stops, pumps, valves, motors) and uses AI to automatically analyze and report on system activity, focusing on safety status, operational changes, and system health.
+
+## ✨ Key Features
+
+### 🔧 **PLC Integration**
+- **Real-time Monitoring**: Connects to Siemens S7-1200 PLC via Ethernet
+- **Comprehensive I/O Support**: Digital I/O (buttons, switches, LEDs, relays) and analog inputs (flow rate, pressure, temperature)
+- **Emergency Stop Tracking**: Critical priority alerts with automatic detection
+- **Data Types**: Supports Bit, Byte, Word, DWord, and Real (32-bit IEEE float) values
+
+### 🤖 **AI-Powered Analysis**
+- **Automated Reports**: Every 15 minutes using Ollama with Gemma3 1B model
+- **Configurable Intelligence**: Customizable system prompts and reporting intervals
+- **Operational Insights**: Analyzes recent events, safety status, and system trends
+- **Local Processing**: On-premises AI for industrial privacy and security
+
+### 📊 **Web Dashboard**
+- **Live Monitoring**: Real-time system status with color-coded indicators
+- **Responsive Design**: Dark/light theme support with sticky navigation
+- **Multi-page Interface**: Dashboard, PLC Config, System Status, Event Logs, Reports, AI Config
+- **Connection Status**: Live PLC connection monitoring with visual indicators
+
+### 📝 **Advanced Reporting System**
+- **AI Reports**: Automated analysis showing operational patterns and recommendations
+- **Data Reports**: Raw I/O snapshots in JSON format for technical analysis  
+- **Event Logs**: Detailed change tracking with timestamps and priority levels
+- **Report Archive**: Historical data with daily rotation and searchable logs
+
+### ⚙️ **Configuration Management**
+- **Web-based Setup**: PLC connection settings (IP, rack, slot) through browser
+- **Dynamic I/O Mapping**: Custom descriptions and data type configuration
+- **AI Configuration**: Report intervals, system prompts, and analysis parameters
+- **I/O Grouping**: Organized monitoring with custom groups and categorization
+
+## 🏗️ Technical Architecture
+
+- **Backend**: Python Flask with multi-threading for real-time polling
+- **PLC Communication**: Custom communicator using industrial S7 protocol
+- **Data Storage**: JSON-based configuration with daily rotation event logging
+- **AI Integration**: Local Ollama server for private, on-premises analysis
+- **Frontend**: Responsive web interface with live updates and theme support
+- **Deployment**: Raspberry Pi compatible with systemd service integration
+
+## 🎯 Use Cases
+
+- **Safety Monitoring**: Track emergency stop activations and system health compliance
+- **Operational Analysis**: Understand test rig usage patterns and performance metrics
+- **Maintenance Planning**: AI identifies potential issues and provides actionable recommendations
+- **Industrial Compliance**: Automated logging for safety requirements and audit trails
+- **Cost-Effective Monitoring**: Raspberry Pi deployment for budget-conscious industrial monitoring
 
 ## Quick Start
 
@@ -60,11 +101,20 @@ Open your browser and go to: `http://localhost:5001`
 - **IO Status**: Monitor all configured PLC inputs and outputs
 - **Event Log**: View recent system events and E-Stop activations
 - **AI Analysis**: Ask questions about your system data
+- **Connection Monitoring**: Live PLC connection status with visual indicators
 
-### Reports (Coming Next)
-- The app will generate a report every 30 minutes.
-- Reports will include: timestamp, key IO summary, and a short AI-written summary.
-- Reports will be saved under `data/reports/` and visible in a new “Reports” page.
+### AI Reports System
+- **Automated Generation**: AI reports generated every 15 minutes (configurable)
+- **Full Content Display**: Latest 3 reports shown with complete analysis content
+- **Manual Generation**: Generate reports on-demand via web interface
+- **Report Archive**: Historical reports organized by date with searchable content
+- **Intelligent Analysis**: Focuses on safety status, operational changes, system health, trend analysis, and maintenance recommendations
+
+### AI Configuration
+- **Custom Intervals**: Configure report generation frequency (minutes)
+- **System Prompts**: Customize AI analysis focus and reporting style  
+- **Event Analysis Limits**: Control how many recent events to analyze
+- **Startup Delays**: Configure initialization timing for system stability
 
 ### PLC Configuration
 1. Click **"PLC Configuration"** in the navigation menu
