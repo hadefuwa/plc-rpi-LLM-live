@@ -23,6 +23,8 @@ Thumbs.db
 # Logs
 *.log
 
-# Data files (optional - uncomment if you don't want to track data)
-# data/
-# *.json
+# Data files - don't track generated data and reports
+data/
+data/reports/
+data/io_events*.json
+*.json
