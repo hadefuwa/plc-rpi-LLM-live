@@ -1947,6 +1947,18 @@ def reports():
                         with open(full_path, 'r', encoding='utf-8') as f:
                             content = f.read()
                         
+                        # Extract the actual report timestamp from content
+                        import re
+                        report_timestamp = None
+                        timestamp_match = re.search(r'Report time: (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+)', content)
+                        if timestamp_match:
+                            try:
+                                report_timestamp = datetime.fromisoformat(timestamp_match.group(1))
+                            except:
+                                report_timestamp = datetime.fromtimestamp(mtime)
+                        else:
+                            report_timestamp = datetime.fromtimestamp(mtime)
+                        
                         # Extract date from path (YYYY-MM-DD format)
                         path_parts = full_path.split(os.sep)
                         date_part = None
@@ -1958,7 +1970,7 @@ def reports():
                         reports_data.append({
                             'filename': file,
                             'content': content,
-                            'timestamp': datetime.fromtimestamp(mtime),
+                            'timestamp': report_timestamp,  # Use actual report timestamp
                             'date': date_part or 'unknown',
                             'path': full_path
                         })

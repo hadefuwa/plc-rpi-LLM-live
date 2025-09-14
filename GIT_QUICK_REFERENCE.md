@@ -4,7 +4,7 @@
 ```bash
 cd ~/plc-rpi-LLM-live
 git add .
-git commit -m "ai updated"
+git commit -m "report times"
 git push origin main
 ```
 
