@@ -3290,6 +3290,12 @@ def ollama_monitor():
         .status-online { color: #10b981; }
         .status-offline { color: #ef4444; }
         .status-loading { color: #f59e0b; }
+        .status-error { color: #ef4444; }
+        
+        .cpu-high { color: #f59e0b; font-weight: bold; }
+        .cpu-very-high { color: #ef4444; font-weight: bold; }
+        .process-busy { background: rgba(245, 158, 11, 0.1); border-left: 3px solid #f59e0b; }
+        .process-very-busy { background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; }
         </style>
     </head>
     <body>
@@ -3319,6 +3325,22 @@ def ollama_monitor():
                         <div class="status-value" id="lastResponse">Checking...</div>
                         <div class="status-label">Last Response Time</div>
                     </div>
+                    <div class="status-card">
+                        <div class="status-value" id="cpuUsage">Checking...</div>
+                        <div class="status-label">CPU Usage</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-value" id="processCount">Checking...</div>
+                        <div class="status-label">Active Processes</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-value" id="runtime">Checking...</div>
+                        <div class="status-label">Runtime</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-value" id="reportStatus">Checking...</div>
+                        <div class="status-label">Report Generation</div>
+                    </div>
                 </div>
                 
                 <div class="control-buttons">
@@ -3326,6 +3348,16 @@ def ollama_monitor():
                     <button class="btn btn-secondary" onclick="testModel()">Test Model</button>
                     <button class="btn btn-secondary" onclick="warmupModel()">Warm Up Model</button>
                     <button class="btn btn-danger" onclick="restartOllama()">Restart Ollama</button>
+                </div>
+            </div>
+            
+            <div class="monitor-section">
+                <div class="section-title">
+                    <span>⚙️</span>
+                    Process Details
+                </div>
+                <div class="log-container" id="processDetails">
+                    Loading process information...
                 </div>
             </div>
             
@@ -3396,9 +3428,67 @@ def ollama_monitor():
                     '<span class="status-' + data.model_status.toLowerCase() + '">' + data.model_status + '</span>';
                 document.getElementById('memoryUsage').textContent = data.memory_usage;
                 document.getElementById('lastResponse').textContent = data.last_response_time;
+                const cpuElement = document.getElementById('cpuUsage');
+                const cpuUsage = data.cpu_usage || 'N/A';
+                cpuElement.textContent = cpuUsage;
+                cpuElement.className = '';
+                if (cpuUsage !== 'N/A' && parseFloat(cpuUsage) > 200) {
+                    cpuElement.className = 'cpu-very-high';
+                } else if (cpuUsage !== 'N/A' && parseFloat(cpuUsage) > 100) {
+                    cpuElement.className = 'cpu-high';
+                }
+                document.getElementById('processCount').textContent = data.process_count || '0';
+                document.getElementById('runtime').textContent = data.runtime || 'N/A';
+                document.getElementById('reportStatus').innerHTML = 
+                    '<span class="status-' + (data.report_generating ? 'loading' : 'online') + '">' + 
+                    (data.report_generating ? 'Generating...' : 'Idle') + '</span>';
             })
             .catch(error => {
                 console.error('Status refresh failed:', error);
+            });
+            
+            // Also refresh process details
+            refreshProcessDetails();
+        }
+        
+        function refreshProcessDetails() {
+            fetch('/ollama_process_details')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('processDetails');
+                container.innerHTML = '';
+                
+                if (data.processes && data.processes.length > 0) {
+                    data.processes.forEach(proc => {
+                        const entry = document.createElement('div');
+                        entry.className = 'log-entry';
+                        
+                        // Add styling based on CPU usage
+                        const cpuUsage = parseFloat(proc.cpu_usage);
+                        if (cpuUsage > 200) {
+                            entry.className += ' process-very-busy';
+                        } else if (cpuUsage > 100) {
+                            entry.className += ' process-busy';
+                        }
+                        
+                        let statusClass = 'log-success';
+                        if (cpuUsage > 200) statusClass = 'log-error';
+                        else if (cpuUsage > 100) statusClass = 'log-warning';
+                        
+                        entry.innerHTML = 
+                            '<span class="log-timestamp">PID ' + proc.pid + '</span> ' +
+                            '<span class="' + statusClass + '">' + proc.name + '</span> ' +
+                            '<span class="log-timestamp">CPU: ' + proc.cpu_usage + '%</span> ' +
+                            '<span class="log-timestamp">MEM: ' + proc.memory_usage + '%</span> ' +
+                            '<span class="log-timestamp">Runtime: ' + proc.runtime + '</span>';
+                        container.appendChild(entry);
+                    });
+                } else {
+                    container.innerHTML = '<div class="log-entry">No Ollama processes found</div>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('processDetails').innerHTML = 'Error loading process details: ' + error;
             });
         }
         
@@ -3889,11 +3979,47 @@ def ollama_status():
         memory = psutil.virtual_memory()
         memory_usage = f"{(ollama_memory / 1024 / 1024):.0f}MB / {(memory.total / 1024 / 1024 / 1024):.1f}GB"
         
+        # Get detailed process information
+        cpu_usage = "0%"
+        process_count = 0
+        runtime = "N/A"
+        report_generating = False
+        
+        for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent', 'create_time']):
+            if 'ollama' in proc.info['name'].lower():
+                process_count += 1
+                try:
+                    cpu_percent = proc.info['cpu_percent']
+                    if cpu_percent is not None:
+                        cpu_usage = f"{cpu_percent:.1f}%"
+                        if cpu_percent > 200:  # High CPU indicates active processing
+                            report_generating = True
+                    
+                    # Calculate runtime
+                    create_time = proc.info['create_time']
+                    if create_time:
+                        runtime_seconds = time.time() - create_time
+                        hours = int(runtime_seconds // 3600)
+                        minutes = int((runtime_seconds % 3600) // 60)
+                        seconds = int(runtime_seconds % 60)
+                        if hours > 0:
+                            runtime = f"{hours}h {minutes}m {seconds}s"
+                        elif minutes > 0:
+                            runtime = f"{minutes}m {seconds}s"
+                        else:
+                            runtime = f"{seconds}s"
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    pass
+        
         return jsonify({
             'service_status': 'online' if ollama_running else 'offline',
             'model_status': model_status,
             'memory_usage': memory_usage,
             'last_response_time': last_response_time,
+            'cpu_usage': cpu_usage,
+            'process_count': str(process_count),
+            'runtime': runtime,
+            'report_generating': report_generating,
             'timestamp': datetime.now().isoformat()
         })
         
@@ -3903,6 +4029,65 @@ def ollama_status():
             'model_status': 'error',
             'memory_usage': 'error',
             'last_response_time': 'error',
+            'error': str(e)
+        }), 500
+
+@app.route('/ollama_process_details')
+def ollama_process_details():
+    """Get detailed information about Ollama processes"""
+    try:
+        import psutil
+        import time
+        
+        processes = []
+        
+        for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent', 'create_time', 'cmdline']):
+            if 'ollama' in proc.info['name'].lower():
+                try:
+                    cpu_percent = proc.info['cpu_percent'] or 0
+                    memory_percent = proc.info['memory_percent'] or 0
+                    
+                    # Calculate runtime
+                    runtime = "N/A"
+                    create_time = proc.info['create_time']
+                    if create_time:
+                        runtime_seconds = time.time() - create_time
+                        hours = int(runtime_seconds // 3600)
+                        minutes = int((runtime_seconds % 3600) // 60)
+                        seconds = int(runtime_seconds % 60)
+                        if hours > 0:
+                            runtime = f"{hours}h {minutes}m {seconds}s"
+                        elif minutes > 0:
+                            runtime = f"{minutes}m {seconds}s"
+                        else:
+                            runtime = f"{seconds}s"
+                    
+                    # Get process name/type
+                    name = proc.info['name']
+                    cmdline = proc.info.get('cmdline', [])
+                    if 'runner' in ' '.join(cmdline):
+                        name = "ollama runner (AI processing)"
+                    elif 'serve' in ' '.join(cmdline):
+                        name = "ollama serve (main service)"
+                    
+                    processes.append({
+                        'pid': proc.info['pid'],
+                        'name': name,
+                        'cpu_usage': f"{cpu_percent:.1f}",
+                        'memory_usage': f"{memory_percent:.1f}",
+                        'runtime': runtime
+                    })
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    pass
+        
+        return jsonify({
+            'processes': processes,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'processes': [],
             'error': str(e)
         }), 500
 
