@@ -2285,13 +2285,18 @@ def write_report_files(payload: dict, ai_text: str):
     json_path = os.path.join(out_dir, f'{ts}.json')
     md_path = os.path.join(out_dir, f'{ts}.md')
     import json
+    
+    # Get current AI config to show correct interval
+    ai_config = get_ai_config()
+    interval_minutes = ai_config["report_interval_minutes"]
+    
     # Attach the AI summary into the JSON payload
     payload_with_ai = dict(payload)
     payload_with_ai['ai_summary'] = ai_text
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump(payload_with_ai, f, indent=2, ensure_ascii=False)
     with open(md_path, 'w', encoding='utf-8') as f:
-        f.write('# 30-minute PLC Report\n\n')
+        f.write(f'# {interval_minutes}-minute PLC AI Report\n\n')
         f.write(ai_text + '\n')
     return json_path, md_path
 
@@ -3077,6 +3082,445 @@ def about():
     
     return rendered_page
 
+@app.route('/ollama_monitor')
+def ollama_monitor():
+    """Ollama monitoring page with real-time logs and status"""
+    theme_styles = get_theme_styles(get_current_theme())
+    
+    page = '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Ollama Monitor - E-Stop AI Status Reporter</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+        {{ nav_styles }}
+        {{ theme_styles }}
+        
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: var(--body-bg); 
+            color: var(--text-primary); 
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .monitor-section { 
+            background: var(--panel-bg); 
+            border: 1px solid var(--panel-border); 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .section-title { 
+            font-size: 18px; 
+            font-weight: 600; 
+            color: var(--text-primary); 
+            margin-bottom: 15px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .status-card {
+            background: var(--nav-bg);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .status-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .status-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        .log-container {
+            background: var(--body-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .log-entry {
+            margin-bottom: 2px;
+            padding: 2px 0;
+        }
+        .log-timestamp {
+            color: var(--text-secondary);
+        }
+        .log-error {
+            color: #ef4444;
+        }
+        .log-success {
+            color: #10b981;
+        }
+        .log-warning {
+            color: #f59e0b;
+        }
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .btn {
+            background: var(--btn-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: var(--btn-primary-hover);
+        }
+        .btn-secondary {
+            background: #6b7280;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .btn-danger {
+            background: #dc2626;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--btn-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .test-area {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .test-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--input-border);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .status-online { color: #10b981; }
+        .status-offline { color: #ef4444; }
+        .status-loading { color: #f59e0b; }
+        </style>
+    </head>
+    <body>
+        {{ nav_html }}
+        
+        <div class="container">
+            <div class="monitor-section">
+                <div class="section-title">
+                    <span>🔍</span>
+                    Ollama System Monitor
+                </div>
+                
+                <div class="status-grid">
+                    <div class="status-card">
+                        <div class="status-value" id="ollamaStatus">Checking...</div>
+                        <div class="status-label">Service Status</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-value" id="modelStatus">Checking...</div>
+                        <div class="status-label">Model Status</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-value" id="memoryUsage">Checking...</div>
+                        <div class="status-label">Memory Usage</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-value" id="lastResponse">Checking...</div>
+                        <div class="status-label">Last Response Time</div>
+                    </div>
+                </div>
+                
+                <div class="control-buttons">
+                    <button class="btn" onclick="refreshStatus()">Refresh Status</button>
+                    <button class="btn btn-secondary" onclick="testModel()">Test Model</button>
+                    <button class="btn btn-secondary" onclick="warmupModel()">Warm Up Model</button>
+                    <button class="btn btn-danger" onclick="restartOllama()">Restart Ollama</button>
+                </div>
+            </div>
+            
+            <div class="monitor-section">
+                <div class="section-title">
+                    <span>📋</span>
+                    Real-time Ollama Logs
+                    <button class="btn btn-secondary" onclick="toggleAutoRefresh()" id="autoRefreshBtn">Auto-Refresh: ON</button>
+                </div>
+                <div class="log-container" id="logContainer">
+                    Loading logs...
+                </div>
+            </div>
+            
+            <div class="monitor-section">
+                <div class="section-title">
+                    <span>🧪</span>
+                    AI Model Test
+                </div>
+                <div class="test-area">
+                    <input type="text" id="testPrompt" class="test-input" placeholder="Enter test prompt..." value="Hello, respond with 'AI is working!'">
+                    <div class="control-buttons">
+                        <button class="btn" onclick="runTest()">Run Test</button>
+                        <button class="btn btn-secondary" onclick="clearTestResults()">Clear Results</button>
+                    </div>
+                    <div id="testResults" class="log-container" style="min-height: 100px; max-height: 200px;">
+                        Test results will appear here...
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+        let autoRefresh = true;
+        let refreshInterval;
+        
+        // Start auto-refresh
+        function startAutoRefresh() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(() => {
+                if (autoRefresh) {
+                    refreshStatus();
+                    refreshLogs();
+                }
+            }, 5000); // Every 5 seconds
+        }
+        
+        function toggleAutoRefresh() {
+            autoRefresh = !autoRefresh;
+            const btn = document.getElementById('autoRefreshBtn');
+            btn.textContent = 'Auto-Refresh: ' + (autoRefresh ? 'ON' : 'OFF');
+            btn.className = 'btn ' + (autoRefresh ? 'btn-secondary' : 'btn-danger');
+            
+            if (autoRefresh) {
+                startAutoRefresh();
+            } else {
+                clearInterval(refreshInterval);
+            }
+        }
+        
+        function refreshStatus() {
+            fetch('/ollama_status')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('ollamaStatus').innerHTML = 
+                    '<span class="status-' + data.service_status.toLowerCase() + '">' + data.service_status + '</span>';
+                document.getElementById('modelStatus').innerHTML = 
+                    '<span class="status-' + data.model_status.toLowerCase() + '">' + data.model_status + '</span>';
+                document.getElementById('memoryUsage').textContent = data.memory_usage;
+                document.getElementById('lastResponse').textContent = data.last_response_time;
+            })
+            .catch(error => {
+                console.error('Status refresh failed:', error);
+            });
+        }
+        
+        function refreshLogs() {
+            fetch('/ollama_logs')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('logContainer');
+                container.innerHTML = '';
+                
+                data.logs.forEach(log => {
+                    const entry = document.createElement('div');
+                    entry.className = 'log-entry';
+                    
+                    let logClass = '';
+                    if (log.includes('error') || log.includes('Error')) logClass = 'log-error';
+                    else if (log.includes('success') || log.includes('completed')) logClass = 'log-success';
+                    else if (log.includes('warning') || log.includes('Warning')) logClass = 'log-warning';
+                    
+                    entry.innerHTML = '<span class="log-timestamp">' + data.timestamp + '</span> ' + 
+                                    '<span class="' + logClass + '">' + log + '</span>';
+                    container.appendChild(entry);
+                });
+                
+                // Auto-scroll to bottom
+                container.scrollTop = container.scrollHeight;
+            })
+            .catch(error => {
+                document.getElementById('logContainer').innerHTML = 'Error loading logs: ' + error;
+            });
+        }
+        
+        function testModel() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.innerHTML = '<span class="spinner"></span> Testing...';
+            btn.disabled = true;
+            
+            fetch('/test_ollama')
+            .then(response => response.json())
+            .then(data => {
+                const results = document.getElementById('testResults');
+                const timestamp = new Date().toLocaleTimeString();
+                results.innerHTML += '<div class="log-entry">' +
+                    '<span class="log-timestamp">[' + timestamp + ']</span> ' +
+                    '<span class="' + (data.status === 'success' ? 'log-success' : 'log-error') + '">' +
+                    'Test Result: ' + (data.response || data.exception || 'Unknown error') +
+                    '</span></div>';
+                results.scrollTop = results.scrollHeight;
+            })
+            .catch(error => {
+                const results = document.getElementById('testResults');
+                const timestamp = new Date().toLocaleTimeString();
+                results.innerHTML += '<div class="log-entry">' +
+                    '<span class="log-timestamp">[' + timestamp + ']</span> ' +
+                    '<span class="log-error">Test Failed: ' + error + '</span></div>';
+            })
+            .finally(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            });
+        }
+        
+        function warmupModel() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.innerHTML = '<span class="spinner"></span> Warming Up...';
+            btn.disabled = true;
+            
+            // This can take several minutes
+            fetch('/warmup_ollama', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'Warmup completed');
+                refreshStatus();
+            })
+            .catch(error => {
+                alert('Warmup failed: ' + error);
+            })
+            .finally(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            });
+        }
+        
+        function runTest() {
+            const prompt = document.getElementById('testPrompt').value;
+            if (!prompt.trim()) {
+                alert('Please enter a test prompt');
+                return;
+            }
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.innerHTML = '<span class="spinner"></span> Running...';
+            btn.disabled = true;
+            
+            const startTime = Date.now();
+            
+            fetch('/test_ai_prompt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+                const results = document.getElementById('testResults');
+                const timestamp = new Date().toLocaleTimeString();
+                
+                results.innerHTML += '<div class="log-entry">' +
+                    '<span class="log-timestamp">[' + timestamp + '] (' + duration + 's)</span> ' +
+                    '<span class="' + (data.status === 'success' ? 'log-success' : 'log-error') + '">' +
+                    'Prompt: "' + prompt + '"\\n' +
+                    'Response: ' + (data.response || data.message || 'No response') +
+                    '</span></div>';
+                results.scrollTop = results.scrollHeight;
+            })
+            .catch(error => {
+                const results = document.getElementById('testResults');
+                const timestamp = new Date().toLocaleTimeString();
+                results.innerHTML += '<div class="log-entry">' +
+                    '<span class="log-timestamp">[' + timestamp + ']</span> ' +
+                    '<span class="log-error">Test Failed: ' + error + '</span></div>';
+            })
+            .finally(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            });
+        }
+        
+        function clearTestResults() {
+            document.getElementById('testResults').innerHTML = 'Test results cleared...';
+        }
+        
+        function restartOllama() {
+            if (!confirm('Are you sure you want to restart Ollama? This may take a few minutes to reload.')) {
+                return;
+            }
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.innerHTML = '<span class="spinner"></span> Restarting...';
+            btn.disabled = true;
+            
+            fetch('/restart_ollama', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'Restart initiated');
+                refreshStatus();
+            })
+            .catch(error => {
+                alert('Restart failed: ' + error);
+            })
+            .finally(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            });
+        }
+        
+        // Initialize
+        refreshStatus();
+        refreshLogs();
+        startAutoRefresh();
+        </script>
+    </body>
+    </html>
+    '''
+    
+    # Replace template variables manually
+    rendered_page = page.replace('{{ nav_html }}', NAV_TEMPLATE)
+    rendered_page = rendered_page.replace('{{ nav_styles }}', NAV_STYLES)
+    rendered_page = rendered_page.replace('{{ theme_styles }}', theme_styles)
+    
+    return rendered_page
+
 @app.route('/download_report/<day>/<name>')
 def download_report(day, name):
     base = os.path.join(os.path.dirname(__file__), 'data', 'reports')
@@ -3333,6 +3777,237 @@ def clear_event_log():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+
+# ============================================================
+# OLLAMA MONITORING API ENDPOINTS
+# ============================================================
+
+@app.route('/ollama_status')
+def ollama_status():
+    """Get Ollama service status and system info"""
+    try:
+        import subprocess
+        import psutil
+        
+        # Check if Ollama process is running
+        ollama_running = False
+        ollama_memory = 0
+        for proc in psutil.process_iter(['pid', 'name', 'memory_info']):
+            if 'ollama' in proc.info['name'].lower():
+                ollama_running = True
+                ollama_memory += proc.info['memory_info'].rss
+        
+        # Test model availability
+        model_status = "offline"
+        last_response_time = "N/A"
+        
+        if ollama_running:
+            try:
+                start_time = time.time()
+                response = requests.get("http://localhost:11434/api/tags", timeout=5)
+                if response.status_code == 200:
+                    models = response.json().get('models', [])
+                    if any('gemma3:1b' in model.get('name', '') for model in models):
+                        # Test if model responds quickly
+                        test_start = time.time()
+                        test_response = requests.post(
+                            "http://localhost:11434/api/generate",
+                            json={"model": "gemma3:1b", "prompt": "Hi", "stream": False},
+                            timeout=2
+                        )
+                        if test_response.status_code == 200:
+                            model_status = "online"
+                        else:
+                            model_status = "loading"
+                        test_end = time.time()
+                        last_response_time = f"{(test_end - test_start):.1f}s"
+                    else:
+                        model_status = "no model"
+            except requests.RequestException:
+                model_status = "loading"
+            except Exception:
+                model_status = "error"
+        
+        # Get memory usage
+        memory = psutil.virtual_memory()
+        memory_usage = f"{(ollama_memory / 1024 / 1024):.0f}MB / {(memory.total / 1024 / 1024 / 1024):.1f}GB"
+        
+        return jsonify({
+            'service_status': 'online' if ollama_running else 'offline',
+            'model_status': model_status,
+            'memory_usage': memory_usage,
+            'last_response_time': last_response_time,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'service_status': 'error',
+            'model_status': 'error',
+            'memory_usage': 'error',
+            'last_response_time': 'error',
+            'error': str(e)
+        }), 500
+
+@app.route('/ollama_logs')
+def ollama_logs():
+    """Get recent Ollama logs"""
+    try:
+        import subprocess
+        
+        # Get recent journalctl logs for ollama or our service
+        result = subprocess.run([
+            'journalctl', '-u', 'plc-estop.service', '-n', '50', '--no-pager', '--since', '5 minutes ago'
+        ], capture_output=True, text=True, timeout=10)
+        
+        if result.returncode == 0:
+            logs = result.stdout.strip().split('\n')
+            # Filter for relevant Ollama/AI related logs
+            filtered_logs = []
+            for log in logs[-20:]:  # Last 20 lines
+                if any(keyword in log.lower() for keyword in ['ollama', 'ai', 'model', 'generate', 'error']):
+                    # Clean up the log line
+                    if ']' in log:
+                        log_content = log.split(']', 1)[1].strip() if ']' in log else log
+                    else:
+                        log_content = log
+                    filtered_logs.append(log_content)
+            
+            if not filtered_logs:
+                filtered_logs = ["No recent Ollama-related activity"]
+                
+        else:
+            filtered_logs = ["Unable to fetch logs: " + result.stderr]
+            
+        return jsonify({
+            'logs': filtered_logs,
+            'timestamp': datetime.now().strftime('%H:%M:%S'),
+            'status': 'success'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'logs': [f"Error fetching logs: {str(e)}"],
+            'timestamp': datetime.now().strftime('%H:%M:%S'),
+            'status': 'error'
+        })
+
+@app.route('/warmup_ollama', methods=['POST'])
+def warmup_ollama():
+    """Pre-warm the Ollama model"""
+    try:
+        # Make a simple request to load the model into memory
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "gemma3:1b",
+                "prompt": "System ready. Please respond with 'Model loaded successfully.'",
+                "stream": False,
+                "options": {
+                    "num_predict": 10,
+                    "temperature": 0.1
+                }
+            },
+            timeout=300  # 5 minute timeout for warmup
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            return jsonify({
+                'status': 'success',
+                'message': 'Model warmed up successfully',
+                'response': result.get('response', 'No response')
+            })
+        else:
+            return jsonify({
+                'status': 'error',
+                'message': f'Warmup failed with status {response.status_code}',
+                'details': response.text[:200]
+            }), 500
+            
+    except requests.Timeout:
+        return jsonify({
+            'status': 'timeout',
+            'message': 'Model warmup timed out after 5 minutes'
+        }), 408
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Warmup error: {str(e)}'
+        }), 500
+
+@app.route('/test_ai_prompt', methods=['POST'])
+def test_ai_prompt():
+    """Test AI with custom prompt"""
+    try:
+        data = request.json
+        prompt = data.get('prompt', 'Hello')
+        
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "gemma3:1b",
+                "prompt": prompt,
+                "stream": False,
+                "options": {
+                    "num_predict": 50,
+                    "temperature": 0.7
+                }
+            },
+            timeout=300  # 5 minute timeout
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            return jsonify({
+                'status': 'success',
+                'response': result.get('response', 'No response'),
+                'prompt': prompt
+            })
+        else:
+            return jsonify({
+                'status': 'error',
+                'message': f'API returned status {response.status_code}',
+                'details': response.text[:200]
+            }), response.status_code
+            
+    except requests.Timeout:
+        return jsonify({
+            'status': 'timeout',
+            'message': 'Request timed out after 5 minutes'
+        }), 408
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@app.route('/restart_ollama', methods=['POST'])
+def restart_ollama():
+    """Restart Ollama service"""
+    try:
+        import subprocess
+        
+        # Kill existing Ollama processes
+        subprocess.run(['pkill', '-f', 'ollama'], capture_output=True)
+        time.sleep(2)
+        
+        # Start Ollama again
+        subprocess.Popen(['ollama', 'serve'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(3)
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Ollama restart initiated. Please wait a moment for it to fully load.'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Restart failed: {str(e)}'
+        }), 500
 
 
 if __name__ == '__main__':

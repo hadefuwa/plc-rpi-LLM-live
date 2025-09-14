@@ -23,6 +23,10 @@ NAV_TEMPLATE = '''
                 <i class="nav-icon">🤖</i>
                 AI Config
             </a>
+            <a href="/ollama_monitor" class="nav-link {% if request.endpoint == "ollama_monitor" %}active{% endif %}">
+                <i class="nav-icon">🔍</i>
+                Ollama Monitor
+            </a>
             <a href="/about" class="nav-link {% if request.endpoint == "about" %}active{% endif %}">
                 <i class="nav-icon">ℹ️</i>
                 About
