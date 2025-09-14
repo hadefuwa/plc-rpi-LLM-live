@@ -15,14 +15,6 @@ NAV_TEMPLATE = '''
                 <i class="nav-icon">⚙️</i>
                 PLC Config
             </a>
-            <a href="/status" class="nav-link {% if request.endpoint == "status" %}active{% endif %}">
-                <i class="nav-icon">📈</i>
-                System Status
-            </a>
-            <a href="/logs" class="nav-link {% if request.endpoint == "logs" %}active{% endif %}">
-                <i class="nav-icon">📋</i>
-                Event Logs
-            </a>
             <a href="/reports" class="nav-link {% if request.endpoint == "reports" %}active{% endif %}">
                 <i class="nav-icon">📝</i>
                 Reports
@@ -30,6 +22,10 @@ NAV_TEMPLATE = '''
             <a href="/ai_config" class="nav-link {% if request.endpoint == "ai_config_page" %}active{% endif %}">
                 <i class="nav-icon">🤖</i>
                 AI Config
+            </a>
+            <a href="/about" class="nav-link {% if request.endpoint == "about" %}active{% endif %}">
+                <i class="nav-icon">ℹ️</i>
+                About
             </a>
         </div>
         <div class="nav-actions">

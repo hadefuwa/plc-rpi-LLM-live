@@ -2713,6 +2713,348 @@ def reset_ai_prompt():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+@app.route('/about')
+def about():
+    """About page explaining how the application works"""
+    theme_styles = get_theme_styles(get_current_theme())
+    
+    page = '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>About - E-Stop AI Status Reporter</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+        {{ nav_styles }}
+        {{ theme_styles }}
+        
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: var(--body-bg); 
+            color: var(--text-primary); 
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .about-section { 
+            background: var(--panel-bg); 
+            border: 1px solid var(--panel-border); 
+            border-radius: 12px; 
+            padding: 30px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .section-title { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: var(--text-primary); 
+            margin-bottom: 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+        }
+        .section-subtitle {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--btn-primary);
+            padding-left: 15px;
+        }
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .tech-card {
+            background: var(--body-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .tech-card h4 {
+            color: var(--btn-primary);
+            margin-top: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .tech-list {
+            list-style: none;
+            padding: 0;
+        }
+        .tech-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tech-list li:last-child {
+            border-bottom: none;
+        }
+        .tech-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .tech-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            max-width: 200px;
+        }
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .overview-item {
+            background: var(--nav-bg);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .overview-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .overview-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .overview-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .back-btn {
+            background: var(--btn-primary);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .back-btn:hover {
+            background: var(--btn-primary-hover);
+        }
+        code {
+            background: var(--input-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: var(--link-color);
+            font-size: 14px;
+        }
+        </style>
+    </head>
+    <body>
+        {{ nav_html }}
+        
+        <div class="container">
+            <div class="about-section">
+                <div class="section-title">
+                    <span>🤖</span>
+                    About E-Stop AI Status Reporter
+                </div>
+                <p style="font-size: 18px; color: var(--text-secondary); margin-bottom: 25px;">
+                    A comprehensive industrial automation monitoring system that combines real-time PLC communication with AI-powered analysis to provide intelligent operational insights and safety monitoring.
+                </p>
+                
+                <div class="overview-grid">
+                    <div class="overview-item">
+                        <div class="overview-icon">🏭</div>
+                        <div class="overview-title">PLC Integration</div>
+                        <div class="overview-desc">Real-time monitoring of Siemens S7-1200 PLCs with comprehensive I/O support</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-icon">🧠</div>
+                        <div class="overview-title">AI Analysis</div>
+                        <div class="overview-desc">Local Gemma3 1B model analyzes operational patterns and generates insights</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-icon">🌐</div>
+                        <div class="overview-title">Web Interface</div>
+                        <div class="overview-desc">Modern responsive dashboard with real-time updates and theming</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-icon">🛡️</div>
+                        <div class="overview-title">Safety Focus</div>
+                        <div class="overview-desc">Emergency stop detection with critical event prioritization</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-icon">📊</div>
+                        <div class="overview-title">Automated Reports</div>
+                        <div class="overview-desc">Scheduled AI reports with configurable intervals and analysis depth</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-icon">🔧</div>
+                        <div class="overview-title">Self-Contained</div>
+                        <div class="overview-desc">All configuration managed through web UI with JSON-based storage</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-section">
+                <div class="section-title">
+                    <span>⚙️</span>
+                    Core Architecture
+                </div>
+                
+                <div class="section-subtitle">🖥️ System Overview</div>
+                <p><strong>Core Stack:</strong> Runs on a Raspberry Pi 4, using a local Gemma3 1B model via Ollama to analyze a Siemens S7-1200 PLC.</p>
+                <p><strong>PLC Communication:</strong> Employs the python-snap7 library with multi-threading to continuously poll the PLC's I/O memory areas (DB, I, Q).</p>
+                <p><strong>AI Analysis:</strong> The AI processes time-stamped JSON event logs to generate reports on operational trends, anomalies, and safety event sequences.</p>
+                <p><strong>Web Interface:</strong> A Flask-based Progressive Web App (PWA) delivers a real-time dashboard updated via WebSockets or long-polling.</p>
+                <p><strong>Configuration:</strong> Self-contained system with all parameters (PLC connection, I/O mapping) managed dynamically through the web UI and stored in JSON files.</p>
+                
+                <div class="section-subtitle">🔧 Technical Implementation</div>
+                
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <h4>🐍 Backend Stack</h4>
+                        <ul class="tech-list">
+                            <li>
+                                <span class="tech-name">Flask</span>
+                                <span class="tech-desc">Web framework</span>
+                            </li>
+                            <li>
+                                <span class="tech-name">Python-snap7</span>
+                                <span class="tech-desc">PLC communication</span>
+                            </li>
+                            <li>
+                                <span class="tech-name">Threading</span>
+                                <span class="tech-desc">Multi-threaded polling</span>
+                            </li>
+                            <li>
+                                <span class="tech-name">Schedule</span>
+                                <span class="tech-desc">Task automation</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tech-card">
+                        <h4>🤖 AI Integration</h4>
+                        <ul class="tech-list">
+                            <li>
+                                <span class="tech-name">Ollama</span>
+                                <span class="tech-desc">Local AI server</span>
+                            </li>
+                            <li>
+                                <span class="tech-name">Gemma3 1B</span>
+                                <span class="tech-desc">Language model</span>
+                            </li>
+                            <li>
+                                <span class="tech-name">REST API</span>
+                                <span class="tech-desc">AI communication</span>
+                            </li>
+                            <li>
+                                <span class="tech-name">JSON Processing</span>
+                                <span class="tech-desc">Event analysis</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tech-card">
+                        <h4>🌐 Frontend</h4>
+                        <ul class="tech-list">
+                            <li>
+                                <span class="tech-name">HTML5/CSS3</span>
+                                <span class="tech-desc">Modern web standards</span>
+                            </li>
+                            <li>
+                                <span class="tech-name">JavaScript</span>
+                                <span class="tech-desc">Interactive features</span>
+                            </li>
+                            <li>
+                                <span class="tech-name">CSS Variables</span>
+                                <span class="tech-desc">Dynamic theming</span>
+                            </li>
+                            <li>
+                                <span class="tech-name">Responsive Design</span>
+                                <span class="tech-desc">Mobile-friendly</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tech-card">
+                        <h4>💾 Data Management</h4>
+                        <ul class="tech-list">
+                            <li>
+                                <span class="tech-name">JSON Storage</span>
+                                <span class="tech-desc">Configuration files</span>
+                            </li>
+                            <li>
+                                <span class="tech-name">Daily Rotation</span>
+                                <span class="tech-desc">Event log management</span>
+                            </li>
+                            <li>
+                                <span class="tech-name">Real-time Caching</span>
+                                <span class="tech-desc">Performance optimization</span>
+                            </li>
+                            <li>
+                                <span class="tech-name">Markdown Reports</span>
+                                <span class="tech-desc">AI-generated content</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="section-subtitle">🔄 Data Flow</div>
+                <ol style="margin-top: 15px;">
+                    <li><strong>PLC Polling:</strong> Multi-threaded background processes continuously read I/O data from configured PLC addresses</li>
+                    <li><strong>Change Detection:</strong> Event logger identifies state changes and timestamps all transitions with priority classification</li>
+                    <li><strong>Event Storage:</strong> JSON-based daily logs store all events with metadata for historical analysis</li>
+                    <li><strong>AI Processing:</strong> Scheduled tasks collect recent events and current I/O states for AI analysis</li>
+                    <li><strong>Report Generation:</strong> Local Ollama/Gemma3 processes data and generates operational insights in markdown format</li>
+                    <li><strong>Web Display:</strong> Flask serves real-time dashboard with live updates, reports, and configuration interfaces</li>
+                </ol>
+                
+                <div class="section-subtitle">🛡️ Safety & Reliability</div>
+                <ul style="margin-top: 15px;">
+                    <li><strong>Emergency Stop Priority:</strong> Critical events trigger immediate logging with high-priority classification</li>
+                    <li><strong>Connection Monitoring:</strong> Continuous PLC connectivity verification with automatic reconnection</li>
+                    <li><strong>Data Integrity:</strong> Robust error handling prevents data loss during communication failures</li>
+                    <li><strong>Local Processing:</strong> All AI analysis happens on-premises for industrial security requirements</li>
+                    <li><strong>Persistent Configuration:</strong> System state preserved across restarts with automatic recovery</li>
+                </ul>
+            </div>
+            
+            <div class="about-section">
+                <div class="section-title">
+                    <span>📋</span>
+                    Supported PLC Data Types
+                </div>
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <h4>Digital I/O</h4>
+                        <ul class="tech-list">
+                            <li><code>DBX</code> - Single bit values (0/1)</li>
+                            <li><code>DBB</code> - 8-bit byte values</li>
+                        </ul>
+                    </div>
+                    <div class="tech-card">
+                        <h4>Analog I/O</h4>
+                        <ul class="tech-list">
+                            <li><code>DBW</code> - 16-bit word values</li>
+                            <li><code>DBD</code> - 32-bit double word</li>
+                            <li><code>Real</code> - IEEE 754 float values</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <a href="/" class="back-btn">← Back to Dashboard</a>
+        </div>
+    </body>
+    </html>
+    '''
+    
+    return render_template_string(page, nav_html=NAV_TEMPLATE, nav_styles=NAV_STYLES, theme_styles=theme_styles)
+
 @app.route('/download_report/<day>/<name>')
 def download_report(day, name):
     base = os.path.join(os.path.dirname(__file__), 'data', 'reports')
