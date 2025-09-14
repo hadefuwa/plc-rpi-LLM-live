@@ -3053,7 +3053,12 @@ def about():
     </html>
     '''
     
-    return render_template_string(page, nav_html=NAV_TEMPLATE, nav_styles=NAV_STYLES, theme_styles=theme_styles)
+    # Replace template variables manually since we're using render_template_string
+    rendered_page = page.replace('{{ nav_html }}', NAV_TEMPLATE)
+    rendered_page = rendered_page.replace('{{ nav_styles }}', NAV_STYLES)
+    rendered_page = rendered_page.replace('{{ theme_styles }}', theme_styles)
+    
+    return rendered_page
 
 @app.route('/download_report/<day>/<name>')
 def download_report(day, name):
