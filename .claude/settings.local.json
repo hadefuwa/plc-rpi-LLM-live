@@ -13,7 +13,8 @@
     "deny": [],
     "ask": [],
     "additionalDirectories": [
-      "C:\\c\\Users\\Adefu\\OneDrive\\Documents"
+      "C:\\c\\Users\\Adefu\\OneDrive\\Documents",
+      "C:\\home\\pi"
     ]
   }
 }
